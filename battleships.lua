@@ -1,15 +1,15 @@
-function CreateBattleships()
+function GR:CreateBattleships()
 
 end
 
-function ShowBattleships()
+function GR:ShowBattleships()
 
 end
 
-function HideBattleships()
+function GR:HideBattleships()
 
 end
 
-function BattleshipsComm(...)
+function GR:BattleshipsComm(...)
     local prefix, text, distribution, target = ...
 end

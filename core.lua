@@ -54,22 +54,22 @@ function GR:OnInitialize()
     GR.IsPlayerTurn = nil
     GR.GameOver = false
     GR.IsChallenged = false
-
+    
     GR:CreateMainWindow()
     GR:CreateHeaderInfo()
     GR:CreateAcceptDecline()
     GR:CreateSettings()
     GR:CreateInvite()
     GR:CreateTicTacToe()
-    GR:CreateBattleships()
-
+    -- GR:CreateBattleships()
+    
     GR.db.realm.tab = 1
     GR:TabSelect()
 
     GR:RegisterComm("ZUI_GameRoom_Reg", function(...) GR:RegisterPlayers(...) end)
     GR:RegisterComm("ZUI_GameRoom_Inv", function(...) GR:AcceptDeclineChal(...) end)
     GR:RegisterComm("ZUI_GameRoom_TiG", function(...) GR:TicTacToeComm(...) end)
-    GR:RegisterComm("ZUI_GameRoom_TiG", function(...) GR:BattleshipsComm(...) end)
+    GR:RegisterComm("ZUI_GameRoom_BSG", function(...) GR:BattleshipsComm(...) end)
 end
 
 function GR:OpenClose(input)
