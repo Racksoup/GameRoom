@@ -319,6 +319,7 @@ function GR:CreateHeaderInfo()
             end
             if (GR.GameType == "Battleships") then
                 GR:SendCommMessage("ZUI_GameRoom_Inv", "Battleships_Accept, " .. GR.PlayerPos .. ", " .. UnitName("player"), "WHISPER", Opponent)
+                GR_GUI.Main.Battleships.Board:Show()
                 GR_GUI.Main.Battleships:Show()
                 GR:ShowGame()
             end
@@ -385,6 +386,7 @@ function GR:CreateAcceptDecline()
         end
         if (GR.GameType == "Battleships") then
             GR:SendCommMessage("ZUI_GameRoom_Inv", "Battleships_Accept, " .. GR.PlayerPos .. ", " .. PlayerName, "WHISPER", GR.Opponent)
+            GR_GUI.Main.Battleships.Board:Show()
             GR_GUI.Main.Battleships:Show()
             GR:ShowGame()
         end
@@ -469,6 +471,7 @@ function GR:CreateAcceptDecline()
         end
         if (GR.GameType == "Battleships") then
             GR:SendCommMessage("ZUI_GameRoom_Inv", "Battleships_Accept, " .. GR.PlayerPos .. ", " .. PlayerName, "WHISPER", GR.Opponent)
+            GR_GUI.Main.Battleships.Board:Show()
             GR_GUI.Main.Battleships:Show()
             GR:ShowGame()
         end

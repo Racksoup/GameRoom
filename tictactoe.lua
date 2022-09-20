@@ -192,25 +192,14 @@ function GR:ResizeTictactoe()
 end
 
 function GR:TicTacToeHideContent()
-    GR.InGame = false
     GR_GUI.Main.Tictactoe:Hide()
-    GR_GUI.Main.HeaderInfo:Hide()
-    GR_GUI.Main.Invite:Show()
-    GR_GUI.Main.HomeBtn:Show()
     GR.TicBoard = {0,0,0,0,0,0,0,0,0}
-    GR.PlayerPos = nil
-    GR.IsPlayerTurn = nil
-    GR.GameOver = false
-    GR.db.realm.tab = 1
-    GR.CanSendInvite = true
-    GR.IsChallenged = false
-    GR.Opponent = nil
     local Buttons = GR_GUI.Main.Tictactoe.Buttons
     for i,v in ipairs(Buttons) do 
         local BtnTex = v:GetRegions()
         BtnTex:Hide()
     end
-    GR_GUI.Main:SetSize(750, 510)
+    GR:HideGame()
 end
 
 function GR:TicTacToeComm(...) 

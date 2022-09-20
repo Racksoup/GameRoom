@@ -780,6 +780,7 @@ function GR:AcceptDeclineChal(...)
             GR.IsPlayerTurn = false
         end
         GR_GUI.Main.Battleships:Show()
+        GR_GUI.Main.Battleships.Board:Show()
         GR:ShowGame()
     end
 
