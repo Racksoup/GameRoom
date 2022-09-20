@@ -198,7 +198,6 @@ function GR:ResizeGame()
         end 
     end
     
-    print(Game:GetNumChildren(), #children)
     -- resize buttons
     for i,v in ipairs(children) do
         -- point

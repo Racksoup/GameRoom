@@ -8,8 +8,7 @@ local GR_LDB = LibStub("LibDataBroker-1.1"):NewDataObject("GR", {
     icon = "interface/icons/inv_misc_ticket_tarot_maelstrom_01.blp",
     OnClick = function()
         if (GR_GUI.Main:IsVisible()) then 
-            GR_GUI.Main:Hide() 
-            GR.GameType = nil
+            GR:HideMain()
         else 
             GR_GUI.Main:ClearAllPoints()
             GR_GUI.Main:SetPoint("TOP", UIParent, "TOP", 0, -130)
@@ -61,14 +60,13 @@ function GR:OnInitialize()
     GR:TabSelect()
 
     GR:RegisterComm("ZUI_GameRoom_TiG", function(...) GR:TicTacToeComm(...) end)
-    GR:RegisterComm("ZUI_GameRoom_Inv", function(...) GR:RegisterPlayers(...) end)
-    GR:RegisterComm("ZUI_GameRoom_Tic", function(...) GR:AcceptDeclineChal(...) end)
+    GR:RegisterComm("ZUI_GameRoom_Reg", function(...) GR:RegisterPlayers(...) end)
+    GR:RegisterComm("ZUI_GameRoom_Inv", function(...) GR:AcceptDeclineChal(...) end)
 end
 
 function GR:OpenClose(input)
     if (GR_GUI.Main:IsVisible()) then 
-        GR_GUI.Main:Hide() 
-        GR.GameType = nil
+        GR:HideMain()
     else
         GR_GUI.Main:ClearAllPoints()
         GR_GUI.Main:SetPoint("TOP", UIParent, "TOP", 0, -130)
@@ -88,6 +86,19 @@ function ScrollFrame_OnMouseWheel(self, delta)
     end
    
     self:SetVerticalScroll(newValue);
+end
+
+function GR:HideMain()
+    if (GR.GameType == "Tictactoe" and GR.InGame) then
+        GR:SendCommMessage("ZUI_GameRoom_Inv", "TicTacToe_GameEnd", "WHISPER", GR.Opponent)
+        GR:TicTacToeHideContent()
+    end
+    if (GR.GameType == "Battleships" and GR.InGame) then
+        GR:SendCommMessage("ZUI_GameRoom_Inv", "Battleships_GameEnd", "WHISPER", GR.Opponent)
+        GR:BattleshipsHideContent()
+    end
+    GR_GUI.Main:Hide() 
+    GR.GameType = nil
 end
 
 function GR:CreateMainWindow()
@@ -168,7 +179,7 @@ function GR:CreateMainWindow()
 
     GR_GUI.Main.xButton:SetScript("OnClick", function(self, button, down) 
         if(button == "LeftButton" and down == true) then GR_GUI.Main.xButton.tex:SetTexture("Interface\\AddOns\\ZUI_GameRoom\\images\\XButtonDown.blp") end
-        if(button == "LeftButton" and down == false) then GR_GUI.Main:Hide() GR.GameType = nil end
+        if(button == "LeftButton" and down == false) then GR:HideMain() end
     end)
     GR_GUI.Main.xButton:SetScript("OnEnter", function(self, motion)
         GR_GUI.Main.xButton.tint:SetColorTexture(0,0,0,.3);
@@ -222,9 +233,15 @@ function GR:CreateHeaderInfo()
     ExitBtnString:SetText("Exit Game")
     ExitBtn:SetScript("OnClick", function(self, button, down)
         if (button == "LeftButton" and down == false) then 
-            GR:SendCommMessage("ZUI_GameRoom_Tic", "TicTacToe_GameEnd", "WHISPER", GR.Opponent)
+            if (GR.GameType == "Tictactoe") then
+                GR:SendCommMessage("ZUI_GameRoom_Inv", "TicTacToe_GameEnd", "WHISPER", GR.Opponent)
+                GR:TicTacToeHideContent()
+            end
+            if (GR.GameType == "Battleships") then
+                GR:SendCommMessage("ZUI_GameRoom_Inv", "Battleships_GameEnd", "WHISPER", GR.Opponent)
+                GR:BattleshipsHideContent()
+            end
             GR.GameType = nil
-            GR:TicTacToeHideContent()
         end
     end)
     ExitBtn:Hide()
@@ -248,7 +265,12 @@ function GR:CreateHeaderInfo()
     ReInvite:SetScript("OnClick", function(self, button, down)
         if (button == "LeftButton" and down == false) then
             local UserName = UnitName("player")
-            GR:SendCommMessage("ZUI_GameRoom_Tic", "TicTacToe_Challenge, " .. UserName, "WHISPER", GR.Opponent)
+            if (GR.GameType == "Tictactoe") then
+                GR:SendCommMessage("ZUI_GameRoom_Inv", "TicTacToe_Challenge, " .. UserName, "WHISPER", GR.Opponent)
+            end
+            if (GR.GameType == "Battleships") then
+                GR:SendCommMessage("ZUI_GameRoom_Inv", "Battleships_Challenge, " .. UserName, "WHISPER", GR.Opponent)
+            end
             GR.CanSendInvite = false
             ReInvite:Hide()
             C_Timer.After(4, function() 
@@ -272,14 +294,20 @@ function GR:CreateHeaderInfo()
             local Opponent = GR.Opponent
             GR:TicTacToeHideContent()
             GR.PlayerPos = random(1,2)
-            GR:SendCommMessage("ZUI_GameRoom_Tic", "TicTacToe_Accept, " .. GR.PlayerPos .. ", " .. UnitName("player"), "WHISPER", Opponent)
             if (GR.PlayerPos == 2) then
                 GR.IsPlayerTurn = false
             else
                 GR.IsPlayerTurn = true
             end
+            if (GR.GameType == "Tictactoe") then
+                GR:SendCommMessage("ZUI_GameRoom_Inv", "TicTacToe_Accept, " .. GR.PlayerPos .. ", " .. UnitName("player"), "WHISPER", Opponent)
+                GR:TicTacToeShowContent()
+            end
+            if (GR.GameType == "Battleships") then
+                GR:SendCommMessage("ZUI_GameRoom_Inv", "Battleships_Accept, " .. GR.PlayerPos .. ", " .. UnitName("player"), "WHISPER", Opponent)
+                GR:BattleshipsShowContent()
+            end
             GR.Opponent = Opponent
-            GR:TicTacToeShowContent()
         end
     end)
     ReMatch:Hide()
@@ -310,6 +338,7 @@ end
 
 function GR:CreateAcceptDecline()
     -- Accept Button when GameRoom is closed
+    local PlayerName = UnitName("player")
     GR_GUI.Accept = CreateFrame("Button", Accept, UIParent, "UIPanelButtonTemplate")
     local Accept = GR_GUI.Accept
     Accept:SetPoint(GR.db.realm.Point, GR.db.realm.Xpos, GR.db.realm.Ypos)
@@ -335,13 +364,12 @@ function GR:CreateAcceptDecline()
             GR.IsPlayerTurn = true
         end
         if (GR.GameType == "Tictactoe") then
-            print("here")
-            GR:SendCommMessage("ZUI_GameRoom_Tic", "TicTacToe_Accept, " .. GR.PlayerPos .. ", " .. UnitName("player"), "WHISPER", GR.Opponent)
+            GR:SendCommMessage("ZUI_GameRoom_Inv", "TicTacToe_Accept, " .. GR.PlayerPos .. ", " .. PlayerName, "WHISPER", GR.Opponent)
             GR:TicTacToeShowContent()
         end
         if (GR.GameType == "Battleships") then
-            GR:SendCommMessage("ZUI_GameRoom_Tic", "Battleships_Accept, " .. GR.PlayerPos .. ", " .. UnitName("player"), "WHISPER", GR.Opponent)
-            GR:TicTacToeShowContent()
+            GR:SendCommMessage("ZUI_GameRoom_Inv", "Battleships_Accept, " .. GR.PlayerPos .. ", " .. PlayerName, "WHISPER", GR.Opponent)
+            GR:BattleshipsShowContent()
         end
     end)
 
@@ -360,8 +388,13 @@ function GR:CreateAcceptDecline()
             GR.Opponent = nil
             GR_GUI.Main.Accept:Hide()
             GR_GUI.Accept:Hide()
-            GR:SendCommMessage("ZUI_GameRoom_Tic", "TicTacToe_Decline, ", "WHISPER", GR.Opponent)
-        end
+            if (GR.GameType == "Tictactoe") then
+                GR:SendCommMessage("ZUI_GameRoom_Inv", "TicTacToe_Decline, ", "WHISPER", GR.Opponent)
+            end 
+            if (GR.GameType == "Battleships") then
+                GR:SendCommMessage("ZUI_GameRoom_Inv", "Battleships_Decline, ", "WHISPER", GR.Opponent)
+            end 
+        end 
     end)
 
     -- Mover for Accept Button when GameRoom is closed
@@ -412,8 +445,14 @@ function GR:CreateAcceptDecline()
         else
             GR.IsPlayerTurn = true
         end
-        GR:SendCommMessage("ZUI_GameRoom_Tic", "TicTacToe_Accept, " .. GR.PlayerPos .. ", " .. UnitName("player"), "WHISPER", GR.Opponent)
-        GR:TicTacToeShowContent()
+        if (GR.GameType == "Tictactoe") then
+            GR:SendCommMessage("ZUI_GameRoom_Inv", "TicTacToe_Accept, " .. GR.PlayerPos .. ", " .. PlayerName, "WHISPER", GR.Opponent)
+            GR:TicTacToeShowContent()
+        end
+        if (GR.GameType == "Battleships") then
+            GR:SendCommMessage("ZUI_GameRoom_Inv", "Battleships_Accept, " .. GR.PlayerPos .. ", " .. PlayerName, "WHISPER", GR.Opponent)
+            GR:BattleshipsShowContent()
+        end
     end)
 
     GR_GUI.Main.DeclineBtn = CreateFrame("Button", DeclineBtn2, GR_GUI.Main, "UIPanelButtonTemplate")
@@ -432,7 +471,12 @@ function GR:CreateAcceptDecline()
             GR_GUI.Main.Accept:Hide()
             GR_GUI.Main.DeclineBtn:Hide()
             GR_GUI.Accept:Hide()
-            GR:SendCommMessage("ZUI_GameRoom_Tic", "TicTacToe_Decline, ", "WHISPER", GR.Opponent)
+            if (GR.GameType == "Tictactoe") then
+                GR:SendCommMessage("ZUI_GameRoom_Inv", "TicTacToe_Decline, ", "WHISPER", GR.Opponent)
+            end
+            if (GR.GameType == "Battleships") then
+                GR:SendCommMessage("ZUI_GameRoom_Inv", "Battleships_Decline, ", "WHISPER", GR.Opponent)
+            end
         end
     end)
     

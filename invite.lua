@@ -55,7 +55,7 @@ function GR:CreateInvite()
                 local PlayerName = UnitName("player")
                 C_Timer.After(1, function() 
                     if (type(PartyMember) == "string" and UnitIsConnected(PlayerIndex)) then
-                        GR:SendCommMessage("ZUI_GameRoom_Inv", "Register Party, " .. PlayerName, "WHISPER", PartyMember)
+                        GR:SendCommMessage("ZUI_GameRoom_Reg", "Register Party, " .. PlayerName, "WHISPER", PartyMember)
                     end
                 end)
             end
@@ -76,7 +76,7 @@ function GR:CreateInvite()
                     for j,v in pairs(WhoPlayer) do
                         if (string.match(j, "fullName") and not string.match(v, UnitName("player"))) then
                             local PlayerName  = UnitName("player")
-                            GR:SendCommMessage("ZUI_GameRoom_Inv", "Register Zone, " .. PlayerName, "WHISPER", v)
+                            GR:SendCommMessage("ZUI_GameRoom_Reg", "Register Zone, " .. PlayerName, "WHISPER", v)
                         end
                     end
                 end
@@ -84,7 +84,7 @@ function GR:CreateInvite()
         end
 
         if (event == "GUILD_ROSTER_UPDATE") then
-            GR:SendCommMessage("ZUI_GameRoom_Inv", "Register Party, " .. UnitName("player"), "GUILD")
+            GR:SendCommMessage("ZUI_GameRoom_Reg", "Register Party, " .. UnitName("player"), "GUILD")
         end
     end)
 
@@ -172,7 +172,7 @@ function GR:CreateGameButtons()
     Btns.Tic:SetScript("OnClick", function(self, button, down)
         if (button == "LeftButton" and down == false) then
             local UserName = UnitName("player")
-            GR:SendCommMessage("ZUI_GameRoom_Tic", "TicTacToe_Challenge, " .. UserName, "WHISPER", GR.Target)
+            GR:SendCommMessage("ZUI_GameRoom_Inv", "TicTacToe_Challenge, " .. UserName, "WHISPER", GR.Target)
             GR.CanSendInvite = false
             GR:HideGameBtnsIfSentInvite()
             C_Timer.After(4, function() 
@@ -193,7 +193,7 @@ function GR:CreateGameButtons()
     Btns.Battleships:SetScript("OnClick", function(self, button, down)
         if (button == "LeftButton" and down == false) then
             local UserName = UnitName("player")
-            GR:SendCommMessage("ZUI_GameRoom_BS", "Battleships_Challenge, " .. UserName, "WHISPER", GR.Target)
+            GR:SendCommMessage("ZUI_GameRoom_Inv", "Battleships_Challenge, " .. UserName, "WHISPER", GR.Target)
             GR.CanSendInvite = false
             GR:HideGameBtnsIfSentInvite()
             C_Timer.After(4, function() 
@@ -257,7 +257,7 @@ function GR:RegisterFriends()
                 end
             end
             if (IsInFriends == false) then
-                GR:SendCommMessage("ZUI_GameRoom_Inv", "Register Friend, " .. PlayerName, "WHISPER", OGFriend.name)
+                GR:SendCommMessage("ZUI_GameRoom_Reg", "Register Friend, " .. PlayerName, "WHISPER", OGFriend.name)
             end
         end
     end
@@ -275,14 +275,14 @@ function GR:RegisterFriends()
                     end
                 end
                 if (Client == "WoW" and type(Character) == "string" and IsInFriends == false) then
-                    GR:SendCommMessage("ZUI_GameRoom_Inv", "Register Friend, " .. PlayerName, "WHISPER", Character)
+                    GR:SendCommMessage("ZUI_GameRoom_Reg", "Register Friend, " .. PlayerName, "WHISPER", Character)
                 end
             end
         end
     end 
     -- add rivals
     for i,v in ipairs(GR.db.realm.Rivals) do
-        GR:SendCommMessage("ZUI_GameRoom_Inv", "Register Friend, " .. PlayerName, "WHISPER", v)
+        GR:SendCommMessage("ZUI_GameRoom_Reg", "Register Friend, " .. PlayerName, "WHISPER", v)
     end
 end
 
@@ -320,11 +320,11 @@ function GR:CreateInviteParty()
         local PartyMember = UnitName(PlayerIndex)
         local PlayerName = UnitName("player")
         if (type(PartyMember) == "string"  and UnitIsConnected(PlayerIndex)) then
-            GR:SendCommMessage("ZUI_GameRoom_Inv", "Register Party, " .. PlayerName, "PARTY")
+            GR:SendCommMessage("ZUI_GameRoom_Reg", "Register Party, " .. PlayerName, "PARTY")
         end
     end
     if (IsInGuild()) then
-        GR:SendCommMessage("ZUI_GameRoom_Inv", "Register Guild, " .. UnitName("player"), "GUILD")
+        GR:SendCommMessage("ZUI_GameRoom_Reg", "Register Guild, " .. UnitName("player"), "GUILD")
     end
 end
 
@@ -372,7 +372,7 @@ function GR:CreateInviteZone()
                     local WhoPlayer = C_FriendList.GetWhoInfo(i)
                     for j,v in pairs(WhoPlayer) do
                         if (string.match(j, "fullName") and not string.match(v, UnitName("player"))) then
-                            GR:SendCommMessage("ZUI_GameRoom_Inv", "Register Zone, " .. UnitName("player"), "WHISPER", v)
+                            GR:SendCommMessage("ZUI_GameRoom_Reg", "Register Zone, " .. UnitName("player"), "WHISPER", v)
                         end
                     end
                 end
@@ -381,7 +381,7 @@ function GR:CreateInviteZone()
     end) 
 
     local function RegisterYell()
-        GR:SendCommMessage("ZUI_GameRoom_Inv", "Register Zone, " .. UnitName("player"), "YELL")
+        GR:SendCommMessage("ZUI_GameRoom_Reg", "Register Zone, " .. UnitName("player"), "YELL")
         C_Timer.After(5, function() 
             RegisterYell()
         end)
@@ -515,7 +515,7 @@ function GR:RegisterPlayers(...)
         GR:AddToFriendsList(Value1)
         GR:RemoveFromFriendsList()
         GR:RefreshFriendsList()
-        GR:SendCommMessage("ZUI_GameRoom_Inv", "Friend Registered, " .. PlayerName, "WHISPER", Value1)
+        GR:SendCommMessage("ZUI_GameRoom_Reg", "Friend Registered, " .. PlayerName, "WHISPER", Value1)
     end
     -- Friend Registered
     local Action2 = string.sub(text, 0, 17)
@@ -545,7 +545,7 @@ function GR:RegisterPlayers(...)
             table.insert(GR.Zone, Value3)
         end
         GR:RefreshZoneList()
-        GR:SendCommMessage("ZUI_GameRoom_Inv", "Zone Registered, " .. PlayerName, "WHISPER", Value3)
+        GR:SendCommMessage("ZUI_GameRoom_Reg", "Zone Registered, " .. PlayerName, "WHISPER", Value3)
     end
     -- Zone Registered
     local Action4 = string.sub(text, 0, 15)
@@ -587,11 +587,11 @@ function GR:RegisterPlayers(...)
             -- set party and guild arrays for whilelist option
             if (string.match(Action5, "Register Party")) then
                 table.insert(GR.OnlyParty, Value5)
-                GR:SendCommMessage("ZUI_GameRoom_Inv", "Party Registered, " .. PlayerName, "WHISPER", Value5)
+                GR:SendCommMessage("ZUI_GameRoom_Reg", "Party Registered, " .. PlayerName, "WHISPER", Value5)
             end
             if (string.match(Action5, "Register Guild")) then
                 table.insert(GR.OnlyGuild, Value5)
-                GR:SendCommMessage("ZUI_GameRoom_Inv", "Guild Registered, " .. PlayerName, "WHISPER", Value5)
+                GR:SendCommMessage("ZUI_GameRoom_Reg", "Guild Registered, " .. PlayerName, "WHISPER", Value5)
             end
         end
         GR:RefreshPartyList()
@@ -642,10 +642,9 @@ function GR:AcceptDeclineChal(...)
     local BSChallenge = string.sub(text, 0, 21)
     local TicOpponent = string.sub(text, 22, 50)
     local BSOpponent = string.sub(text, 24, 50)
-    if ((string.match(TicChallenge, "Battleships_Challenge") or string.match(TicChallenge, "TicTacToe_Challenge")) and GR.IsChallenged == false and GR.db.realm.disableChallenges == false) then
-        print("Challenged")
+    if ((string.match(BSChallenge, "Battleships_Challenge") or string.match(TicChallenge, "TicTacToe_Challenge")) and GR.IsChallenged == false and GR.db.realm.disableChallenges == false) then
         local AcceptGameString = ""
-        if (string.match(TicChallenge, "Battleships_Challenge")) then
+        if (string.match(BSChallenge, "Battleships_Challenge")) then
             GR.GameType = "Battleships"
             AcceptGameString = "Battleships"
         end
@@ -696,7 +695,7 @@ function GR:AcceptDeclineChal(...)
         if (AcceptChallenger) then
             GR_GUI.Main.Accept.Fs2:SetText(TicOpponent .. " - " .. AcceptGameString)
             GR_GUI.Accept.Fs2:SetText(TicOpponent .. " - " .. AcceptGameString)
-            if (string.match(TicChallenge, "Battleships_Challenge")) then
+            if (string.match(BSChallenge, "Battleships_Challenge")) then
                 GR.Opponent = BSOpponent
             end
             if (string.match(TicChallenge, "TicTacToe_Challenge")) then
