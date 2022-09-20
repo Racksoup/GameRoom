@@ -763,6 +763,22 @@ function GR:AcceptDeclineChal(...)
         end
         GR:TicTacToeShowContent()  
     end
+    local BSAccept = string.sub(text, 0, 18)
+    local BSPlayerTurn = string.sub(text, 21, 21)
+    local BSOpponent = string.sub(text, 24, 50)
+    if (string.match(BSAccept, "Battleships_Accept")) then
+        GR.GameType = "Battleships"
+        GR:BattleshipsHideContent()  
+        GR.Opponent = BSOpponent
+        if (string.match(BSPlayerTurn, "2")) then
+            GR.PlayerPos = 1
+            GR.IsPlayerTurn = true
+        else
+            GR.PlayerPos = 2
+            GR.IsPlayerTurn = false
+        end
+        GR:BattleshipsShowContent()  
+    end
 
     -- ends game if opponent ends game
     local TicEndGame = string.sub(text, 0, 17)
@@ -770,10 +786,21 @@ function GR:AcceptDeclineChal(...)
         GR.GameType = nil
         GR:TicTacToeHideContent()
     end
+    local BSEndGame = string.sub(text, 0, 19)
+    if (string.match(BSEndGame, "Battleships_GameEnd")) then
+        GR.GameType = nil
+        GR:BattleshipsHideContent()
+    end
     
     -- game declined
     local TicDecline = string.sub(text, 0, 17)
     if (string.match(TicDecline, "TicTacToe_Decline")) then
+        GR.CanSendInvite = true
+        GR:HideGameBtnsIfSentInvite()
+        GR.Opponent = nil
+    end
+    local BSDecline = string.sub(text, 0, 19)
+    if (string.match(BSDecline, "Battleships_Decline")) then
         GR.CanSendInvite = true
         GR:HideGameBtnsIfSentInvite()
         GR.Opponent = nil

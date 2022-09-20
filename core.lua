@@ -49,19 +49,27 @@ function GR:OnInitialize()
     icon:Register("ZUI_GameRoom", GR_LDB, self.db.realm.minimap)
     GR:RegisterChatCommand("gr", "OpenClose")
 
+    -- Game Varibales
+    GR.PlayerPos = nil
+    GR.IsPlayerTurn = nil
+    GR.GameOver = false
+    GR.IsChallenged = false
+
     GR:CreateMainWindow()
     GR:CreateHeaderInfo()
     GR:CreateAcceptDecline()
     GR:CreateSettings()
     GR:CreateInvite()
     GR:CreateTicTacToe()
+    GR:CreateBattleships()
 
     GR.db.realm.tab = 1
     GR:TabSelect()
 
-    GR:RegisterComm("ZUI_GameRoom_TiG", function(...) GR:TicTacToeComm(...) end)
     GR:RegisterComm("ZUI_GameRoom_Reg", function(...) GR:RegisterPlayers(...) end)
     GR:RegisterComm("ZUI_GameRoom_Inv", function(...) GR:AcceptDeclineChal(...) end)
+    GR:RegisterComm("ZUI_GameRoom_TiG", function(...) GR:TicTacToeComm(...) end)
+    GR:RegisterComm("ZUI_GameRoom_TiG", function(...) GR:BattleshipsComm(...) end)
 end
 
 function GR:OpenClose(input)

@@ -1,9 +1,5 @@
 function GR:CreateTicTacToe() 
     GR.TicBoard = {0,0,0,0,0,0,0,0,0}
-    GR.PlayerPos = nil
-    GR.IsPlayerTurn = nil
-    GR.GameOver = false
-    GR.IsChallenged = false
     
     GR_GUI.Main.Tictactoe = CreateFrame("Frame", Game, GR_GUI.Main, "ThinBorderTemplate")
     local Game = GR_GUI.Main.Tictactoe
