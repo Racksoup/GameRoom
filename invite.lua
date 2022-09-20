@@ -751,6 +751,7 @@ function GR:AcceptDeclineChal(...)
     local TicPlayerTurn = string.sub(text, 19, 19)
     local TicOpponent = string.sub(text, 22, 50)
     if (string.match(TicAccept, "TicTacToe_Accept")) then
+        print("Accept")
         GR.GameType = "Tictactoe"
         GR:TicTacToeHideContent()  
         GR.Opponent = TicOpponent
@@ -761,7 +762,8 @@ function GR:AcceptDeclineChal(...)
             GR.PlayerPos = 2
             GR.IsPlayerTurn = false
         end
-        GR:TicTacToeShowContent()  
+        GR_GUI.Main.Tictactoe:Show()
+        GR:ShowGame() 
     end
     local BSAccept = string.sub(text, 0, 18)
     local BSPlayerTurn = string.sub(text, 21, 21)
@@ -777,7 +779,8 @@ function GR:AcceptDeclineChal(...)
             GR.PlayerPos = 2
             GR.IsPlayerTurn = false
         end
-        GR:BattleshipsShowContent()  
+        GR_GUI.Main.Battleships:Show()
+        GR:ShowGame()
     end
 
     -- ends game if opponent ends game

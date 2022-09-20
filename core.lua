@@ -61,7 +61,7 @@ function GR:OnInitialize()
     GR:CreateSettings()
     GR:CreateInvite()
     GR:CreateTicTacToe()
-    -- GR:CreateBattleships()
+    GR:CreateBattleships()
     
     GR.db.realm.tab = 1
     GR:TabSelect()
@@ -146,7 +146,12 @@ function GR:CreateMainWindow()
     ResizeBtn:SetScript("OnMouseUp", function()
         GR_GUI.Main:StopMovingOrSizing("BOTTOMRIGHT")
         if (GR_GUI.Main.Tictactoe:IsVisible()) then
-            GR:ResizeGame()
+            if (GR.GameType == "Tictactoe") then
+                GR:ResizeTictactoe()
+            end
+            if (GR.GameType == "Battleships") then
+                GR:ResizeBattleships()
+            end
         end
     end)
 
@@ -309,11 +314,13 @@ function GR:CreateHeaderInfo()
             end
             if (GR.GameType == "Tictactoe") then
                 GR:SendCommMessage("ZUI_GameRoom_Inv", "TicTacToe_Accept, " .. GR.PlayerPos .. ", " .. UnitName("player"), "WHISPER", Opponent)
-                GR:TicTacToeShowContent()
+                GR_GUI.Main.Tictactoe:Show()
+                GR:ShowGame()
             end
             if (GR.GameType == "Battleships") then
                 GR:SendCommMessage("ZUI_GameRoom_Inv", "Battleships_Accept, " .. GR.PlayerPos .. ", " .. UnitName("player"), "WHISPER", Opponent)
-                GR:BattleshipsShowContent()
+                GR_GUI.Main.Battleships:Show()
+                GR:ShowGame()
             end
             GR.Opponent = Opponent
         end
@@ -373,11 +380,13 @@ function GR:CreateAcceptDecline()
         end
         if (GR.GameType == "Tictactoe") then
             GR:SendCommMessage("ZUI_GameRoom_Inv", "TicTacToe_Accept, " .. GR.PlayerPos .. ", " .. PlayerName, "WHISPER", GR.Opponent)
-            GR:TicTacToeShowContent()
+            GR_GUI.Main.Tictactoe:Show()
+            GR:ShowGame()
         end
         if (GR.GameType == "Battleships") then
             GR:SendCommMessage("ZUI_GameRoom_Inv", "Battleships_Accept, " .. GR.PlayerPos .. ", " .. PlayerName, "WHISPER", GR.Opponent)
-            GR:BattleshipsShowContent()
+            GR_GUI.Main.Battleships:Show()
+            GR:ShowGame()
         end
     end)
 
@@ -455,11 +464,13 @@ function GR:CreateAcceptDecline()
         end
         if (GR.GameType == "Tictactoe") then
             GR:SendCommMessage("ZUI_GameRoom_Inv", "TicTacToe_Accept, " .. GR.PlayerPos .. ", " .. PlayerName, "WHISPER", GR.Opponent)
-            GR:TicTacToeShowContent()
+            GR_GUI.Main.Tictactoe:Show()
+            GR:ShowGame()
         end
         if (GR.GameType == "Battleships") then
             GR:SendCommMessage("ZUI_GameRoom_Inv", "Battleships_Accept, " .. GR.PlayerPos .. ", " .. PlayerName, "WHISPER", GR.Opponent)
-            GR:BattleshipsShowContent()
+            GR_GUI.Main.Battleships:Show()
+            GR:ShowGame()
         end
     end)
 
@@ -517,6 +528,55 @@ function GR:TabSelect()
         GR_GUI.Main.SettingsScroll:Show() 
         GR_GUI.Main.Settings:Show() 
     end 
+end
+
+function GR:SetTurnString()
+    local TurnString = GR_GUI.Main.HeaderInfo.TurnString
+    if (GR.GameOver == false) then
+        if (GR.IsPlayerTurn) then
+            TurnString:SetTextColor(0,1,0,1)
+            TurnString:SetText(UnitName("player"))
+            TurnString:SetPoint("TOP", 0, -35)
+        else
+            TurnString:SetTextColor(1,0,0,1)
+            TurnString:SetText(GR.Opponent)
+            TurnString:SetPoint("TOP", 0, -35)
+        end
+    end
+end
+
+function GR:ShowGame()
+    GR.InGame = true
+    GR_GUI.Main.HeaderInfo:Show()
+    GR_GUI.Main.HeaderInfo.OpponentString:Show()
+    GR_GUI.Main.HeaderInfo.TurnString:Show()
+    GR_GUI.Main.HeaderInfo.ExitBtn:Show()
+    GR_GUI.Accept:Hide()
+    GR_GUI.Main.SettingsScroll:Hide()
+    GR_GUI.Main.Settings:Hide()
+    GR_GUI.Main.HeaderInfo.ReInvite:Hide()
+    GR_GUI.Main.HeaderInfo.ReMatch:Hide()
+    GR_GUI.Main.HeaderInfo.Rival:Hide()
+    GR_GUI.Main.HomeBtn:Hide()
+    GR_GUI.Main.Invite:Hide()
+    GR_GUI.Main.HeaderInfo.OpponentString:SetText("Opponent: " .. GR.Opponent)
+    GR:SetTurnString()
+    GR_GUI.Main:SetSize(750, 620)
+end
+
+function GR:HideGame()
+    GR.PlayerPos = nil
+    GR.IsPlayerTurn = nil
+    GR.InGame = false
+    GR.GameOver = false
+    GR.db.realm.tab = 1
+    GR.CanSendInvite = true
+    GR.IsChallenged = false
+    GR.Opponent = nil
+    GR_GUI.Main.HeaderInfo:Hide()
+    GR_GUI.Main.Invite:Show()
+    GR_GUI.Main.HomeBtn:Show()
+    GR_GUI.Main:SetSize(750, 510)
 end
 
 -- 2048 game before release

@@ -94,7 +94,7 @@ function GR:CreateTicTacToeButtons()
                 BtnTex:Show()
                 GR.IsPlayerTurn = false
                 GR:TicCheckForWin()
-                GR:SetTicTurnString()
+                GR:SetTurnString()
             end
         end)
         table.insert(Buttons, Btn)
@@ -138,22 +138,7 @@ function GR:TicCheckForWin()
     end
 end
 
-function GR:SetTicTurnString()
-    local TurnString = GR_GUI.Main.HeaderInfo.TurnString
-    if (GR.GameOver == false) then
-        if (GR.IsPlayerTurn) then
-            TurnString:SetTextColor(0,1,0,1)
-            TurnString:SetText(UnitName("player"))
-            TurnString:SetPoint("TOP", 0, -35)
-        else
-            TurnString:SetTextColor(1,0,0,1)
-            TurnString:SetText(GR.Opponent)
-            TurnString:SetPoint("TOP", 0, -35)
-        end
-    end
-end
-
-function GR:ResizeGame()
+function GR:ResizeTictactoe()
     local Game = GR_GUI.Main.Tictactoe
     local children = { Game:GetChildren() }
     local regions = { Game:GetRegions() }
@@ -204,26 +189,6 @@ function GR:ResizeGame()
         local ySize = 140 * (Game:GetHeight() / 450)
         v:SetSize(xSize, ySize)
     end
-end
-
-function GR:TicTacToeShowContent()
-    GR.InGame = true
-    GR_GUI.Main.Tictactoe:Show()
-    GR_GUI.Main.HeaderInfo:Show()
-    GR_GUI.Main.HeaderInfo.OpponentString:Show()
-    GR_GUI.Main.HeaderInfo.TurnString:Show()
-    GR_GUI.Main.HeaderInfo.ExitBtn:Show()
-    GR_GUI.Accept:Hide()
-    GR_GUI.Main.SettingsScroll:Hide()
-    GR_GUI.Main.Settings:Hide()
-    GR_GUI.Main.HeaderInfo.ReInvite:Hide()
-    GR_GUI.Main.HeaderInfo.ReMatch:Hide()
-    GR_GUI.Main.HeaderInfo.Rival:Hide()
-    GR_GUI.Main.HomeBtn:Hide()
-    GR_GUI.Main.Invite:Hide()
-    GR_GUI.Main.HeaderInfo.OpponentString:SetText("Opponent: " .. GR.Opponent)
-    GR:SetTicTurnString()
-    GR_GUI.Main:SetSize(750, 620)
 end
 
 function GR:TicTacToeHideContent()
@@ -277,7 +242,7 @@ function GR:TicTacToeComm(...)
             end
             GR.IsPlayerTurn = true
             GR:TicCheckForWin()
-            GR:SetTicTurnString()
+            GR:SetTurnString()
         end
     end
 end
