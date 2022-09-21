@@ -1,4 +1,4 @@
-GR = LibStub("AceAddon-3.0"):NewAddon("ZUI_GameRoom", "AceConsole-3.0", "AceComm-3.0" )
+GR = LibStub("AceAddon-3.0"):NewAddon("ZUI_GameRoom", "AceConsole-3.0", "AceComm-3.0", "AceSerializer-3.0" )
 L = LibStub("AceLocale-3.0"):GetLocale("ZUI_GameRoomLocale")
 GR_GUI = {}
 local icon = LibStub("LibDBIcon-1.0")
@@ -54,6 +54,7 @@ function GR:OnInitialize()
     GR.IsPlayerTurn = nil
     GR.GameOver = false
     GR.IsChallenged = false
+    GR.PlayerName = UnitName("player")
     
     GR:CreateMainWindow()
     GR:CreateHeaderInfo()
@@ -313,11 +314,13 @@ function GR:CreateHeaderInfo()
                 GR.IsPlayerTurn = true
             end
             if (GR.GameType == "Tictactoe") then
+                GR_GUI.Main:SetSize(750, 620)
                 GR:SendCommMessage("ZUI_GameRoom_Inv", "TicTacToe_Accept, " .. GR.PlayerPos .. ", " .. UnitName("player"), "WHISPER", Opponent)
                 GR_GUI.Main.Tictactoe:Show()
                 GR:ShowGame()
             end
             if (GR.GameType == "Battleships") then
+                GR:BattleshipsShowContent()
                 GR:SendCommMessage("ZUI_GameRoom_Inv", "Battleships_Accept, " .. GR.PlayerPos .. ", " .. UnitName("player"), "WHISPER", Opponent)
                 GR_GUI.Main.Battleships.Board:Show()
                 GR_GUI.Main.Battleships:Show()
@@ -564,7 +567,11 @@ function GR:ShowGame()
     GR_GUI.Main.Invite:Hide()
     GR_GUI.Main.HeaderInfo.OpponentString:SetText("Opponent: " .. GR.Opponent)
     GR:SetTurnString()
-    GR_GUI.Main:SetSize(750, 620)
+    if GR.GameType == "Tictactoe" then
+        GR_GUI.Main:SetSize(750, 620)
+    elseif GR.GameType == "Battleships" then
+        GR:BattleshipsShowContent()
+    end
 end
 
 function GR:HideGame()
@@ -586,3 +593,4 @@ end
 -- battleships
 -- asteroids
 
+-- open and close main window without exiting game
