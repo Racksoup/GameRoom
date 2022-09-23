@@ -119,15 +119,7 @@ function GR:TicCheckForWin()
         GR_GUI.Main.HeaderInfo.ReInvite:Show()
         GR_GUI.Main.HeaderInfo.OpponentString:Hide()
         -- show add to rival if not in rivals
-        local InRivals = false
-        for i,v in ipairs(GR.db.realm.Rivals) do
-            if (string.match(v, GR.Opponent)) then
-                InRivals = true
-            end
-        end
-        if (InRivals == false) then
-            GR_GUI.Main.HeaderInfo.Rival:Show()
-        end
+        GR:ShowRivalsBtn()
         local TurnString = GR_GUI.Main.HeaderInfo.TurnString
         TurnString:SetPoint("TOP", -150, -35)
         if (GR.IsPlayerTurn == false) then

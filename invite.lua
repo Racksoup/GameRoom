@@ -625,7 +625,7 @@ function GR:RegisterPlayers(...)
 end
 
 function GR:ShowChallengeIfChallenged()
-    if (GR.IsChallenged and GR_GUI.Main.Tictactoe:IsVisible() == false) then 
+    if (GR.IsChallenged and GR_GUI.Main.Tictactoe:IsVisible() == false and GR_GUI.Main.Battleships:IsVisible() == false) then 
         GR_GUI.Main.Accept:Show()
         GR_GUI.Main.DeclineBtn:Show()
     else
@@ -693,12 +693,14 @@ function GR:AcceptDeclineChal(...)
             end
         end
         if (AcceptChallenger) then
-            GR_GUI.Main.Accept.Fs2:SetText(TicOpponent .. " - " .. AcceptGameString)
-            GR_GUI.Accept.Fs2:SetText(TicOpponent .. " - " .. AcceptGameString)
             if (string.match(BSChallenge, "Battleships_Challenge")) then
+                GR_GUI.Main.Accept.Fs2:SetText(BSOpponent .. " - " .. AcceptGameString)
+                GR_GUI.Accept.Fs2:SetText(BSOpponent .. " - " .. AcceptGameString)
                 GR.Opponent = BSOpponent
             end
             if (string.match(TicChallenge, "TicTacToe_Challenge")) then
+                GR_GUI.Main.Accept.Fs2:SetText(TicOpponent .. " - " .. AcceptGameString)
+                GR_GUI.Accept.Fs2:SetText(TicOpponent .. " - " .. AcceptGameString)
                 GR.Opponent = TicOpponent
             end
             if (GR.InGame == false) then
@@ -740,8 +742,11 @@ function GR:AcceptDeclineChal(...)
                     end
                 end
             else
-                GR_GUI.Main.HeaderInfo.ReInvite:Hide()
-                GR_GUI.Main.HeaderInfo.ReMatch:Show()
+                -- show accept button if not in game
+                if (GR.InGame == false) then
+                    GR_GUI.Main.HeaderInfo.ReInvite:Hide()
+                    GR_GUI.Main.HeaderInfo.ReMatch:Show()
+                end
             end
         end
     end
@@ -751,7 +756,6 @@ function GR:AcceptDeclineChal(...)
     local TicPlayerTurn = string.sub(text, 19, 19)
     local TicOpponent = string.sub(text, 22, 50)
     if (string.match(TicAccept, "TicTacToe_Accept")) then
-        print("Accept")
         GR.GameType = "Tictactoe"
         GR:TicTacToeHideContent()  
         GR.Opponent = TicOpponent
@@ -779,9 +783,7 @@ function GR:AcceptDeclineChal(...)
             GR.PlayerPos = 2
             GR.IsPlayerTurn = false
         end
-        GR_GUI.Main.Battleships:Show()
-        GR_GUI.Main.Battleships.Board:Show()
-        GR:ShowGame()
+        GR:BattleshipsShowContent()
     end
 
     -- ends game if opponent ends game

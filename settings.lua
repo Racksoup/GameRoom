@@ -14,6 +14,7 @@ function GR:CreateSettings()
 
     GR_GUI.Main.Settings = CreateFrame("Frame", Settings, SettingsScroll)
     local Settings = GR_GUI.Main.Settings
+    Settings:SetClipsChildren(true)
     Settings:SetPoint("TOPLEFT", 0, -66)
     Settings:SetSize(350, 480)
     SettingsScroll:SetScrollChild(Settings)

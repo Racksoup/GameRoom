@@ -8,13 +8,10 @@ local GR_LDB = LibStub("LibDataBroker-1.1"):NewDataObject("GR", {
     icon = "interface/icons/inv_misc_ticket_tarot_maelstrom_01.blp",
     OnClick = function()
         if (GR_GUI.Main:IsVisible()) then 
-            GR:HideMain()
+            --GR:HideMain()
+            GR_GUI.Main:Hide()
         else 
-            GR_GUI.Main:ClearAllPoints()
-            GR_GUI.Main:SetPoint("TOP", UIParent, "TOP", 0, -130)
-            GR_GUI.Main:SetSize(750, 510)
-            GR_GUI.Main:Show()
-            GR:ShowChallengeIfChallenged() 
+            GR:ShowMain()
         end
     end,
     OnTooltipShow = function(tooltip)
@@ -75,13 +72,10 @@ end
 
 function GR:OpenClose(input)
     if (GR_GUI.Main:IsVisible()) then 
-        GR:HideMain()
+        --GR:HideMain()
+        GR_GUI.Main:Hide()
     else
-        GR_GUI.Main:ClearAllPoints()
-        GR_GUI.Main:SetPoint("TOP", UIParent, "TOP", 0, -130)
-        GR_GUI.Main:SetSize(750, 510)
-        GR_GUI.Main:Show() 
-        GR:ShowChallengeIfChallenged() 
+        GR:ShowMain()
     end
 end
 
@@ -110,6 +104,22 @@ function GR:HideMain()
     GR.GameType = nil
 end
 
+function GR:ShowMain()
+    GR_GUI.Main:ClearAllPoints()
+    GR_GUI.Main:SetPoint("TOP", UIParent, "TOP", 0, -130)
+    GR_GUI.Main:SetSize(750, 510)
+    if (GR.GameType == "Tictactoe" ) then
+        GR_GUI.Main:SetSize(750, 620)
+    end
+    if (GR.GameType == "Battleships" ) then
+        GR_GUI.Main:SetSize(800, 640)
+    end
+    GR:ResizeBattleships()
+    GR:ResizeTictactoe()
+    GR:ShowChallengeIfChallenged() 
+    GR_GUI.Main:Show() 
+end
+
 function GR:CreateMainWindow()
     -- Main Window
     GR_GUI.Main = CreateFrame("Frame", GameRoom, UIParent, "TranslucentFrameTemplate")
@@ -133,7 +143,6 @@ function GR:CreateMainWindow()
     end)
     GR_GUI.Main:Show()
     GR_GUI.Main:SetAlpha(GR.db.realm.windowAlpha)
-    GR_GUI.Main:SetClipsChildren(true)
     local ResizeBtn = CreateFrame("Button", nil, GR_GUI.Main)
     ResizeBtn:EnableMouse("true")
     ResizeBtn:SetPoint("BOTTOMRIGHT", -11, 11)
@@ -146,14 +155,8 @@ function GR:CreateMainWindow()
     end)
     ResizeBtn:SetScript("OnMouseUp", function()
         GR_GUI.Main:StopMovingOrSizing("BOTTOMRIGHT")
-        if (GR_GUI.Main.Tictactoe:IsVisible()) then
-            if (GR.GameType == "Tictactoe") then
-                GR:ResizeTictactoe()
-            end
-            if (GR.GameType == "Battleships") then
-                GR:ResizeBattleships()
-            end
-        end
+        GR:ResizeTictactoe()
+        GR:ResizeBattleships()
     end)
 
     -- GR_GUI.Main.Tex = GR_GUI.Main:CreateTexture()
@@ -176,7 +179,7 @@ function GR:CreateMainWindow()
     GR_GUI.Main.xButton = CreateFrame("Button", XButton, GR_GUI.Main)
     local xButton = GR_GUI.Main.xButton
     xButton:SetSize(25,25)
-    xButton:SetPoint("TOPRIGHT", -18, -18)
+    xButton:SetPoint("TOPRIGHT", -13, -13)
     xButton:RegisterForClicks("AnyUp", "AnyDown")
 
     GR_GUI.Main.xButton.tex = xButton:CreateTexture()
@@ -193,7 +196,10 @@ function GR:CreateMainWindow()
 
     GR_GUI.Main.xButton:SetScript("OnClick", function(self, button, down) 
         if(button == "LeftButton" and down == true) then GR_GUI.Main.xButton.tex:SetTexture("Interface\\AddOns\\ZUI_GameRoom\\images\\XButtonDown.blp") end
-        if(button == "LeftButton" and down == false) then GR:HideMain() end
+        if(button == "LeftButton" and down == false) then 
+            --GR:HideMain() 
+            GR_GUI.Main:Hide()
+        end
     end)
     GR_GUI.Main.xButton:SetScript("OnEnter", function(self, motion)
         GR_GUI.Main.xButton.tint:SetColorTexture(0,0,0,.3);
@@ -234,11 +240,11 @@ function GR:CreateHeaderInfo()
     HeaderInfo.TurnString = HeaderInfo:CreateFontString(HeaderInfo, "HIGH", "GameTooltipText")
     local TurnString = HeaderInfo.TurnString
     TurnString:SetPoint("TOP", 100, 0)
-    TurnString:SetTextScale(1.1)
+    TurnString:SetTextScale(2)
 
-    HeaderInfo.ExitBtn = CreateFrame("Button", ExitBtn, HeaderInfo, "UIPanelButtonTemplate")
+    HeaderInfo.ExitBtn = CreateFrame("Button", ExitBtn, GR_GUI.Main, "UIPanelButtonTemplate")
     local ExitBtn = HeaderInfo.ExitBtn
-    ExitBtn:SetPoint("TOPRIGHT", 0, 7)
+    ExitBtn:SetPoint("TOPRIGHT", -20, -64)
     ExitBtn:SetSize(100, 30)
     local ExitBtnString = ExitBtn:CreateFontString(ExitBtn, "HIGH", "GameTooltipText")
     ExitBtnString:SetPoint("CENTER", 0, 0)
@@ -260,9 +266,9 @@ function GR:CreateHeaderInfo()
     end)
     ExitBtn:Hide()
 
-    HeaderInfo.OpponentString = HeaderInfo:CreateFontString(HeaderInfo, "HIGH", "GameTooltipText")
+    HeaderInfo.OpponentString = GR_GUI.Main:CreateFontString(HeaderInfo, "HIGH", "GameTooltipText")
     local Opp = HeaderInfo.OpponentString
-    Opp:SetPoint("TOPLEFT", 0, -1)
+    Opp:SetPoint("TOPLEFT", 20, -68)
     Opp:SetTextColor(.8,.8,.8, 1)
     Opp:SetTextScale(1.1)
     Opp:Hide()
@@ -306,7 +312,6 @@ function GR:CreateHeaderInfo()
     ReMatch:SetScript("OnClick", function(self, button, down)
         if (button == "LeftButton" and down == false) then 
             local Opponent = GR.Opponent
-            GR:TicTacToeHideContent()
             GR.PlayerPos = random(1,2)
             if (GR.PlayerPos == 2) then
                 GR.IsPlayerTurn = false
@@ -314,17 +319,15 @@ function GR:CreateHeaderInfo()
                 GR.IsPlayerTurn = true
             end
             if (GR.GameType == "Tictactoe") then
+                GR:TicTacToeHideContent()
                 GR_GUI.Main:SetSize(750, 620)
                 GR:SendCommMessage("ZUI_GameRoom_Inv", "TicTacToe_Accept, " .. GR.PlayerPos .. ", " .. UnitName("player"), "WHISPER", Opponent)
                 GR_GUI.Main.Tictactoe:Show()
                 GR:ShowGame()
             end
             if (GR.GameType == "Battleships") then
-                GR:BattleshipsShowContent()
                 GR:SendCommMessage("ZUI_GameRoom_Inv", "Battleships_Accept, " .. GR.PlayerPos .. ", " .. UnitName("player"), "WHISPER", Opponent)
-                GR_GUI.Main.Battleships.Board:Show()
-                GR_GUI.Main.Battleships:Show()
-                GR:ShowGame()
+                GR:BattleshipsShowContent()
             end
             GR.Opponent = Opponent
         end
@@ -375,7 +378,6 @@ function GR:CreateAcceptDecline()
     Accept:SetScript("OnClick", function(self, button, down) 
         -- send message to show other user board
         GR_GUI.Main:Show()
-        GR_GUI.Main.Tictactoe:Show()
         GR.PlayerPos = random(1,2)
         if (GR.PlayerPos == 2) then
             GR.IsPlayerTurn = false
@@ -389,9 +391,7 @@ function GR:CreateAcceptDecline()
         end
         if (GR.GameType == "Battleships") then
             GR:SendCommMessage("ZUI_GameRoom_Inv", "Battleships_Accept, " .. GR.PlayerPos .. ", " .. PlayerName, "WHISPER", GR.Opponent)
-            GR_GUI.Main.Battleships.Board:Show()
-            GR_GUI.Main.Battleships:Show()
-            GR:ShowGame()
+            GR:BattleshipsShowContent()
         end
     end)
 
@@ -407,7 +407,6 @@ function GR:CreateAcceptDecline()
     DeclineBtn:SetScript("OnClick", function(self, button, down)
         if (button == "LeftButton" and down == false) then 
             GR.IsChallenged = false
-            GR.Opponent = nil
             GR_GUI.Main.Accept:Hide()
             GR_GUI.Accept:Hide()
             if (GR.GameType == "Tictactoe") then
@@ -416,6 +415,7 @@ function GR:CreateAcceptDecline()
             if (GR.GameType == "Battleships") then
                 GR:SendCommMessage("ZUI_GameRoom_Inv", "Battleships_Decline, ", "WHISPER", GR.Opponent)
             end 
+            GR.Opponent = nil
         end 
     end)
 
@@ -474,9 +474,7 @@ function GR:CreateAcceptDecline()
         end
         if (GR.GameType == "Battleships") then
             GR:SendCommMessage("ZUI_GameRoom_Inv", "Battleships_Accept, " .. GR.PlayerPos .. ", " .. PlayerName, "WHISPER", GR.Opponent)
-            GR_GUI.Main.Battleships.Board:Show()
-            GR_GUI.Main.Battleships:Show()
-            GR:ShowGame()
+            GR:BattleshipsShowContent()
         end
     end)
 
@@ -515,6 +513,7 @@ function GR:TabSelect()
         GR_GUI.Main.Invite:Hide() 
     else 
         GR_GUI.Main.Tictactoe:Hide() 
+        GR_GUI.Main.HomeBtn:Hide() 
         GR_GUI.Main.HeaderInfo:Hide() 
         GR_GUI.Main.Settings:Hide() 
         GR_GUI.Main.Invite:Show() 
@@ -530,7 +529,9 @@ function GR:TabSelect()
     if GR.db.realm.tab ~= 7 then 
         GR_GUI.Main.SettingsScroll:Hide() 
         GR_GUI.Main.Settings:Hide() 
+        GR_GUI.Main.HomeBtn:Hide() 
     else 
+        GR_GUI.Main.HomeBtn:Show() 
         GR_GUI.Main.SettingsScroll:Show() 
         GR_GUI.Main.Settings:Show() 
     end 
@@ -548,6 +549,18 @@ function GR:SetTurnString()
             TurnString:SetText(GR.Opponent)
             TurnString:SetPoint("TOP", 0, -35)
         end
+    end
+end
+
+function GR:ShowRivalsBtn() 
+    local InRivals = false
+    for i,v in ipairs(GR.db.realm.Rivals) do
+        if (string.match(v, GR.Opponent)) then
+            InRivals = true
+        end
+    end
+    if (InRivals == false) then
+        GR_GUI.Main.HeaderInfo.Rival:Show()
     end
 end
 
@@ -569,8 +582,6 @@ function GR:ShowGame()
     GR:SetTurnString()
     if GR.GameType == "Tictactoe" then
         GR_GUI.Main:SetSize(750, 620)
-    elseif GR.GameType == "Battleships" then
-        GR:BattleshipsShowContent()
     end
 end
 
@@ -584,13 +595,22 @@ function GR:HideGame()
     GR.IsChallenged = false
     GR.Opponent = nil
     GR_GUI.Main.HeaderInfo:Hide()
+    GR_GUI.Main.HeaderInfo.ExitBtn:Hide()
+    GR_GUI.Main.HeaderInfo.OpponentString:Hide()
     GR_GUI.Main.Invite:Show()
     GR_GUI.Main.HomeBtn:Show()
     GR_GUI.Main:SetSize(750, 510)
 end
 
--- 2048 game before release
--- battleships
--- asteroids
+function GR:AABB(Rect1, Rect2)
+    local margin = 9
+    if (Rect1.tl.x + margin > Rect2.br.x - margin or Rect1.tl.y - margin < Rect2.br.y + margin or Rect1.br.x - margin < Rect2.tl.x + margin or Rect1.br.y + margin > Rect2.tl.y - margin) then
+        return false
+    end
+    return true
+end
 
--- open and close main window without exiting game
+-- 2048 game before release
+-- asteroids
+-- death rolls
+
