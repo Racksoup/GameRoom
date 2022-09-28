@@ -63,23 +63,25 @@ function GR:CreateBattleships()
     
     -- info strings
     Battleships.CurrPhase = Battleships:CreateFontString(Battleships, "HIGH", "GameTooltipText")
-    Battleships.CurrPhase:SetPoint("TOP", 0, 40)
+    Battleships.CurrPhase:SetPoint("TOP", 0, 60)
     Battleships.CurrPhase:SetTextColor(.8,.8,.8, 1)
+    Battleships.CurrPhase:SetTextScale(1.6)
     Battleships.CurrPhase:SetText("Place your Battleships")
     Battleships.ExtraInfo = Battleships:CreateFontString(Battleships, "HIGH", "GameTooltipText")
-    Battleships.ExtraInfo:SetPoint("TOP", 0, 20)
+    Battleships.ExtraInfo:SetPoint("TOP", 0, 30)
     Battleships.ExtraInfo:SetTextColor(.8,.8,.8, 1)
+    Battleships.ExtraInfo:SetTextScale(1.6)
     Battleships.ExtraInfo:SetText("Press X to rotate ships")
-
+    
     -- Show Legend Button
     Battleships.ShowLegend = CreateFrame("Button", ShowLegend, Battleships, "UIPanelButtonTemplate")
-    Battleships.ShowLegend:SetPoint("TOPRIGHT", -4, 30)
-    Battleships.ShowLegend:SetSize(100, 30)
-    local ShowLegendFS = Battleships.ShowLegend:CreateFontString(Battleships.ShowLegend, "HIGH", "GameTooltipText")
-    ShowLegendFS:SetPoint("CENTER")
-    ShowLegendFS:SetTextScale(1.1)
-    ShowLegendFS:SetTextColor(.8,.8,.8, 1)
-    ShowLegendFS:SetText("Legend")
+    Battleships.ShowLegend:SetPoint("TOPRIGHT", -20, 60)
+    Battleships.ShowLegend:SetSize(230, 58)
+    Battleships.ShowLegendFS = Battleships.ShowLegend:CreateFontString(Battleships.ShowLegend, "HIGH", "GameTooltipText")
+    Battleships.ShowLegendFS:SetPoint("CENTER")
+    Battleships.ShowLegendFS:SetTextScale(1.8)
+    Battleships.ShowLegendFS:SetTextColor(.8,.8,.8, 1)
+    Battleships.ShowLegendFS:SetText("Legend")
     Battleships.ShowLegend:SetScript("OnClick", function(self, button, down) 
         if (button == "LeftButton" and down == false) then
             if (Battleships.Legend:IsVisible()) then
@@ -93,8 +95,8 @@ function GR:CreateBattleships()
     
     -- Complete Phase 1 Btn
     Battleships.Phase = CreateFrame("Button", Phase, Battleships, "UIPanelButtonTemplate")
-    Battleships.Phase:SetPoint("TOPLEFT", 100, 40)
-    Battleships.Phase:SetSize(120, 30)
+    Battleships.Phase:SetPoint("TOPLEFT", 20, 58)
+    Battleships.Phase:SetSize(230, 61)
     Battleships.Phase:Hide()
     Battleships.Phase:SetScript("OnClick", function(self, button, down) 
         if (button == "LeftButton" and down == false) then
@@ -126,10 +128,11 @@ function GR:CreateBattleships()
             Battleships.Phase:Hide()
         end
     end)
-    local PhaseFS = Battleships.Phase:CreateFontString(Battleships.Phase, "HIGH", "GameTooltipText")
-    PhaseFS:SetPoint("CENTER")
-    PhaseFS:SetTextColor(.8,.8,.8, 1)
-    PhaseFS:SetText("Confirm Selection")
+    Battleships.PhaseFS = Battleships.Phase:CreateFontString(Battleships.Phase, "HIGH", "GameTooltipText")
+    Battleships.PhaseFS:SetPoint("CENTER")
+    Battleships.PhaseFS:SetTextColor(.8,.8,.8, 1)
+    Battleships.PhaseFS:SetTextScale(1.8)
+    Battleships.PhaseFS:SetText("Confirm Selection")
 
     -- Create line and buttons for both boards, ships
     GR:CreateBattleshipsLines(GR_GUI.Main.Battleships.Board, GR_GUI.Main.Battleships.VLines, GR_GUI.Main.Battleships.HLines)
@@ -299,7 +302,7 @@ function GR:CreateShips()
         Battleships.Ship1.Rotate = 0
         Battleships.Ship1:SetPoint("TOPRIGHT", -4, -3)
         Battleships.Ship1:SetFrameLevel(7)
-        Battleships.Ship1:SetSize((Battleships.Board:GetWidth() / 10) * 2 -18, (Battleships.Board:GetHeight() / 10) * 3 -18)
+        Battleships.Ship1:SetSize((Battleships.Board:GetWidth() / 10) * 2 -(18 * (Battleships:GetWidth() / 770)), (Battleships.Board:GetHeight() / 10) * 3 -(8 * (Battleships:GetHeight() / 450)))
         local Ship1Tex = Battleships.Ship1:CreateTexture()
         Ship1Tex:SetAllPoints(Battleships.Ship1)
         Ship1Tex:SetTexture("Interface\\AddOns\\ZUI_GameRoom\\images\\Battleship1.blp")
@@ -313,7 +316,7 @@ function GR:CreateShips()
                 -- rotate 90deg
                 if (Battleships.Ship1.Rotate == 0) then
                     -- rotate ship
-                    Battleships.Ship1:SetSize((Battleships.Board:GetWidth() / 10) * 3 -18, (Battleships.Board:GetHeight() / 10) * 2 -18)
+                    Battleships.Ship1:SetSize((Battleships.Board:GetWidth() / 10) * 3 -(18 * (Battleships:GetWidth() / 770)), (Battleships.Board:GetHeight() / 10) * 2 -(4 * (Battleships:GetHeight() / 450)))
                     Battleships.Ship1.Rotate = 90
                      -- rotate texture
                      local Tex = Battleships.Ship1:GetRegions()
@@ -324,7 +327,7 @@ function GR:CreateShips()
                 -- rotate 0deg
                 if (Battleships.Ship1.Rotate == 90) then
                     -- rotate ship
-                    Battleships.Ship1:SetSize((Battleships.Board:GetWidth() / 10) * 2 -18, (Battleships.Board:GetHeight() / 10) * 3 -18)
+                    Battleships.Ship1:SetSize((Battleships.Board:GetWidth() / 10) * 2 -(18 * (Battleships:GetWidth() / 770)), (Battleships.Board:GetHeight() / 10) * 3 -(8 * (Battleships:GetHeight() / 450)))
                     Battleships.Ship1.Rotate = 0
                     -- rotate texture
                     local Tex = Battleships.Ship1:GetRegions()
@@ -366,7 +369,7 @@ function GR:CreateShips()
         Battleships.Ship2.Rotate = 0
         Battleships.Ship2:SetPoint("TOPRIGHT", -4, (Battleships.Board:GetHeight() / 10) * -3)
         Battleships.Ship2:SetFrameLevel(7)
-        Battleships.Ship2:SetSize((Battleships.Board:GetWidth() / 10) * 1 -18, (Battleships.Board:GetHeight() / 10) * 3 -18)
+        Battleships.Ship2:SetSize((Battleships.Board:GetWidth() / 10) * 1 -(18 * (Battleships:GetWidth() / 770)), (Battleships.Board:GetHeight() / 10) * 3 -(8 * (Battleships:GetHeight() / 450)))
         local Ship2Tex = Battleships.Ship2:CreateTexture()
         Ship2Tex:SetAllPoints(Battleships.Ship2)
         Ship2Tex:SetTexture("Interface\\AddOns\\ZUI_GameRoom\\images\\Battleship2.blp")
@@ -380,7 +383,7 @@ function GR:CreateShips()
                 -- rotate 90deg
                 if (Battleships.Ship2.Rotate == 0) then
                     -- rotate ship
-                    Battleships.Ship2:SetSize((Battleships.Board:GetWidth() / 10) * 3 -18, (Battleships.Board:GetHeight() / 10) * 1 -18)
+                    Battleships.Ship2:SetSize((Battleships.Board:GetWidth() / 10) * 3 -(18 * (Battleships:GetWidth() / 770)), (Battleships.Board:GetHeight() / 10) * 1 -(4 * (Battleships:GetHeight() / 450)))
                     Battleships.Ship2.Rotate = 90
                     -- rotate texture
                     local Tex = Battleships.Ship2:GetRegions()
@@ -391,7 +394,7 @@ function GR:CreateShips()
                 -- rotate 0deg
                 if (Battleships.Ship2.Rotate == 90) then
                     -- rotate ship
-                    Battleships.Ship2:SetSize((Battleships.Board:GetWidth() / 10) * 1 -18, (Battleships.Board:GetHeight() / 10) * 3 -18)
+                    Battleships.Ship2:SetSize((Battleships.Board:GetWidth() / 10) * 1 -(18 * (Battleships:GetWidth() / 770)), (Battleships.Board:GetHeight() / 10) * 3 -(8 * (Battleships:GetHeight() / 450)))
                     Battleships.Ship2.Rotate = 0
                      -- rotate texture
                      local Tex = Battleships.Ship2:GetRegions()
@@ -433,7 +436,7 @@ function GR:CreateShips()
         Battleships.Ship3.Rotate = 0
         Battleships.Ship3:SetPoint("TOPRIGHT", (Battleships.Board:GetWidth() / 10) * -2 +10, -3)
         Battleships.Ship3:SetFrameLevel(7)
-        Battleships.Ship3:SetSize((Battleships.Board:GetWidth() / 10) * 2 -18, (Battleships.Board:GetHeight() / 10) * 4 -18)
+        Battleships.Ship3:SetSize((Battleships.Board:GetWidth() / 10) * 2 -(18 * (Battleships:GetWidth() / 770)), (Battleships.Board:GetHeight() / 10) * 4 -(8 * (Battleships:GetHeight() / 450)))
         local Ship3Tex = Battleships.Ship3:CreateTexture()
         Ship3Tex:SetAllPoints(Battleships.Ship3)
         Ship3Tex:SetTexture("Interface\\AddOns\\ZUI_GameRoom\\images\\Battleship3.blp")
@@ -447,7 +450,7 @@ function GR:CreateShips()
                 -- rotate 90deg
                 if (Battleships.Ship3.Rotate == 0) then
                     -- rotate ship
-                    Battleships.Ship3:SetSize((Battleships.Board:GetWidth() / 10) * 4 -18, (Battleships.Board:GetHeight() / 10) * 2 -18)
+                    Battleships.Ship3:SetSize((Battleships.Board:GetWidth() / 10) * 4 -(18 * (Battleships:GetWidth() / 770)), (Battleships.Board:GetHeight() / 10) * 2 -(4 * (Battleships:GetHeight() / 450)))
                     Battleships.Ship3.Rotate = 90
                     -- rotate texture
                     local Tex = Battleships.Ship3:GetRegions()
@@ -458,7 +461,7 @@ function GR:CreateShips()
                 -- rotate 0deg
                 if (Battleships.Ship3.Rotate == 90) then
                     -- rotate ship
-                    Battleships.Ship3:SetSize((Battleships.Board:GetWidth() / 10) * 2 -18, (Battleships.Board:GetHeight() / 10) * 4 -18)
+                    Battleships.Ship3:SetSize((Battleships.Board:GetWidth() / 10) * 2 -(18 * (Battleships:GetWidth() / 770)), (Battleships.Board:GetHeight() / 10) * 4 -(8 * (Battleships:GetHeight() / 450)))
                     Battleships.Ship3.Rotate = 0
                     -- rotate texture
                     local Tex = Battleships.Ship3:GetRegions()
@@ -500,7 +503,7 @@ function GR:CreateShips()
         Battleships.Ship4.Rotate = 0
         Battleships.Ship4:SetPoint("TOPRIGHT", (Battleships.Board:GetWidth() / 10) * -2 +10, (Battleships.Board:GetHeight() / 10) * -4)
         Battleships.Ship4:SetFrameLevel(7)
-        Battleships.Ship4:SetSize((Battleships.Board:GetWidth() / 10) * 2 -18, (Battleships.Board:GetHeight() / 10) * 2 -18)
+        Battleships.Ship4:SetSize((Battleships.Board:GetWidth() / 10) * 2 -(18 * (Battleships:GetWidth() / 770)), (Battleships.Board:GetHeight() / 10) * 2 -(8 * (Battleships:GetHeight() / 450)))
         local Ship4Tex = Battleships.Ship4:CreateTexture()
         Ship4Tex:SetAllPoints(Battleships.Ship4)
         Ship4Tex:SetTexture("Interface\\AddOns\\ZUI_GameRoom\\images\\Battleship4.blp")
@@ -514,7 +517,7 @@ function GR:CreateShips()
                 -- rotate 90deg
                 if (Battleships.Ship4.Rotate == 0) then
                     -- rotate ship
-                    Battleships.Ship4:SetSize((Battleships.Board:GetWidth() / 10) * 2 -18, (Battleships.Board:GetHeight() / 10) * 2 -18)
+                    Battleships.Ship4:SetSize((Battleships.Board:GetWidth() / 10) * 2 -(18 * (Battleships:GetWidth() / 770)), (Battleships.Board:GetHeight() / 10) * 2 -(4 * (Battleships:GetHeight() / 450)))
                     Battleships.Ship4.Rotate = 90
                     -- rotate texture
                     local Tex = Battleships.Ship4:GetRegions()
@@ -525,7 +528,7 @@ function GR:CreateShips()
                 -- rotate 0deg
                 if (Battleships.Ship4.Rotate == 90) then
                     -- rotate ship
-                    Battleships.Ship4:SetSize((Battleships.Board:GetWidth() / 10) * 2 -18, (Battleships.Board:GetHeight() / 10) * 2 -18)
+                    Battleships.Ship4:SetSize((Battleships.Board:GetWidth() / 10) * 2 -(18 * (Battleships:GetWidth() / 770)), (Battleships.Board:GetHeight() / 10) * 2 -(8 * (Battleships:GetHeight() / 450)))
                     Battleships.Ship4.Rotate = 0
                     -- rotate texture
                     local Tex = Battleships.Ship4:GetRegions()
@@ -567,7 +570,7 @@ function GR:CreateShips()
         Battleships.Ship5.Rotate = 0
         Battleships.Ship5:SetPoint("TOPRIGHT", -4, (Battleships.Board:GetHeight() / 10) * -6)
         Battleships.Ship5:SetFrameLevel(7)
-        Battleships.Ship5:SetSize((Battleships.Board:GetWidth() / 10) * 1 -18, (Battleships.Board:GetHeight() / 10) * 4 -18)
+        Battleships.Ship5:SetSize((Battleships.Board:GetWidth() / 10) * 1 -(18 * (Battleships:GetWidth() / 770)), (Battleships.Board:GetHeight() / 10) * 4 -(8 * (Battleships:GetHeight() / 450)))
         local Ship5Tex = Battleships.Ship5:CreateTexture()
         Ship5Tex:SetAllPoints(Battleships.Ship5)
         Ship5Tex:SetTexture("Interface\\AddOns\\ZUI_GameRoom\\images\\Battleship5.blp")
@@ -581,7 +584,7 @@ function GR:CreateShips()
                 -- Rotate 90deg
                 if (Battleships.Ship5.Rotate == 0) then
                     -- rotate ship
-                    Battleships.Ship5:SetSize((Battleships.Board:GetWidth() / 10) * 4 -18, (Battleships.Board:GetHeight() / 10) * 1 -18)
+                    Battleships.Ship5:SetSize((Battleships.Board:GetWidth() / 10) * 4 -(18 * (Battleships:GetWidth() / 770)), (Battleships.Board:GetHeight() / 10) * 1 -(4 * (Battleships:GetHeight() / 450)))
                     Battleships.Ship5.Rotate = 90
                     -- rotate texture
                     local Tex = Battleships.Ship5:GetRegions()
@@ -593,7 +596,7 @@ function GR:CreateShips()
                 -- Rotate 0deg
                 if (Battleships.Ship5.Rotate == 90) then
                     -- rotate ship
-                    Battleships.Ship5:SetSize((Battleships.Board:GetWidth() / 10) * 1 -18, (Battleships.Board:GetHeight() / 10) * 4 -18)
+                    Battleships.Ship5:SetSize((Battleships.Board:GetWidth() / 10) * 1 -(18 * (Battleships:GetWidth() / 770)), (Battleships.Board:GetHeight() / 10) * 4 -(8 * (Battleships:GetHeight() / 450)))
                     Battleships.Ship5.Rotate = 0
                     -- rotate Texture
                     local Tex = Battleships.Ship5:GetRegions()
@@ -751,10 +754,14 @@ function GR:ResizeBattleships()
     local OppVLines = GR_GUI.Main.Battleships.OppVLines
     local OppHLines = GR_GUI.Main.Battleships.OppHLines
     local OppButtons = GR_GUI.Main.Battleships.OppButtons
-
+    
     --Battleships:ClearAllPoints()
     local heightBuffer =  (65 * (300 / GR_GUI.Main:GetHeight()))
-    Battleships:SetSize(GR_GUI.Main:GetWidth() * (770 / 800), GR_GUI.Main:GetHeight() * (450 / 640) - heightBuffer)
+    Battleships:SetSize(GR_GUI.Main:GetWidth() * (770 / 800), GR_GUI.Main:GetHeight() * (450 / 640))
+    Battleships:SetPoint("BOTTOM", 0, 25 * (GR_GUI.Main:GetHeight() / 640))
+    local WidthRatio = Battleships:GetWidth() / 770
+    local HeightRatio = Battleships:GetHeight() / 450
+
     -- resize Game Window
     if (GR.Phase == 1) then
         Board:SetSize(Battleships:GetWidth() * (570 / 770), Battleships:GetHeight() * (450 / 450))
@@ -769,6 +776,27 @@ function GR:ResizeBattleships()
     -- resize Ships, Legend
     GR:ResizeShips(Board)
     GR:ResizeLegend()
+
+    -- resize FontStrings
+    local FontScale = ((WidthRatio + HeightRatio) / 2)
+    Battleships.Board.FS:SetTextScale(FontScale * 1.3)
+    Battleships.Board.FS:SetPoint("TOP", 0, 22 * HeightRatio)
+    Battleships.OppBoard.FS:SetTextScale(FontScale * 1.3)
+    Battleships.OppBoard.FS:SetPoint("TOP", 0, 22 * HeightRatio)
+    
+    Battleships.CurrPhase:SetPoint("TOP", 0, 51 * HeightRatio)
+    Battleships.CurrPhase:SetTextScale(FontScale * 1.6)
+    Battleships.ExtraInfo:SetPoint("TOP", 0, 22 * HeightRatio)
+    Battleships.ExtraInfo:SetTextScale(FontScale * 1.6)
+
+    -- resize Phase Button
+    Battleships.Phase:SetPoint("TOPLEFT", 20 * WidthRatio, 60 * HeightRatio)
+    Battleships.Phase:SetSize(230 * WidthRatio, 58 * HeightRatio)
+    Battleships.PhaseFS:SetTextScale(FontScale * 1.8)
+    -- resize ShowLegend Button
+    Battleships.ShowLegend:SetPoint("TOPRIGHT", -20 * WidthRatio, 60 * HeightRatio)
+    Battleships.ShowLegend:SetSize(230 * WidthRatio, 58 * HeightRatio)
+    Battleships.ShowLegendFS:SetTextScale(FontScale * 1.8)
 end
 
 function GR:RedrawBattleshipLinesAndButtons(Content, VLines, HLines, Buttons, x, y)
@@ -848,35 +876,39 @@ function GR:ResizeShips(Board)
     local Ship3 = GR_GUI.Main.Battleships.Ship3
     local Ship4 = GR_GUI.Main.Battleships.Ship4
     local Ship5 = GR_GUI.Main.Battleships.Ship5
+    local BoardWidth = Board:GetWidth()
+    local BoardHeight = Board:GetHeight()
+    local BSWidthRatio = (Battleships:GetWidth() / 770)
+    local BSHeightRatio = (Battleships:GetHeight() / 450)
 
     Ship1:ClearAllPoints()
     Ship1:SetParent(Battleships)
     Ship1:SetPoint("TOPRIGHT", -4, -3)
-    Ship1:SetSize((Board:GetWidth() / 10) * 2 -18, (Board:GetHeight() / 10) * 3 -18)
+    Ship1:SetSize((BoardWidth / 10) * 2 -(18 * BSWidthRatio), (BoardHeight / 10) * 3 -(8 * BSHeightRatio))
     local Tex1 = Ship1:GetRegions()
     Tex1:SetTexCoord(0,.02, 0,.73, .5,.02, .5,.73)
     Ship2:ClearAllPoints()
     Ship2:SetParent(Battleships)
-    Ship2:SetPoint("TOPRIGHT", -4, (Board:GetHeight() / 10) * -3)
-    Ship2:SetSize((Board:GetWidth() / 10) * 1 -18, (Board:GetHeight() / 10) * 3 -18)
+    Ship2:SetPoint("TOPRIGHT", -4, (BoardHeight / 10) * -3)
+    Ship2:SetSize((BoardWidth / 10) * 1 -(18 * BSWidthRatio), (BoardHeight / 10) * 3 -(8 * BSHeightRatio))
     local Tex2 = Ship2:GetRegions()
     Tex2:SetTexCoord(0,0, 0,.75, .25,0, .25,.75)
     Ship3:ClearAllPoints()
     Ship3:SetParent(Battleships)
-    Ship3:SetPoint("TOPRIGHT", (Board:GetWidth() / 10) * -2 +10, -3)
-    Ship3:SetSize((Board:GetWidth() / 10) * 2 -18, (Board:GetHeight() / 10) * 4 -18)
+    Ship3:SetPoint("TOPRIGHT", (BoardWidth / 10) * -2 +10, -3)
+    Ship3:SetSize((BoardWidth / 10) * 2 -(18 * BSWidthRatio), (BoardHeight / 10) * 4 -(8 * BSHeightRatio))
     local Tex3 = Ship3:GetRegions()
     Tex3:SetTexCoord(0,0, 0,1, .5,0, .5,1)
     Ship4:ClearAllPoints()
     Ship4:SetParent(Battleships)
-    Ship4:SetPoint("TOPRIGHT", (Board:GetWidth() / 10) * -2 +10, (Board:GetHeight() / 10) * -4)
-    Ship4:SetSize((Board:GetWidth() / 10) * 2 -18, (Board:GetHeight() / 10) * 2 -18)
+    Ship4:SetPoint("TOPRIGHT", (BoardWidth / 10) * -2 +10, (BoardHeight / 10) * -4)
+    Ship4:SetSize((BoardWidth / 10) * 2 -(18 * BSWidthRatio), (BoardHeight / 10) * 2 -(8 * BSHeightRatio))
     local Tex4 = Ship4:GetRegions()
     Tex4:SetTexCoord(0,.03, 0,.47, .5,.03, .5,.47)
     Ship5:ClearAllPoints()
     Ship5:SetParent(Battleships)
-    Ship5:SetPoint("TOPRIGHT", -4, (Board:GetHeight() / 10) * -6)
-    Ship5:SetSize((Board:GetWidth() / 10) * 1 -18, (Board:GetHeight() / 10) * 4 -18)
+    Ship5:SetPoint("TOPRIGHT", -4, (BoardHeight / 10) * -6)
+    Ship5:SetSize((BoardWidth / 10) * 1 -(18 * BSWidthRatio), (BoardHeight / 10) * 4 -(8 * BSHeightRatio))
     local Tex5 = Ship5:GetRegions()
     Tex5:SetTexCoord(.14,0, .14,1, .36,0, .36,1)
 end
@@ -884,44 +916,56 @@ end
 function GR:ResizeLegend()
     local Battleships = GR_GUI.Main.Battleships
     local Legend = GR_GUI.Main.Battleships.Legend
-
-    Legend:SetSize(Battleships:GetWidth() * .22, Battleships:GetHeight() * .7)
+    
+    Legend:SetSize(Battleships:GetWidth() * .26, Battleships:GetHeight() * .7)
     Legend:SetPoint("TOPRIGHT", Legend:GetWidth(), 0)
+    local FontScale = (((Battleships:GetWidth() / 770) + (Battleships:GetHeight() / 450)) / 2)
     
     Legend.PlayerString:SetPoint("TOP", 0, Legend:GetHeight() * -((0 / 12) + (.05 * (10 / 12))))
-    Legend.PlayerShip1:SetPoint("TOPRIGHT", Legend:GetWidth() * -.15, Legend:GetHeight() * -((1 / 12) + (.05 * (8 / 12))))
-    Legend.PlayerShip2:SetPoint("TOPRIGHT", Legend:GetWidth() * -.15, Legend:GetHeight() * -((2 / 12) + (.05 * (6 / 12))))
-    Legend.PlayerShip3:SetPoint("TOPRIGHT", Legend:GetWidth() * -.15, Legend:GetHeight() * -((3 / 12) + (.05 * (4 / 12))))
-    Legend.PlayerShip4:SetPoint("TOPRIGHT", Legend:GetWidth() * -.15, Legend:GetHeight() * -((4 / 12) + (.05 * (2 / 12))))
-    Legend.PlayerShip5:SetPoint("TOPRIGHT", Legend:GetWidth() * -.15, Legend:GetHeight() * -((5 / 12) + (.05 * (0 / 12))))
-    Legend.PlayerShip1Tex:SetPoint("TOPLEFT",  Legend:GetWidth() * .23, Legend:GetHeight() * -((1 / 12) + (.05 * (8 / 12))))
+    Legend.PlayerString:SetTextScale(FontScale * 1.3)
+    Legend.PlayerShip1:SetPoint("TOPRIGHT", Legend:GetWidth() * -.1, Legend:GetHeight() * -((1 / 12) + (.05 * (8 / 12))))
+    Legend.PlayerShip1:SetTextScale(FontScale)
+    Legend.PlayerShip2:SetPoint("TOPRIGHT", Legend:GetWidth() * -.1, Legend:GetHeight() * -((2 / 12) + (.05 * (6 / 12))))
+    Legend.PlayerShip2:SetTextScale(FontScale)
+    Legend.PlayerShip3:SetPoint("TOPRIGHT", Legend:GetWidth() * -.1, Legend:GetHeight() * -((3 / 12) + (.05 * (4 / 12))))
+    Legend.PlayerShip3:SetTextScale(FontScale)
+    Legend.PlayerShip4:SetPoint("TOPRIGHT", Legend:GetWidth() * -.1, Legend:GetHeight() * -((4 / 12) + (.05 * (2 / 12))))
+    Legend.PlayerShip4:SetTextScale(FontScale)
+    Legend.PlayerShip5:SetPoint("TOPRIGHT", Legend:GetWidth() * -.1, Legend:GetHeight() * -((5 / 12) + (.05 * (0 / 12))))
+    Legend.PlayerShip5:SetTextScale(FontScale)
+    Legend.PlayerShip1Tex:SetPoint("TOPLEFT",  Legend:GetWidth() * .19, Legend:GetHeight() * -((1 / 12) + (.05 * (8 / 12))))
     Legend.PlayerShip1Tex:SetSize(Legend:GetWidth() *.4, Legend:GetHeight() * .07)
-    Legend.PlayerShip2Tex:SetPoint("TOPLEFT",  Legend:GetWidth() * .25, Legend:GetHeight() * -((1.8 / 12) + (.05 * (6 / 12))))
+    Legend.PlayerShip2Tex:SetPoint("TOPLEFT",  Legend:GetWidth() * .21, Legend:GetHeight() * -((1.8 / 12) + (.05 * (6 / 12))))
     Legend.PlayerShip2Tex:SetSize(Legend:GetWidth() *.4, Legend:GetHeight() * .07)
-    Legend.PlayerShip3Tex:SetPoint("TOPLEFT",  Legend:GetWidth() * .15, Legend:GetHeight() * -((2.7 / 12) + (.05 * (4 / 12))))
+    Legend.PlayerShip3Tex:SetPoint("TOPLEFT",  Legend:GetWidth() * .11, Legend:GetHeight() * -((2.7 / 12) + (.05 * (4 / 12))))
     Legend.PlayerShip3Tex:SetSize(Legend:GetWidth() *.5, Legend:GetHeight() * .1)
-    Legend.PlayerShip4Tex:SetPoint("TOPLEFT",  Legend:GetWidth() * .48, Legend:GetHeight() * -((4 / 12) + (.05 * (2 / 12))))
+    Legend.PlayerShip4Tex:SetPoint("TOPLEFT",  Legend:GetWidth() * .44, Legend:GetHeight() * -((4 / 12) + (.05 * (2 / 12))))
     Legend.PlayerShip4Tex:SetSize(Legend:GetWidth() *.15, Legend:GetHeight() * .07)
-    Legend.PlayerShip5Tex:SetPoint("TOPLEFT",  Legend:GetWidth() * .15, Legend:GetHeight() * -((5 / 12) + (.05 * (0 / 12))))
+    Legend.PlayerShip5Tex:SetPoint("TOPLEFT",  Legend:GetWidth() * .11, Legend:GetHeight() * -((5 / 12) + (.05 * (0 / 12))))
     Legend.PlayerShip5Tex:SetSize(Legend:GetWidth() *.5, Legend:GetHeight() * .06)
-
+    
     Legend.OppString:SetPoint("TOP", 0, Legend:GetHeight() * -((6 / 12) + (.05 * (-2 / 12))))
-    Legend.OppShip1:SetPoint("TOPRIGHT", Legend:GetWidth() * -.15, Legend:GetHeight() * -((7 / 12) + (.05 * (-4 / 12))))
-    Legend.OppShip2:SetPoint("TOPRIGHT", Legend:GetWidth() * -.15, Legend:GetHeight() * -((8 / 12) + (.05 * (-6 / 12))))
-    Legend.OppShip3:SetPoint("TOPRIGHT", Legend:GetWidth() * -.15, Legend:GetHeight() * -((9 / 12) + (.05 * (-8 / 12))))
-    Legend.OppShip4:SetPoint("TOPRIGHT", Legend:GetWidth() * -.15, Legend:GetHeight() * -((10 / 12) + (.05 * (-10 / 12))))
-    Legend.OppShip5:SetPoint("TOPRIGHT", Legend:GetWidth() * -.15, Legend:GetHeight() * -((11 / 12) + (.05 * (-12 / 12))))
-    Legend.OppShip1Tex:SetPoint("TOPLEFT",  Legend:GetWidth() * .23, Legend:GetHeight() * -((7 / 12) + (.05 * (-4 / 12))))
+    Legend.OppString:SetTextScale(FontScale)
+    Legend.OppShip1:SetPoint("TOPRIGHT", Legend:GetWidth() * -.1, Legend:GetHeight() * -((7 / 12) + (.05 * (-4 / 12))))
+    Legend.OppShip1:SetTextScale(FontScale)
+    Legend.OppShip2:SetPoint("TOPRIGHT", Legend:GetWidth() * -.1, Legend:GetHeight() * -((8 / 12) + (.05 * (-6 / 12))))
+    Legend.OppShip2:SetTextScale(FontScale)
+    Legend.OppShip3:SetPoint("TOPRIGHT", Legend:GetWidth() * -.1, Legend:GetHeight() * -((9 / 12) + (.05 * (-8 / 12))))
+    Legend.OppShip3:SetTextScale(FontScale)
+    Legend.OppShip4:SetPoint("TOPRIGHT", Legend:GetWidth() * -.1, Legend:GetHeight() * -((10 / 12) + (.05 * (-10 / 12))))
+    Legend.OppShip4:SetTextScale(FontScale)
+    Legend.OppShip5:SetPoint("TOPRIGHT", Legend:GetWidth() * -.1, Legend:GetHeight() * -((11 / 12) + (.05 * (-12 / 12))))
+    Legend.OppShip5:SetTextScale(FontScale)
+    Legend.OppShip1Tex:SetPoint("TOPLEFT",  Legend:GetWidth() * .19, Legend:GetHeight() * -((7 / 12) + (.05 * (-4 / 12))))
     Legend.OppShip1Tex:SetSize(Legend:GetWidth() *.4, Legend:GetHeight() * .07)
-    Legend.OppShip2Tex:SetPoint("TOPLEFT",  Legend:GetWidth() * .25, Legend:GetHeight() * -((7.8 / 12) + (.05 * (-6 / 12))))
+    Legend.OppShip2Tex:SetPoint("TOPLEFT",  Legend:GetWidth() * .21, Legend:GetHeight() * -((7.8 / 12) + (.05 * (-6 / 12))))
     Legend.OppShip2Tex:SetSize(Legend:GetWidth() *.4, Legend:GetHeight() * .07)
-    Legend.OppShip3Tex:SetPoint("TOPLEFT",  Legend:GetWidth() * .15, Legend:GetHeight() * -((8.7 / 12) + (.05 * (-8 / 12))))
+    Legend.OppShip3Tex:SetPoint("TOPLEFT",  Legend:GetWidth() * .11, Legend:GetHeight() * -((8.7 / 12) + (.05 * (-8 / 12))))
     Legend.OppShip3Tex:SetSize(Legend:GetWidth() *.5, Legend:GetHeight() * .1)
-    Legend.OppShip4Tex:SetPoint("TOPLEFT",  Legend:GetWidth() * .48, Legend:GetHeight() * -((10 / 12) + (.05 * (-10 / 12))))
+    Legend.OppShip4Tex:SetPoint("TOPLEFT",  Legend:GetWidth() * .44, Legend:GetHeight() * -((10 / 12) + (.05 * (-10 / 12))))
     Legend.OppShip4Tex:SetSize(Legend:GetWidth() *.15, Legend:GetHeight() * .07)
-    Legend.OppShip5Tex:SetPoint("TOPLEFT",  Legend:GetWidth() * .15, Legend:GetHeight() * -((11 / 12) + (.05 * (-12 / 12))))
+    Legend.OppShip5Tex:SetPoint("TOPLEFT",  Legend:GetWidth() * .11, Legend:GetHeight() * -((11 / 12) + (.05 * (-12 / 12))))
     Legend.OppShip5Tex:SetSize(Legend:GetWidth() *.5, Legend:GetHeight() * .06)
-
 end
 
 -- phase 1 functionality
@@ -964,7 +1008,12 @@ function GR:SetShipPosOnPlacement(Ship)
                 FirstTile = false
                 Ship:ClearAllPoints()
                 Ship:SetParent(v)
-                Ship:SetPoint("TOPLEFT", 8, -8)
+                if (Ship.Rotate == 0) then
+                    Ship:SetPoint("TOPLEFT", 8 * (GR_GUI.Main.Battleships:GetWidth() / 770), -3 * (GR_GUI.Main.Battleships:GetHeight() / 450))
+                end
+                if (Ship.Rotate == 90) then
+                    Ship:SetPoint("TOPLEFT", 8 * (GR_GUI.Main.Battleships:GetWidth() / 770), -1 * (GR_GUI.Main.Battleships:GetHeight() / 450))
+                end
             end
         end
     end
@@ -1332,28 +1381,28 @@ function GR:UpdateLegend()
     Legend.OppString:SetText(GR.Opponent)
 
     if (GR.PlayerPos == 1) then
-        Legend.PlayerShip1:SetText(GR.P1Ship1)
-        Legend.PlayerShip2:SetText(GR.P1Ship2)
-        Legend.PlayerShip3:SetText(GR.P1Ship3)
-        Legend.PlayerShip4:SetText(GR.P1Ship4)
-        Legend.PlayerShip5:SetText(GR.P1Ship5)
-        Legend.OppShip1:SetText(GR.P2Ship1)
-        Legend.OppShip2:SetText(GR.P2Ship2)
-        Legend.OppShip3:SetText(GR.P2Ship3)
-        Legend.OppShip4:SetText(GR.P2Ship4)
-        Legend.OppShip5:SetText(GR.P2Ship5)
+        Legend.PlayerShip1:SetText(GR.P1Ship1 .. " / 6")
+        Legend.PlayerShip2:SetText(GR.P1Ship2 .. " / 3")
+        Legend.PlayerShip3:SetText(GR.P1Ship3 .. " / 8")
+        Legend.PlayerShip4:SetText(GR.P1Ship4 .. " / 4")
+        Legend.PlayerShip5:SetText(GR.P1Ship5 .. " / 4")
+        Legend.OppShip1:SetText(GR.P2Ship1 .. " / 6")
+        Legend.OppShip2:SetText(GR.P2Ship2 .. " / 3")
+        Legend.OppShip3:SetText(GR.P2Ship3 .. " / 8")
+        Legend.OppShip4:SetText(GR.P2Ship4 .. " / 4")
+        Legend.OppShip5:SetText(GR.P2Ship5 .. " / 4")
     end
     if (GR.PlayerPos == 2) then
-        Legend.PlayerShip1:SetText(GR.P2Ship1)
-        Legend.PlayerShip2:SetText(GR.P2Ship2)
-        Legend.PlayerShip3:SetText(GR.P2Ship3)
-        Legend.PlayerShip4:SetText(GR.P2Ship4)
-        Legend.PlayerShip5:SetText(GR.P2Ship5)
-        Legend.OppShip1:SetText(GR.P1Ship1)
-        Legend.OppShip2:SetText(GR.P1Ship2)
-        Legend.OppShip3:SetText(GR.P1Ship3)
-        Legend.OppShip4:SetText(GR.P1Ship4)
-        Legend.OppShip5:SetText(GR.P1Ship5)
+        Legend.PlayerShip1:SetText(GR.P2Ship1 .. " / 6")
+        Legend.PlayerShip2:SetText(GR.P2Ship2 .. " / 3")
+        Legend.PlayerShip3:SetText(GR.P2Ship3 .. " / 8")
+        Legend.PlayerShip4:SetText(GR.P2Ship4 .. " / 4")
+        Legend.PlayerShip5:SetText(GR.P2Ship5 .. " / 4")
+        Legend.OppShip1:SetText(GR.P1Ship1 .. " / 6")
+        Legend.OppShip2:SetText(GR.P1Ship2 .. " / 3")
+        Legend.OppShip3:SetText(GR.P1Ship3 .. " / 8")
+        Legend.OppShip4:SetText(GR.P1Ship4 .. " / 4")
+        Legend.OppShip5:SetText(GR.P1Ship5 .. " / 4")
     end
 end
 
@@ -1428,8 +1477,14 @@ function GR:BattleshipsHideContent()
     GR.BattleshipsBoardP2 = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
     local Buttons = GR_GUI.Main.Battleships.Buttons
     for i,v in ipairs(Buttons) do 
-        local BtnTex = v:GetRegions()
+        local BtnTex, x = v:GetRegions()
         BtnTex:Hide()
+        x:Hide()
+    end
+    for i,v in ipairs(GR_GUI.Main.Battleships.OppButtons) do 
+        local BtnTex, x = v:GetRegions()
+        BtnTex:Hide()
+        x:Hide()
     end
     GR:HideGame()
 end
@@ -1464,8 +1519,9 @@ function GR:BattleshipsShowContent()
     GR_GUI.Main.Battleships.ShowLegend:Hide()
     GR_GUI.Main.HeaderInfo.OpponentString:Show()
     GR_GUI.Main.Battleships.Legend:Hide()
+    GR_GUI.Main.HeaderInfo.TurnString:SetPoint("TOP", 0, -67 * (GR_GUI.Main:GetHeight() / 750))
     
-    GR_GUI.Main:SetSize(800, 640)
+    --GR_GUI.Main:SetSize(800, 640)
     GR:RedrawBattleshipLinesAndButtons(Battleships.Board, Battleships.VLines, Battleships.HLines, Battleships.Buttons, 570, 450)
     for i,v in ipairs(GR_GUI.Main.Battleships.OppButtons) do
         v:EnableMouse(true)
@@ -1503,5 +1559,3 @@ function GR:BattleshipsShowContent()
     GR:ResizeShips(Battleships.Board)
     GR:ResizeBattleships(Battleships.Board)
 end
-
--- resize needs to size ships better so they fit on tiles (to small)

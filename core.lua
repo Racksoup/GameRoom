@@ -106,14 +106,22 @@ end
 
 function GR:ShowMain()
     GR_GUI.Main:ClearAllPoints()
-    GR_GUI.Main:SetPoint("TOP", UIParent, "TOP", 0, -130)
-    GR_GUI.Main:SetSize(750, 510)
-    if (GR.GameType == "Tictactoe" ) then
-        GR_GUI.Main:SetSize(750, 620)
+
+    if (GR:CheckOutOfBoundsRects(GR_GUI.Main, UIParent)) then
+        GR_GUI.Main:SetPoint("TOP", UIParent, "TOP", 0, -130)
     end
-    if (GR.GameType == "Battleships" ) then
-        GR_GUI.Main:SetSize(800, 640)
+
+    -- if main is bigger than screen, reset main size
+    if (GR_GUI.Main:GetHeight() > UIParent:GetHeight() or GR_GUI.Main:GetWidth() > UIParent:GetWidth()) then
+        GR_GUI.Main:SetSize(750, 510)
+        if (GR.GameType == "Tictactoe" ) then
+            GR_GUI.Main:SetSize(750, 620)
+        end
+        if (GR.GameType == "Battleships" ) then
+            GR_GUI.Main:SetSize(800, 640)
+        end
     end
+    GR:ResizeMain()
     GR:ResizeBattleships()
     GR:ResizeTictactoe()
     GR:ShowChallengeIfChallenged() 
@@ -124,6 +132,7 @@ function GR:CreateMainWindow()
     -- Main Window
     GR_GUI.Main = CreateFrame("Frame", GameRoom, UIParent, "TranslucentFrameTemplate")
     GR_GUI.Main:SetSize(750, 510)
+    GR_GUI.Main:SetMinResize(220,220)
     GR_GUI.Main:SetFrameStrata("HIGH")
     GR_GUI.Main:SetPoint("TOP", UIParent, "TOP", 0, -130)
     GR_GUI.Main:SetMovable(true)
@@ -136,17 +145,21 @@ function GR:CreateMainWindow()
     GR_GUI.Main:SetScript("OnKeyDown", function(self, key)
         if (key == "ESCAPE" and GR_GUI.Main:IsVisible()) then
             GR_GUI.Main:Hide()
+            GR_GUI.Main:SetPropagateKeyboardInput(false)
             C_Timer.After(.001, function() 
-                ToggleGameMenu()
+                GR_GUI.Main:SetPropagateKeyboardInput(true)
+                -- ToggleGameMenu()
             end)
         end
     end)
     GR_GUI.Main:Show()
     GR_GUI.Main:SetAlpha(GR.db.realm.windowAlpha)
-    local ResizeBtn = CreateFrame("Button", nil, GR_GUI.Main)
+
+    GR_GUI.Main.ResizeBtn = CreateFrame("Button", nil, GR_GUI.Main)
+    local ResizeBtn = GR_GUI.Main.ResizeBtn    
+    ResizeBtn:SetPoint("BOTTOMRIGHT", -11, 10)
+    ResizeBtn:SetSize(16, 16)
     ResizeBtn:EnableMouse("true")
-    ResizeBtn:SetPoint("BOTTOMRIGHT", -11, 11)
-    ResizeBtn:SetSize(16,16)
     ResizeBtn:SetNormalTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Down")
     ResizeBtn:SetHighlightTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Highlight")
     ResizeBtn:SetPushedTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
@@ -155,6 +168,7 @@ function GR:CreateMainWindow()
     end)
     ResizeBtn:SetScript("OnMouseUp", function()
         GR_GUI.Main:StopMovingOrSizing("BOTTOMRIGHT")
+        GR:ResizeMain()
         GR:ResizeTictactoe()
         GR:ResizeBattleships()
     end)
@@ -169,7 +183,8 @@ function GR:CreateMainWindow()
     -- C_Timer.After(10, function() tex:SetTexCoord(.7324,.586, .7324,0, 0,.586, 0,0) end)
     -- C_Timer.After(12, function() tex:SetTexCoord(0,.586, .7324,.586, 0,0, .7324,0) end)
     -- C_Timer.After(14, function() tex:SetTexCoord(0,0, 0,.586, .7324,0, .7324,.586) end)
-    local H1 = GR_GUI.Main:CreateFontString(GR_GUI.Main, "HIGH", "GameTooltipText")
+    GR_GUI.Main.H1 =  GR_GUI.Main:CreateFontString(GR_GUI.Main, "HIGH", "GameTooltipText")
+    local H1 = GR_GUI.Main.H1
     H1:SetPoint("TOP", 0, -18)
     H1:SetTextScale(2.8)
     H1:SetTextColor(.8,.8,.8,1)
@@ -225,32 +240,64 @@ function GR:CreateMainWindow()
     HomeString:SetTextColor(.8,.5,.2, 1)
 end
 
+function GR:ResizeMain()
+    -- resize FontStrings
+    local Main = GR_GUI.Main
+    local HeaderInfo = Main.HeaderInfo
+    local WidthRatio = (Main:GetWidth() / 750)
+    local HeightRatio = (Main:GetHeight() / 510)
+    local FontScale = ((WidthRatio + HeightRatio) / 2)
+
+    HeaderInfo:SetPoint("TOP", 0, -60 * HeightRatio)
+    HeaderInfo:SetSize(700 * WidthRatio, 100 * HeightRatio)
+    HeaderInfo.TurnString:SetTextScale(FontScale * 2)
+    if (GR.GameType == "Battleships") then
+        HeaderInfo.TurnString:SetPoint("TOP", 0, -55 * (Main:GetHeight() / 750))
+    else
+        HeaderInfo.TurnString:SetPoint("TOP", 0, -25 * (Main:GetHeight() / 750))
+    end
+    HeaderInfo.OpponentString:SetPoint("TOPLEFT", 0, 0)
+    HeaderInfo.OpponentString:SetTextScale(FontScale * 1.5)
+    HeaderInfo.H2:SetTextScale(FontScale * 2.1)
+    HeaderInfo.ExitBtn:SetSize(100 * WidthRatio, 30 * HeightRatio)
+    HeaderInfo.ExitBtnFS:SetTextScale(1.1 * FontScale)
+    Main.H1:SetPoint("TOP", 0, -18 * HeightRatio)
+    Main.H1:SetTextScale(2.8 * FontScale)
+    
+    Main.ResizeBtn:SetPoint("BOTTOMRIGHT", -11 * WidthRatio, 10 * HeightRatio)
+    Main.ResizeBtn:SetSize(16 * WidthRatio, 16 * HeightRatio)
+
+    Main.xButton:SetSize(25 * WidthRatio, 25 * HeightRatio)
+    Main.xButton:SetPoint("TOPRIGHT", -13 * WidthRatio, -13 * HeightRatio)
+end
+
 function GR:CreateHeaderInfo()
     GR_GUI.Main.HeaderInfo = CreateFrame("Frame", HeaderInfo, GR_GUI.Main)
     local HeaderInfo = GR_GUI.Main.HeaderInfo
-    HeaderInfo:SetPoint("TOP", 0, -70)
-    HeaderInfo:SetSize(600, 100)
+    HeaderInfo:SetPoint("TOP", 0, -56)
+    HeaderInfo:SetSize(700, 100)
     GR_GUI.Main.HeaderInfo.H2 = HeaderInfo:CreateFontString(HeaderInfo, "HIGH", "GameTooltipText")
     local H2 = GR_GUI.Main.HeaderInfo.H2
     H2:SetPoint("TOP", 0, 0)
-    H2:SetTextScale(1.5)
+    H2:SetTextScale(2.1)
     H2:SetTextColor(.8,.8,.8,1)
     H2:SetText("Tic-Tac-Toe")
     
     HeaderInfo.TurnString = HeaderInfo:CreateFontString(HeaderInfo, "HIGH", "GameTooltipText")
     local TurnString = HeaderInfo.TurnString
-    TurnString:SetPoint("TOP", 100, 0)
+    TurnString:SetPoint("TOP", 0, -90)
     TurnString:SetTextScale(2)
 
-    HeaderInfo.ExitBtn = CreateFrame("Button", ExitBtn, GR_GUI.Main, "UIPanelButtonTemplate")
+    HeaderInfo.ExitBtn = CreateFrame("Button", ExitBtn, HeaderInfo, "UIPanelButtonTemplate")
     local ExitBtn = HeaderInfo.ExitBtn
-    ExitBtn:SetPoint("TOPRIGHT", -20, -64)
+    ExitBtn:SetPoint("TOPRIGHT", 0, 0)
     ExitBtn:SetSize(100, 30)
-    local ExitBtnString = ExitBtn:CreateFontString(ExitBtn, "HIGH", "GameTooltipText")
-    ExitBtnString:SetPoint("CENTER", 0, 0)
-    ExitBtnString:SetTextScale(1.1)
-    ExitBtnString:SetTextColor(.8,.8,.8, 1)
-    ExitBtnString:SetText("Exit Game")
+    HeaderInfo.ExitBtnFS = ExitBtn:CreateFontString(ExitBtn, "HIGH", "GameTooltipText")
+    local ExitBtnFS = HeaderInfo.ExitBtnFS 
+    ExitBtnFS:SetPoint("CENTER", 0, 0)
+    ExitBtnFS:SetTextScale(1.1)
+    ExitBtnFS:SetTextColor(.8,.8,.8, 1)
+    ExitBtnFS:SetText("Exit Game")
     ExitBtn:SetScript("OnClick", function(self, button, down)
         if (button == "LeftButton" and down == false) then 
             if (GR.GameType == "Tictactoe") then
@@ -266,11 +313,11 @@ function GR:CreateHeaderInfo()
     end)
     ExitBtn:Hide()
 
-    HeaderInfo.OpponentString = GR_GUI.Main:CreateFontString(HeaderInfo, "HIGH", "GameTooltipText")
+    HeaderInfo.OpponentString = HeaderInfo:CreateFontString(HeaderInfo, "HIGH", "GameTooltipText")
     local Opp = HeaderInfo.OpponentString
-    Opp:SetPoint("TOPLEFT", 20, -68)
+    Opp:SetPoint("TOPLEFT", 0, 0)
     Opp:SetTextColor(.8,.8,.8, 1)
-    Opp:SetTextScale(1.1)
+    Opp:SetTextScale(1.5)
     Opp:Hide()
 
     HeaderInfo.ReInvite = CreateFrame("Button", ReInvite, HeaderInfo, "UIPanelButtonTemplate")
@@ -322,10 +369,10 @@ function GR:CreateHeaderInfo()
                 GR:TicTacToeHideContent()
                 GR_GUI.Main:SetSize(750, 620)
                 GR:SendCommMessage("ZUI_GameRoom_Inv", "TicTacToe_Accept, " .. GR.PlayerPos .. ", " .. UnitName("player"), "WHISPER", Opponent)
-                GR_GUI.Main.Tictactoe:Show()
-                GR:ShowGame()
+                GR:ShowTictactoe()
             end
             if (GR.GameType == "Battleships") then
+                GR:BattleshipsHideContent()
                 GR:SendCommMessage("ZUI_GameRoom_Inv", "Battleships_Accept, " .. GR.PlayerPos .. ", " .. UnitName("player"), "WHISPER", Opponent)
                 GR:BattleshipsShowContent()
             end
@@ -386,8 +433,7 @@ function GR:CreateAcceptDecline()
         end
         if (GR.GameType == "Tictactoe") then
             GR:SendCommMessage("ZUI_GameRoom_Inv", "TicTacToe_Accept, " .. GR.PlayerPos .. ", " .. PlayerName, "WHISPER", GR.Opponent)
-            GR_GUI.Main.Tictactoe:Show()
-            GR:ShowGame()
+            GR:ShowTictactoe()
         end
         if (GR.GameType == "Battleships") then
             GR:SendCommMessage("ZUI_GameRoom_Inv", "Battleships_Accept, " .. GR.PlayerPos .. ", " .. PlayerName, "WHISPER", GR.Opponent)
@@ -469,8 +515,7 @@ function GR:CreateAcceptDecline()
         end
         if (GR.GameType == "Tictactoe") then
             GR:SendCommMessage("ZUI_GameRoom_Inv", "TicTacToe_Accept, " .. GR.PlayerPos .. ", " .. PlayerName, "WHISPER", GR.Opponent)
-            GR_GUI.Main.Tictactoe:Show()
-            GR:ShowGame()
+            GR:ShowTictactoe()
         end
         if (GR.GameType == "Battleships") then
             GR:SendCommMessage("ZUI_GameRoom_Inv", "Battleships_Accept, " .. GR.PlayerPos .. ", " .. PlayerName, "WHISPER", GR.Opponent)
@@ -543,11 +588,9 @@ function GR:SetTurnString()
         if (GR.IsPlayerTurn) then
             TurnString:SetTextColor(0,1,0,1)
             TurnString:SetText(UnitName("player"))
-            TurnString:SetPoint("TOP", 0, -35)
         else
             TurnString:SetTextColor(1,0,0,1)
             TurnString:SetText(GR.Opponent)
-            TurnString:SetPoint("TOP", 0, -35)
         end
     end
 end
@@ -603,11 +646,22 @@ function GR:HideGame()
 end
 
 function GR:AABB(Rect1, Rect2)
-    local margin = 9
-    if (Rect1.tl.x + margin > Rect2.br.x - margin or Rect1.tl.y - margin < Rect2.br.y + margin or Rect1.br.x - margin < Rect2.tl.x + margin or Rect1.br.y + margin > Rect2.tl.y - margin) then
+    local MarginX = 9 * (GR_GUI.Main:GetWidth() / 800)
+    local MarginY = 9 * (GR_GUI.Main:GetHeight() / 640)
+    if (Rect1.tl.x + MarginX > Rect2.br.x - MarginX or Rect1.tl.y - MarginY < Rect2.br.y + MarginY or Rect1.br.x - MarginX < Rect2.tl.x + MarginX or Rect1.br.y + MarginY > Rect2.tl.y - MarginY) then
         return false
     end
     return true
+end
+
+function GR:CheckOutOfBoundsRects(Rect1, Rect2)
+    local Rect1X, Rect1Y, Rect1Width, Rect1Height = Rect1:GetRect()
+    local Rect2X, Rect2Y, Rect2Width, Rect2Height = Rect2:GetRect()
+    -- out of bounds check. rect1 is fully out of rect2
+    if (Rect1X > Rect2X + Rect2Width or Rect1X + Rect1Width < Rect2X or Rect1Y > Rect2Y + Rect2Height or Rect1Y + Rect1Height < Rect2Y) then
+        return true
+    end
+    return false
 end
 
 -- 2048 game before release

@@ -194,6 +194,12 @@ function GR:TicTacToeHideContent()
     GR:HideGame()
 end
 
+function GR:ShowTictactoe()
+    GR_GUI.Main.Tictactoe:Show()
+    GR_GUI.Main.HeaderInfo.TurnString:SetPoint("TOP", 0, -35)
+    GR:ShowGame()            
+end
+
 function GR:TicTacToeComm(...) 
     local prefix, text, distribution, target = ...
     local Buttons = GR_GUI.Main.Tictactoe.Buttons

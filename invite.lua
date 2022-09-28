@@ -703,7 +703,7 @@ function GR:AcceptDeclineChal(...)
                 GR_GUI.Accept.Fs2:SetText(TicOpponent .. " - " .. AcceptGameString)
                 GR.Opponent = TicOpponent
             end
-            if (GR.InGame == false) then
+            if (GR.InGame == false and GR_GUI.Main.Battleships:IsVisible() == false and GR_GUI.Main.Tictactoe:IsVisible() == false) then
                 GR.IsChallenged = true
                 C_Timer.After(15, function()
                     GR.IsChallenged = false
@@ -743,10 +743,8 @@ function GR:AcceptDeclineChal(...)
                 end
             else
                 -- show accept button if not in game
-                if (GR.InGame == false) then
-                    GR_GUI.Main.HeaderInfo.ReInvite:Hide()
-                    GR_GUI.Main.HeaderInfo.ReMatch:Show()
-                end
+                GR_GUI.Main.HeaderInfo.ReInvite:Hide()
+                GR_GUI.Main.HeaderInfo.ReMatch:Show()
             end
         end
     end
