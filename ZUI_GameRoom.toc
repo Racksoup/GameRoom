@@ -14,3 +14,4 @@ settings.lua
 invite.lua
 tictactoe.lua
 battleships.lua
+asteroids.lua

@@ -60,6 +60,7 @@ function GR:OnInitialize()
     GR:CreateInvite()
     GR:CreateTicTacToe()
     GR:CreateBattleships()
+    GR:CreateAsteroids()
     
     GR.db.realm.tab = 1
     GR:TabSelect()
@@ -299,17 +300,20 @@ function GR:CreateHeaderInfo()
     ExitBtnFS:SetTextColor(.8,.8,.8, 1)
     ExitBtnFS:SetText("Exit Game")
     ExitBtn:SetScript("OnClick", function(self, button, down)
-        if (button == "LeftButton" and down == false) then 
-            if (GR.GameType == "Tictactoe") then
-                GR:SendCommMessage("ZUI_GameRoom_Inv", "TicTacToe_GameEnd", "WHISPER", GR.Opponent)
-                GR:TicTacToeHideContent()
-            end
-            if (GR.GameType == "Battleships") then
-                GR:SendCommMessage("ZUI_GameRoom_Inv", "Battleships_GameEnd", "WHISPER", GR.Opponent)
-                GR:BattleshipsHideContent()
-            end
-            GR.GameType = nil
+      if (button == "LeftButton" and down == false) then 
+        if (GR.GameType == "Tictactoe") then
+          GR:SendCommMessage("ZUI_GameRoom_Inv", "TicTacToe_GameEnd", "WHISPER", GR.Opponent)
+          GR:TicTacToeHideContent()
         end
+        if (GR.GameType == "Battleships") then
+          GR:SendCommMessage("ZUI_GameRoom_Inv", "Battleships_GameEnd", "WHISPER", GR.Opponent)
+          GR:BattleshipsHideContent()
+        end
+        if (GR.GameType == "Asteroids") then
+          GR:AsteroidsHide()    
+        end
+        GR.GameType = nil
+      end
     end)
     ExitBtn:Hide()
 
@@ -621,11 +625,29 @@ function GR:ShowGame()
     GR_GUI.Main.HeaderInfo.Rival:Hide()
     GR_GUI.Main.HomeBtn:Hide()
     GR_GUI.Main.Invite:Hide()
-    GR_GUI.Main.HeaderInfo.OpponentString:SetText("Opponent: " .. GR.Opponent)
+    if (GR.Opponent) then 
+      GR_GUI.Main.HeaderInfo.OpponentString:SetText("Opponent: " .. GR.Opponent)
+    end
     GR:SetTurnString()
     if GR.GameType == "Tictactoe" then
         GR_GUI.Main:SetSize(750, 620)
     end
+end
+
+function GR:ShowSoloGame()
+  GR.InGame = true
+  GR_GUI.Main.HeaderInfo:Show()
+  GR_GUI.Main.HeaderInfo.OpponentString:Hide()
+  GR_GUI.Main.HeaderInfo.TurnString:Hide()
+  GR_GUI.Main.HeaderInfo.ExitBtn:Show()
+  GR_GUI.Accept:Hide()
+  GR_GUI.Main.SettingsScroll:Hide()
+  GR_GUI.Main.Settings:Hide()
+  GR_GUI.Main.HeaderInfo.ReInvite:Hide()
+  GR_GUI.Main.HeaderInfo.ReMatch:Hide()
+  GR_GUI.Main.HeaderInfo.Rival:Hide()
+  GR_GUI.Main.HomeBtn:Hide()
+  GR_GUI.Main.Invite:Hide()
 end
 
 function GR:HideGame()

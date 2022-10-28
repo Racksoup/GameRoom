@@ -92,7 +92,8 @@ function GR:CreateInvite()
     GR:CreateInviteFriends()
     GR:CreateInviteParty()
     GR:CreateInviteZone()
-    GR:CreateGameButtons()
+    GR:CreateMultiGameButtons()
+    GR:CreateSoloGameButtons()
 end
 
 function GR:CreateManualInvite()
@@ -132,6 +133,7 @@ end
 function GR:ToggleGameBtns()
     if (GR.Target == nil) then
         GR_GUI.Main.Invite.GameBtns:Hide()
+        GR_GUI.Main.Invite.SoloGameBtns:Show()
     else
         GR_GUI.Main.Invite.GameBtns.H4:SetText(GR.Target)
         GR_GUI.Main.Invite.GameBtns:Show()
@@ -150,7 +152,34 @@ function GR:HideGameBtnsIfSentInvite()
     end
 end
 
-function GR:CreateGameButtons()
+function GR:CreateSoloGameButtons() 
+  local Invite = GR_GUI.Main.Invite
+  Invite.SoloGameBtns = CreateFrame("Frame", SoloGameBtns, Invite)
+  local Btns = Invite.SoloGameBtns
+  Btns:SetPoint("CENTER", 0, -55)
+  Btns:SetSize(500, 170)
+  Btns.H3 = Btns:CreateFontString(Btns, "HIGH", "GameTooltipText")
+  Btns.H3:SetPoint("TOP", 0, 48)
+  Btns.H3:SetText("Solo Games")
+
+  Btns.Asteroids = CreateFrame("Button", Asteroids, Btns, "UIPanelButtonTemplate")
+  Btns.Asteroids:SetPoint("TOPLEFT", 0, 0)
+  Btns.Asteroids:SetSize(120, 30)
+  Btns.Asteroids:SetScript("OnClick", function(self, button, down)
+    if (button == "LeftButton" and down == false) then 
+      GR_GUI.Main.HeaderInfo.H2:SetText("Asteroids")
+      GR:AsteroidsShow()
+    end
+  end)
+  local AsteroidsFS = Btns.Asteroids:CreateFontString(Btns.Tic, "HIGH", "GameTooltipText")
+  AsteroidsFS:SetPoint("CENTER")
+  AsteroidsFS:SetTextScale(1.1)
+  AsteroidsFS:SetTextColor(.8,.8,.8, 1)
+  AsteroidsFS:SetText("Asteroids")
+
+end
+
+function GR:CreateMultiGameButtons()
     local Invite = GR_GUI.Main.Invite
     Invite.GameBtns = CreateFrame("Frame", GameBtns, Invite)
     local Btns = Invite.GameBtns
