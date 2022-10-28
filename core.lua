@@ -172,6 +172,7 @@ function GR:CreateMainWindow()
         GR:ResizeMain()
         GR:ResizeTictactoe()
         GR:ResizeBattleships()
+        GR:SizeAsteroids()
     end)
 
     -- GR_GUI.Main.Tex = GR_GUI.Main:CreateTexture()

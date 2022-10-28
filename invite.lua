@@ -147,17 +147,19 @@ end
 function GR:HideGameBtnsIfSentInvite()
     if (GR.CanSendInvite) then
         GR_GUI.Main.Invite.GameBtns:Show()
-    else
+        GR_GUI.Main.Invite.SoloGameBtns:Hide()
+      else
         GR_GUI.Main.Invite.GameBtns:Hide()
+        GR_GUI.Main.Invite.SoloGameBtns:Show()
     end
 end
 
 function GR:CreateSoloGameButtons() 
   local Invite = GR_GUI.Main.Invite
-  Invite.SoloGameBtns = CreateFrame("Frame", SoloGameBtns, Invite)
+  Invite.SoloGameBtns = CreateFrame("Frame", SoloGameBtns, Invite, "ThinBorderTemplate")
   local Btns = Invite.SoloGameBtns
-  Btns:SetPoint("CENTER", 0, -55)
-  Btns:SetSize(500, 170)
+  Btns:SetPoint("TOP", 0, -155)
+  Btns:SetSize(500, 100)
   Btns.H3 = Btns:CreateFontString(Btns, "HIGH", "GameTooltipText")
   Btns.H3:SetPoint("TOP", 0, 48)
   Btns.H3:SetText("Solo Games")
@@ -181,10 +183,10 @@ end
 
 function GR:CreateMultiGameButtons()
     local Invite = GR_GUI.Main.Invite
-    Invite.GameBtns = CreateFrame("Frame", GameBtns, Invite)
+    Invite.GameBtns = CreateFrame("Frame", GameBtns, Invite, "ThinBorderTemplate")
     local Btns = Invite.GameBtns
-    Btns:SetPoint("CENTER", 0, -55)
-    Btns:SetSize(500, 170)
+    Btns:SetPoint("TOP", 0, -155)
+    Btns:SetSize(500, 100)
     Btns.H3 = Btns:CreateFontString(Btns, "HIGH", "GameTooltipText")
     Btns.H3:SetPoint("TOP", 0, 48)
     Btns.H3:SetTextScale(1.5)
