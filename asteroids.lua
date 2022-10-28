@@ -1,10 +1,13 @@
 -- create
 function GR:CreateAsteroids()
+  GR.Asteroids = {}
   GR.AsteroidsPhase = "Stopped"
   GR.AsteroidsGameTime = 0
 
   GR_GUI.Main.Asteroids = CreateFrame("Frame", Asteroids, GR_GUI.Main, "ThinBorderTemplate")
   local Asteroids = GR_GUI.Main.Asteroids
+  Asteroids:SetPoint("BOTTOM", 0, 25 * (GR_GUI.Main:GetHeight() / 640))
+  Asteroids:SetSize(GR_GUI.Main:GetWidth() * (500 / 800), GR_GUI.Main:GetHeight() * (500 / 640))
   Asteroids:Hide()
 
   -- Game Loop
@@ -59,9 +62,15 @@ end
 function GR:CreateAsteroidsShip()
   local Main = GR_GUI.Main
   local Asteroids = GR_GUI.Main.Asteroids
-
+  
+  -- Ship Vars
+  GR.Asteroids.ShipXPos = Asteroids:GetWidth() / -2
+  GR.Asteroids.ShipYPos = Asteroids:GetHeight() / 2
+  
+  -- Ship
   Asteroids.Ship = CreateFrame("Frame", Ship, Asteroids)
   local Ship = Asteroids.Ship
+  Ship:SetPoint("BOTTOMRIGHT", GR.Asteroids.ShipXPos, GR.Asteroids.ShipYPos)
 
   -- top-left line
   Ship.Line1 = Ship:CreateLine()
@@ -109,7 +118,6 @@ function GR:SizeAsteroidsShip(WidthRatio, HeightRatio)
   local Ship = GR_GUI.Main.Asteroids.Ship
 
   Ship:SetSize(32 * WidthRatio, 32 * HeightRatio)
-  Ship:SetPoint("CENTER")
 
   -- top-left line
   Ship.Line1:SetStartPoint("BOTTOMLEFT", 0, 0)
@@ -150,10 +158,11 @@ function GR:AsteroidsShow()
 end
 
 -- functionality
-
 function GR:AsteroidsGameLoop(self, elapsed)
   GR.AsteroidsGameTime = GR.AsteroidsGameTime + elapsed
   print(GR.AsteroidsGameTime)
+
+  GR:AsteroidsUpdateShip(elapsed)
 end
 
 function GR:AsteroidsStartGame()
@@ -179,6 +188,8 @@ function GR:AsteroidsStopGame()
   -- ends game loop
   Asteroids.Game:Hide()
   GR.AsteroidsGameTime = 0
+  GR.Asteroids.ShipXPos = Asteroids:GetWidth() / -2
+  GR.Asteroids.ShipYPos = Asteroids:GetHeight() / 2
 end
   
 function GR:AsteroidsPauseGame()
@@ -190,4 +201,13 @@ function GR:AsteroidsPauseGame()
   
   -- pause game loop
   Asteroids.Game:Hide()
+end
+
+-- Update
+function GR:AsteroidsUpdateShip(elapsed)
+  local Asteroids = GR_GUI.Main.Asteroids
+  local Ship = Asteroids.Ship
+
+  GR.Asteroids.ShipXPos = GR.Asteroids.ShipXPos + elapsed * 10
+  Ship:SetPoint("BOTTOMRIGHT", GR.Asteroids.ShipXPos, GR.Asteroids.ShipYPos)
 end
