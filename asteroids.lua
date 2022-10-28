@@ -44,8 +44,32 @@ function GR:CreateAsteroids()
   end)
   StopBtn:Hide()
   
+  -- Create
+  GR:CreateAsteroidsShip()
+
   -- Size
   GR:SizeAsteroids()
+end
+
+function GR:CreateAsteroidsShip()
+  local Main = GR_GUI.Main
+  local Asteroids = GR_GUI.Main.Asteroids
+
+  Asteroids.Ship = CreateFrame("Frame", Ship, Asteroids)
+  local Ship = Asteroids.Ship
+
+  -- top-left line
+  Ship.Line1 = Ship:CreateLine()
+  Ship.Line1:SetColorTexture(.8,.8,.8, 1)
+  -- top-right line
+  Ship.Line2 = Ship:CreateLine()
+  Ship.Line2:SetColorTexture(.8,.8,.8, 1)
+  -- bottom-left line
+  Ship.Line3 = Ship:CreateLine()
+  Ship.Line3:SetColorTexture(.8,.8,.8, 1)
+  -- bottom-right line
+  Ship.Line4 = Ship:CreateLine()
+  Ship.Line4:SetColorTexture(.8,.8,.8, 1)
 end
 
 -- resize
@@ -60,16 +84,44 @@ function GR:SizeAsteroids()
   Asteroids:SetSize(Main:GetWidth() * (500 / 800), Main:GetHeight() * (500 / 640))
   local WidthRatio = Asteroids:GetWidth() / 770
   local HeightRatio = Asteroids:GetHeight() / 450
-
+  
   -- pause button
   PauseBtn:SetPoint("TOPLEFT", 15 * WidthRatio, 40 * HeightRatio)
   PauseBtn:SetSize(100 * WidthRatio, 35 * HeightRatio)
   PauseBtn.FS:SetTextScale(1.8 * ((WidthRatio + HeightRatio) / 2))
-
+  
   -- stop button
   StopBtn:SetPoint("TOPLEFT", 120 * WidthRatio, 40 * HeightRatio)
   StopBtn:SetSize(100 * WidthRatio, 35 * HeightRatio)
   StopBtn.FS:SetTextScale(1.8 * ((WidthRatio + HeightRatio) / 2))
+  
+  GR:SizeAsteroidsShip(WidthRatio, HeightRatio)
+end
+
+function GR:SizeAsteroidsShip(WidthRatio, HeightRatio)
+  local Main = GR_GUI.Main
+  local Asteroids = GR_GUI.Main.Asteroids
+  local Ship = GR_GUI.Main.Asteroids.Ship
+
+  Ship:SetSize(32 * WidthRatio, 32 * HeightRatio)
+  Ship:SetPoint("CENTER")
+
+  -- top-left line
+  Ship.Line1:SetStartPoint("BOTTOMLEFT", 0, 0)
+  Ship.Line1:SetEndPoint("TOP", 0, 0)
+  Ship.Line1:SetThickness(3 * ((WidthRatio + HeightRatio) / 2))
+  -- top-right line
+  Ship.Line2:SetStartPoint("BOTTOMRIGHT", 0, 0)
+  Ship.Line2:SetEndPoint("TOP", 0, 0)
+  Ship.Line2:SetThickness(3 * ((WidthRatio + HeightRatio) / 2))
+  -- bottom-left line
+  Ship.Line3:SetStartPoint("BOTTOMRIGHT", 0, 0)
+  Ship.Line3:SetEndPoint("CENTER", 0, -6 * HeightRatio)
+  Ship.Line3:SetThickness(3 * ((WidthRatio + HeightRatio) / 2))
+  -- bottom-right line
+  Ship.Line4:SetStartPoint("BOTTOMLEFT", 0, 0)
+  Ship.Line4:SetEndPoint("CENTER", 0, -6 * HeightRatio)
+  Ship.Line4:SetThickness(3 * ((WidthRatio + HeightRatio) / 2))
 end
 
 -- hide / show
