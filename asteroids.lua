@@ -1,10 +1,19 @@
 -- create
 function GR:CreateAsteroids()
   GR.AsteroidsPhase = "Stopped"
+  GR.AsteroidsGameTime = 0
 
   GR_GUI.Main.Asteroids = CreateFrame("Frame", Asteroids, GR_GUI.Main, "ThinBorderTemplate")
   local Asteroids = GR_GUI.Main.Asteroids
   Asteroids:Hide()
+
+  -- Game Loop
+  Asteroids.Game = CreateFrame("Frame", Game, Asteroids)
+  local Game = Asteroids.Game
+  Game:SetScript("OnUpdate", function(self, elapsed) 
+    GR:AsteroidsGameLoop(self, elapsed)
+  end)
+  Game:Hide()
 
   -- pause button
   Asteroids.PauseBtn = CreateFrame("Button", PauseBtn, Asteroids, "UIPanelButtonTemplate")
@@ -16,14 +25,11 @@ function GR:CreateAsteroids()
   PauseBtn:SetScript("OnClick", function(self, button, down)
     if (button == "LeftButton" and down == false) then
       if (GR.AsteroidsPhase == "Stopped" or GR.AsteroidsPhase == "Paused") then
-        GR.AsteroidsPhase = "Started"
-        PauseBtn.FS:SetText("Pause")
-        Asteroids.StopBtn:Show()
-        
+        -- start game
+        GR:AsteroidsStartGame()      
       elseif (GR.AsteroidsPhase == "Started") then
-        GR.AsteroidsPhase = "Paused"
-        PauseBtn.FS:SetText("Start")
-        
+        -- pause game
+        GR:AsteroidsPauseGame()
       end
     end
   end)
@@ -37,9 +43,8 @@ function GR:CreateAsteroids()
   StopBtn.FS:SetText("Stop")
   StopBtn:SetScript("OnClick", function(self, button, down)
     if (button == "LeftButton" and down == false) then
-      GR.AsteroidsPhase = "Stopped"
-      PauseBtn.FS:SetText("Start")
-      StopBtn:Hide()
+      -- stop game
+      GR:AsteroidsStopGame()
     end
   end)
   StopBtn:Hide()
@@ -140,7 +145,49 @@ function GR:AsteroidsShow()
   GR.GameType = "Asteroids"
   GR:SizeAsteroids()
   Asteroids:Show()
+  Asteroids.Game:Hide()
   GR:ShowSoloGame()
 end
 
 -- functionality
+
+function GR:AsteroidsGameLoop(self, elapsed)
+  GR.AsteroidsGameTime = GR.AsteroidsGameTime + elapsed
+  print(GR.AsteroidsGameTime)
+end
+
+function GR:AsteroidsStartGame()
+  local Asteroids = GR_GUI.Main.Asteroids
+
+  -- game buttons
+  GR.AsteroidsPhase = "Started"
+  Asteroids.PauseBtn.FS:SetText("Pause")
+  Asteroids.StopBtn:Show()
+
+  -- start game loop
+  Asteroids.Game:Show()
+end
+
+function GR:AsteroidsStopGame()
+  local Asteroids = GR_GUI.Main.Asteroids
+  
+  -- game buttons
+  GR.AsteroidsPhase = "Stopped"
+  Asteroids.PauseBtn.FS:SetText("Start")
+  Asteroids.StopBtn:Hide()
+  
+  -- ends game loop
+  Asteroids.Game:Hide()
+  GR.AsteroidsGameTime = 0
+end
+  
+function GR:AsteroidsPauseGame()
+  local Asteroids = GR_GUI.Main.Asteroids
+    
+  -- game buttons
+  GR.AsteroidsPhase = "Paused"
+  Asteroids.PauseBtn.FS:SetText("Start")
+  
+  -- pause game loop
+  Asteroids.Game:Hide()
+end
