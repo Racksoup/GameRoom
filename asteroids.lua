@@ -1,16 +1,23 @@
 -- create
 function GR:CreateAsteroids()
-  GR.Asteroids = {}
-  GR.Asteroids.Phase = "Stopped"
-  GR.Asteroids.GameTime = 0
-  GR.Asteroids.ShipRotation = 0.0
-
   GR_GUI.Main.Asteroids = CreateFrame("Frame", Asteroids, GR_GUI.Main, "ThinBorderTemplate")
   local Asteroids = GR_GUI.Main.Asteroids
   Asteroids:SetPoint("BOTTOM", 0, 25 * (GR_GUI.Main:GetHeight() / 640))
   Asteroids:SetSize(GR_GUI.Main:GetWidth() * (500 / 800), GR_GUI.Main:GetHeight() * (500 / 640))
   Asteroids:Hide()
 
+  GR.Asteroids = {}
+  GR.Asteroids.Phase = "Stopped"
+  GR.Asteroids.GameTime = 0
+  GR.Asteroids.ShipRotation = 0.0
+  GR.Asteroids.ShipAcceleration = 100
+  GR.Asteroids.ShipDesceleration = -1
+  GR.Asteroids.ShipMaxSpeed = 80
+  GR.Asteroids.ShipXVelocity = 0
+  GR.Asteroids.ShipYVelocity = 0
+  GR.Asteroids.ShipPosX = Asteroids:GetWidth() / 2
+  GR.Asteroids.ShipPosY = Asteroids:GetHeight() / 2
+  
   
   -- Create
   GR:CreateAsteroidsGameLoop()
@@ -264,16 +271,56 @@ function GR:AsteroidsUpdateShip(elapsed)
   local Asteroids = GR_GUI.Main.Asteroids
   local Ship = Asteroids.Ship
 
+  --Ship:SetPoint("BOTTOMLEFT", Asteroids:GetWidth() / 2 + GR.Asteroids.GameTime * 20, Asteroids:GetHeight() / 2 + GR.Asteroids.GameTime * 20)
+
   if (GR.Asteroids.DownA == true) then
-    GR.Asteroids.ShipRotation = GR.Asteroids.ShipRotation + elapsed * 2
+    GR.Asteroids.ShipRotation = (GR.Asteroids.ShipRotation + elapsed * 2) % 4
     GR:AsteroidsRotateShip(elapsed, Asteroids, Ship)
   end
   if (GR.Asteroids.DownD == true) then
-    GR.Asteroids.ShipRotation = GR.Asteroids.ShipRotation - elapsed * 2
+    GR.Asteroids.ShipRotation = (GR.Asteroids.ShipRotation - elapsed * 2) % 4
     GR:AsteroidsRotateShip(elapsed, Asteroids, Ship)
+  end
+  if (GR.Asteroids.DownW == true) then
+    GR:AsteroidsAccelerateShip(elapsed, Asteroids, Ship)
+  end
+
+  GR:AsteroidsApplySpeed(elapsed, Asteroids, Ship)
+end
+
+function GR:AsteroidsAccelerateShip(elapsed, Asteroids, Ship)
+  local ShipRotation = GR.Asteroids.ShipRotation
+
+  local Angle = (3.14159 * ((-ShipRotation -.66) % 4)) / 2
+
+  -- apply acceleration
+  GR.Asteroids.ShipYVelocity = GR.Asteroids.ShipYVelocity + (math.cos(Angle) - math.sin(Angle)) * elapsed * 80
+  GR.Asteroids.ShipXVelocity = GR.Asteroids.ShipXVelocity + (math.cos(Angle) + math.sin(Angle)) * elapsed * 80
+
+  -- limit speed
+  if (GR.Asteroids.ShipXVelocity > GR.Asteroids.ShipMaxSpeed) then
+    GR.Asteroids.ShipXVelocity = GR.Asteroids.ShipMaxSpeed
+  end
+  if (GR.Asteroids.ShipXVelocity < -GR.Asteroids.ShipMaxSpeed) then
+    GR.Asteroids.ShipXVelocity = -GR.Asteroids.ShipMaxSpeed
+  end
+  if (GR.Asteroids.ShipYVelocity > GR.Asteroids.ShipMaxSpeed) then
+    GR.Asteroids.ShipYVelocity = GR.Asteroids.ShipMaxSpeed
+  end
+  if (GR.Asteroids.ShipYVelocity < -GR.Asteroids.ShipMaxSpeed) then
+    GR.Asteroids.ShipYVelocity = -GR.Asteroids.ShipMaxSpeed
   end
 end
 
+function GR:AsteroidsApplySpeed(elapsed, Asteroids, Ship)
+  local ShipRotation = GR.Asteroids.ShipRotation
+
+  local Angle = (3.14159 * ((-ShipRotation -.66) % 4)) / 2
+
+  GR.Asteroids.ShipPosY = GR.Asteroids.ShipPosY + elapsed * GR.Asteroids.ShipYVelocity
+  GR.Asteroids.ShipPosX = GR.Asteroids.ShipPosX + elapsed * GR.Asteroids.ShipXVelocity
+  Ship:SetPoint("BOTTOMLEFT", GR.Asteroids.ShipPosX, GR.Asteroids.ShipPosY)
+end
 
 function GR:AsteroidsRotateShip(elapsed, Asteroids, Ship)
   function RotateCoordPair (x,y,ox,oy,a,asp)
@@ -291,45 +338,45 @@ function GR:AsteroidsRotateShip(elapsed, Asteroids, Ship)
   aspect=1
   
   -- TopLeft Ship Line
-  angle1= (3.14159 * (GR.Asteroids.ShipRotation % 4)) / 2
+  angle1= (3.14159 * GR.Asteroids.ShipRotation) / 2
   local line1 = {}
   line1.ULx, line1.ULy = RotateCoordPair(coords.tl.x,coords.tl.y,origin.x,origin.y,angle1,aspect)
   line1.LLx, line1.LLy = RotateCoordPair(coords.bl.x,coords.bl.y,origin.x,origin.y,angle1,aspect)
   line1.URx, line1.URy = RotateCoordPair(coords.tr.x,coords.tr.y,origin.x,origin.y,angle1,aspect)
   line1.LRx, line1.LRy = RotateCoordPair(coords.br.x,coords.br.y,origin.x,origin.y,angle1,aspect)
-  Ship.Line1:SetStartPoint("CENTER", ((line1.LLx + line1.LRx) / 2 * 70) - 70 / 2, ((line1.LLy + line1.LRy) / 2 * 70) - 70) 
-  Ship.Line1:SetEndPoint("CENTER", ((line1.URx + line1.ULx) / 2 * 70) - 70 / 2, ((line1.URy + line1.ULy) / 2 * 70) - 70) 
+  Ship.Line1:SetStartPoint("CENTER", ((line1.LLx + line1.LRx) / 2 * 40) - 40 / 2, ((line1.LLy + line1.LRy) / 2 * 40) - 40) 
+  Ship.Line1:SetEndPoint("CENTER", ((line1.URx + line1.ULx) / 2 * 40) - 40 / 2, ((line1.URy + line1.ULy) / 2 * 40) - 40) 
   
   -- TopRight Ship Line
-  angle2= (3.14159 * ((GR.Asteroids.ShipRotation + 0.4) % 4)) / 2
+  angle2= (3.14159 * (GR.Asteroids.ShipRotation + 0.4)) / 2
   local line2 = {}
   line2.ULx, line2.ULy = RotateCoordPair(coords.tl.x,coords.tl.y,origin.x,origin.y,angle2,aspect)
   line2.LLx, line2.LLy = RotateCoordPair(coords.bl.x,coords.bl.y,origin.x,origin.y,angle2,aspect)
   line2.URx, line2.URy = RotateCoordPair(coords.tr.x,coords.tr.y,origin.x,origin.y,angle2,aspect)
   line2.LRx, line2.LRy = RotateCoordPair(coords.br.x,coords.br.y,origin.x,origin.y,angle2,aspect)
-  Ship.Line2:SetStartPoint("CENTER", ((line2.LLx + line2.LRx) / 2 * 70) - 70 / 2, ((line2.LLy + line2.LRy) / 2 * 70) - 70) 
-  Ship.Line2:SetEndPoint("CENTER", ((line2.URx + line2.ULx) / 2 * 70) - 70 / 2, ((line2.URy + line2.ULy) / 2 * 70) - 70) 
+  Ship.Line2:SetStartPoint("CENTER", ((line2.LLx + line2.LRx) / 2 * 40) - 40 / 2, ((line2.LLy + line2.LRy) / 2 * 40) - 40) 
+  Ship.Line2:SetEndPoint("CENTER", ((line2.URx + line2.ULx) / 2 * 40) - 40 / 2, ((line2.URy + line2.ULy) / 2 * 40) - 40) 
   
   
   -- BottomLeft Ship Line
-  angle3= (3.14159 * ((GR.Asteroids.ShipRotation + 0.4) % 4)) / 2
+  angle3= (3.14159 * (GR.Asteroids.ShipRotation + 0.4)) / 2
   local line3 = {}
   line3.ULx, line3.ULy = RotateCoordPair(coords.tl.x,coords.tl.y,origin.x,origin.y,angle3,aspect)
   line3.LLx, line3.LLy = RotateCoordPair(coords.bl.x -.333,coords.bl.y,origin.x,origin.y,angle3,aspect)
   line3.URx, line3.URy = RotateCoordPair(coords.tr.x,coords.tr.y,origin.x,origin.y,angle3,aspect)
   line3.LRx, line3.LRy = RotateCoordPair(coords.br.x,coords.br.y -1,origin.x,origin.y,angle3,aspect)
-  Ship.Line3:SetStartPoint("CENTER", ((line3.LLx + line3.LRx) / 2 * 70) - 70 / 2, ((line3.LLy + line3.LRy) / 2 * 70) - 70) 
-  Ship.Line3:SetEndPoint("CENTER", ((line3.URx + line3.ULx) / 2 * 70) - 70 / 2, ((line3.URy + line3.ULy) / 2 * 70) - 70) 
+  Ship.Line3:SetStartPoint("CENTER", ((line3.LLx + line3.LRx) / 2 * 40) - 40 / 2, ((line3.LLy + line3.LRy) / 2 * 40) - 40) 
+  Ship.Line3:SetEndPoint("CENTER", ((line3.URx + line3.ULx) / 2 * 40) - 40 / 2, ((line3.URy + line3.ULy) / 2 * 40) - 40) 
   
   -- BottomRight Ship Line
-  angle4= (3.14159 * (GR.Asteroids.ShipRotation % 4)) / 2
+  angle4= (3.14159 * GR.Asteroids.ShipRotation) / 2
   local line4 = {}
   line4.ULx, line4.ULy = RotateCoordPair(coords.tl.x,coords.tl.y,origin.x,origin.y,angle4,aspect)
   line4.LLx, line4.LLy = RotateCoordPair(coords.bl.x -.333,coords.bl.y,origin.x,origin.y,angle3,aspect)
   line4.URx, line4.URy = RotateCoordPair(coords.tr.x,coords.tr.y,origin.x,origin.y,angle4,aspect)
   line4.LRx, line4.LRy = RotateCoordPair(coords.br.x,coords.br.y -1,origin.x,origin.y,angle3,aspect)
-  Ship.Line4:SetStartPoint("CENTER", ((line4.LLx + line4.LRx) / 2 * 70) - 70 / 2, ((line4.LLy + line4.LRy) / 2 * 70) - 70) 
-  Ship.Line4:SetEndPoint("CENTER", ((line4.URx + line4.ULx) / 2 * 70) - 70 / 2, ((line4.URy + line4.ULy) / 2 * 70) - 70) 
+  Ship.Line4:SetStartPoint("CENTER", ((line4.LLx + line4.LRx) / 2 * 40) - 40 / 2, ((line4.LLy + line4.LRy) / 2 * 40) - 40) 
+  Ship.Line4:SetEndPoint("CENTER", ((line4.URx + line4.ULx) / 2 * 40) - 40 / 2, ((line4.URy + line4.ULy) / 2 * 40) - 40) 
   
   Asteroids.Test.TestTex:SetTexCoord(line1.ULx, line1.ULy, line1.LLx, line1.LLy, line1.URx, line1.URy, line1.LRx, line1.LRy)
 
