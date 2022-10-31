@@ -11,6 +11,8 @@ function GR:CreateAsteroids()
   GR.Asteroids.Const.BulletSize = 20
   GR.Asteroids.Const.BulletThickness = 4
   GR.Asteroids.Const.BulletSpeed = 200
+  GR.Asteroids.Const.CometSize = 20
+  GR.Asteroids.Const.CometMaxSpeed = 50
   
   -- Asteroids Frame
   GR_GUI.Main.Asteroids = CreateFrame("Frame", Asteroids, GR_GUI.Main, "ThinBorderTemplate")
@@ -36,12 +38,15 @@ function GR:CreateAsteroids()
   GR.Asteroids.BulletSize = GR.Asteroids.Const.BulletSize
   GR.Asteroids.BulletThickness = GR.Asteroids.Const.BulletThickness
   GR.Asteroids.BulletSpeed = GR.Asteroids.Const.BulletSpeed
-  
+  GR.Asteroids.CometSize = GR.Asteroids.Const.CometSize
+  GR.Asteroids.CometMaxSpeed = GR.Asteroids.Const.CometMaxSpeed 
+
   -- Create
   GR:CreateAsteroidsGameLoop()
   GR:CreateAsteroidsGameButtons()
   GR:CreateAsteroidsShip()
   GR:CreateAsteroidsBullets()
+  GR:CreateAsteroidsComets()
 
   -- Size
   GR:SizeAsteroids()
@@ -186,6 +191,29 @@ function GR:CreateAsteroidsBullets()
   end
 end
 
+function GR:CreateAsteroidsComets()
+  local Asteroids = GR_GUI.Main.Asteroids
+  Asteroids.Comets = {}
+  local Comets = Asteroids.Comets
+
+  for i=1, 12, 1 do
+    local randX = (Asteroids:GetWidth() - GR.Asteroids.CometSize - 4) * (math.random(0, 10000) / 10000)
+    local randY = (Asteroids:GetHeight() - GR.Asteroids.CometSize - 4) * (math.random(0, 10000) / 10000)
+    local randVelX = GR.Asteroids.CometMaxSpeed * (math.random(-10000, 10000) / 10000)
+    local randVelY = GR.Asteroids.CometMaxSpeed * (math.random(-10000, 10000) / 10000)
+    Comets[i] = CreateFrame("Frame", Comet, Asteroids)
+    Comets[i]:SetPoint("BOTTOMLEFT", randX, randY)
+    Comets[i]:SetSize(GR.Asteroids.CometSize, GR.Asteroids.CometSize)
+    Comets[i].Tex = Comets[i]:CreateTexture()
+    Comets[i].Tex:SetAllPoints(Comets[i])
+    Comets[i].Tex:SetColorTexture(.4,0,1, 1)
+    Comets[i].PosX = randX
+    Comets[i].PosY = randY
+    Comets[i].VelX = randVelX
+    Comets[i].VelY = randVelY
+  end
+end
+
 -- resize
 function GR:SizeAsteroids()
   local Main = GR_GUI.Main
@@ -213,6 +241,7 @@ function GR:SizeAsteroids()
   
   GR:SizeAsteroidsShip(WidthRatio, HeightRatio)
   GR:SizeAsteroidsBullets()
+  GR:SizeAsteroidsComets()
 end
 
 function GR:SizeAsteroidsShip(WidthRatio, HeightRatio)
@@ -247,6 +276,17 @@ function GR:SizeAsteroidsBullets()
   end
 end
 
+function GR:SizeAsteroidsComets()
+  local Comets = GR_GUI.Main.Asteroids.Comets
+  
+  GR.Asteroids.CometSize = GR.Asteroids.Const.CometSize * ((GR.Asteroids.ScreenXRatio + GR.Asteroids.ScreenYRatio) / 2)
+  GR.Asteroids.CometMaxSpeed = GR.Asteroids.Const.CometMaxSpeed * ((GR.Asteroids.ScreenXRatio + GR.Asteroids.ScreenYRatio) / 2)
+
+  for i=1, #Comets, 1 do
+    Comets[i]:SetSize(GR.Asteroids.CometSize, GR.Asteroids.CometSize)
+  end
+end
+
 -- hide / show
 function GR:AsteroidsHide()
   local Main = GR_GUI.Main
@@ -273,6 +313,7 @@ function GR:AsteroidsGameLoop(self, elapsed)
 
   GR:AsteroidsUpdateShip(elapsed)
   GR:AsteroidsUpdateBullets(elapsed)
+  GR:AsteroidsUpdateComets(elapsed)
 end
 
 function GR:AsteroidsStartGame()
@@ -290,6 +331,7 @@ end
 function GR:AsteroidsStopGame()
   local Asteroids = GR_GUI.Main.Asteroids
   local Ship = Asteroids.Ship
+  local Comets = Asteroids.Comets
 
   -- game buttons
   GR.Asteroids.Phase = "Stopped"
@@ -305,8 +347,23 @@ function GR:AsteroidsStopGame()
   GR.Asteroids.ShipPosX = Asteroids:GetWidth() / 2
   GR.Asteroids.ShipPosY = Asteroids:GetHeight() / 2
 
+  -- reset ship
   Ship:SetPoint("BOTTOMLEFT", GR.Asteroids.ShipPosX, GR.Asteroids.ShipPosY)
   GR:AsteroidsRotateShip(Ship)
+
+  -- reset comets
+  for i=1, #Comets, 1 do
+    local randX = (Asteroids:GetWidth() - GR.Asteroids.CometSize - 4) * (math.random(0, 10000) / 10000)
+    local randY = (Asteroids:GetHeight() - GR.Asteroids.CometSize - 4) * (math.random(0, 10000) / 10000)
+    local randVelX = GR.Asteroids.CometMaxSpeed * (math.random(-10000, 10000) / 10000)
+    local randVelY = GR.Asteroids.CometMaxSpeed * (math.random(-10000, 10000) / 10000)
+    Comets[i]:SetPoint("BOTTOMLEFT", randX, randY)
+    Comets[i]:SetSize(GR.Asteroids.CometSize, GR.Asteroids.CometSize)
+    Comets[i].PosX = randX
+    Comets[i].PosY = randY
+    Comets[i].VelX = randVelX
+    Comets[i].VelY = randVelY
+  end
 end
   
 function GR:AsteroidsPauseGame()
@@ -511,6 +568,17 @@ function GR:AsteroidsUpdateBullets(elapsed)
   end
 end
 
+function GR:AsteroidsUpdateComets(elapsed)
+  local Comets = GR_GUI.Main.Asteroids.Comets
+  
+  for i=1, #Comets, 1 do 
+    Comets[i].PosX = Comets[i].PosX + Comets[i].VelX * elapsed
+    Comets[i].PosY = Comets[i].PosY + Comets[i].VelY * elapsed
+    Comets[i]:SetPoint("BOTTOMLEFT", Comets[i].PosX, Comets[i].PosY)
+    GR:AsteroidsColCometWall(GR_GUI.Main.Asteroids, Comets[i])
+  end
+end
+
 -- Collision
 function GR:AsteroidsColShipWall(Asteroids, Ship)
   local point, relativeTo, relativePoint, xOfs, yOfs = Ship:GetPoint()
@@ -580,4 +648,42 @@ function GR:AsteroidsColBulletWall(Asteroids, Bullet)
     Bullet.PosY = 0 + GR.Asteroids.BulletSize
   end
 end
+
+function GR:AsteroidsColCometWall(Asteroids, Comet)
+  if (Comet:IsVisible()) then
+    local point, relativeTo, relativePoint, xOfs, yOfs = Comet:GetPoint()
+    local Cometx = {
+      LLx = xOfs,
+      LLy = yOfs,
+      URx = xOfs + Comet:GetWidth(),
+      URy = yOfs + Comet:GetHeight()
+    }
+    local Border = {
+      LLx = 0,
+      LLy = 0,
+      URx = Asteroids:GetWidth(),
+      URy = Asteroids:GetHeight()
+    }
+    
+    -- check if commet is outside of border
+    -- commet left past border left
+    if (Cometx.LLx < Border.LLx) then 
+      Comet.PosX = Asteroids:GetWidth() - GR.Asteroids.CometSize
+    end
+    -- commet right past border right
+    if (Cometx.URx > Border.URx) then 
+      Comet.PosX = 0 + GR.Asteroids.CometSize
+    end
+    -- commet bottom past border bottom
+    if (Cometx.LLy < Border.LLy) then 
+      Comet.PosY = Asteroids:GetHeight() - GR.Asteroids.CometSize
+    end
+    -- commet top past border top
+    if (Cometx.URy > Border.URy) then 
+      Comet.PosY = 0 + GR.Asteroids.CometSize
+    end
+  end
+end
+
+-- ship could rotate around center
 
