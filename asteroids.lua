@@ -47,6 +47,7 @@ function GR:CreateAsteroids()
   GR:CreateAsteroidsShip()
   GR:CreateAsteroidsBullets()
   GR:CreateAsteroidsComets()
+  GR:CreateAsteroidsFS()
 
   -- Size
   GR:SizeAsteroids()
@@ -214,6 +215,13 @@ function GR:CreateAsteroidsComets()
   end
 end
 
+function GR:CreateAsteroidsFS()
+  local Asteroids = GR_GUI.Main.Asteroids
+
+  Asteroids.FS = Asteroids:CreateFontString(Asteroids, "HIGH", "GameTooltipText")
+  Asteroids.FS:SetTextColor(0,1,0, 1)
+end
+
 -- resize
 function GR:SizeAsteroids()
   local Main = GR_GUI.Main
@@ -242,6 +250,7 @@ function GR:SizeAsteroids()
   GR:SizeAsteroidsShip(WidthRatio, HeightRatio)
   GR:SizeAsteroidsBullets()
   GR:SizeAsteroidsComets()
+  GR:SizeAsteroidsFS()
 end
 
 function GR:SizeAsteroidsShip(WidthRatio, HeightRatio)
@@ -287,6 +296,13 @@ function GR:SizeAsteroidsComets()
   end
 end
 
+function GR:SizeAsteroidsFS()
+  local FS = GR_GUI.Main.Asteroids.FS
+
+  FS:SetTextScale(4 * (GR.Asteroids.ScreenXRatio + GR.Asteroids.ScreenYRatio) / 2)
+  FS:SetPoint("TOP", 0, -100 * GR.Asteroids.ScreenYRatio)
+end
+
 -- hide / show
 function GR:AsteroidsHide()
   local Main = GR_GUI.Main
@@ -314,15 +330,25 @@ function GR:AsteroidsGameLoop(self, elapsed)
   GR:AsteroidsUpdateShip(elapsed)
   GR:AsteroidsUpdateBullets(elapsed)
   GR:AsteroidsUpdateComets(elapsed)
+  GR:AsteroidsCheckForWin()
 end
 
 function GR:AsteroidsStartGame()
   local Asteroids = GR_GUI.Main.Asteroids
+  local Comets = GR_GUI.Main.Asteroids.Comets
 
   -- game buttons
   GR.Asteroids.Phase = "Started"
   Asteroids.PauseBtn.FS:SetText("Pause")
   Asteroids.StopBtn:Show()
+
+  -- gameover fontstring
+  GR_GUI.Main.Asteroids.FS:Hide()
+
+  -- show comets
+  for i=1, #Comets, 1 do
+    Comets[i]:Show()
+  end
 
   -- start game loop
   Asteroids.Game:Show()
@@ -363,6 +389,7 @@ function GR:AsteroidsStopGame()
     Comets[i].PosY = randY
     Comets[i].VelX = randVelX
     Comets[i].VelY = randVelY
+    Comets[i]:Hide()
   end
 end
   
@@ -570,13 +597,35 @@ end
 
 function GR:AsteroidsUpdateComets(elapsed)
   local Comets = GR_GUI.Main.Asteroids.Comets
+  local Bullets = GR_GUI.Main.Asteroids.Bullets
   
   for i=1, #Comets, 1 do 
     Comets[i].PosX = Comets[i].PosX + Comets[i].VelX * elapsed
     Comets[i].PosY = Comets[i].PosY + Comets[i].VelY * elapsed
     Comets[i]:SetPoint("BOTTOMLEFT", Comets[i].PosX, Comets[i].PosY)
     GR:AsteroidsColCometWall(GR_GUI.Main.Asteroids, Comets[i])
+
+    for j=1, #Bullets, 1 do 
+      GR:AsteroidsColCometBullet(GR_GUI.Main.Asteroids, Comets[i], Bullets[j])
+    end
   end
+end
+
+function GR:AsteroidsCheckForWin()
+  local Comets = GR_GUI.Main.Asteroids.Comets
+  local GameOver = true
+
+  for i=1, #Comets, 1 do
+    if (Comets[i]:IsVisible()) then
+      GameOver = false
+    end
+  end
+
+  if (GameOver) then 
+    GR_GUI.Main.Asteroids.FS:SetText("Winner!")
+    GR_GUI.Main.Asteroids.FS:Show()
+    GR:AsteroidsStopGame()
+  end 
 end
 
 -- Collision
@@ -681,6 +730,31 @@ function GR:AsteroidsColCometWall(Asteroids, Comet)
     -- commet top past border top
     if (Cometx.URy > Border.URy) then 
       Comet.PosY = 0 + GR.Asteroids.CometSize
+    end
+  end
+end
+
+function GR:AsteroidsColCometBullet(Asteroids, Comet, Bullet)
+  if (Comet:IsVisible() and Bullet:IsVisible()) then
+    local point, relativeTo, relativePoint, xOfs, yOfs = Comet:GetPoint()
+    local Bpoint, BrelativeTo, BrelativePoint, BxOfs, ByOfs = Bullet:GetPoint()
+    local Cometx = {
+      LLx = xOfs,
+      LLy = yOfs,
+      URx = xOfs + Comet:GetWidth(),
+      URy = yOfs + Comet:GetHeight()
+    }
+    local Bulletx = {
+      LLx = BxOfs,
+      LLy = ByOfs,
+      URx = BxOfs + Bullet:GetWidth(),
+      URy = ByOfs + Bullet:GetHeight()
+    }
+
+      -- check if bullet is inside of comet
+    if ((Bulletx.URx > Cometx.LLx and Bulletx.LLx < Cometx.URx) and (Bulletx.URy > Cometx.LLy and Bulletx.LLy < Cometx.URy)) then 
+      Bullet:Hide()
+      Comet:Hide()
     end
   end
 end
