@@ -3,15 +3,14 @@ function GR:CreateAsteroids()
   -- Constants
   GR.Asteroids = {}
   GR.Asteroids.Const = {}
-  GR.Asteroids.Const.ShipSize = 40
-  GR.Asteroids.Const.ShipMaxSpeed = 80
+  GR.Asteroids.Const.ShipMaxSpeed = 150
   GR.Asteroids.Const.ShipAcceleration = 100
   GR.Asteroids.Const.ScreenSizeX = 750
   GR.Asteroids.Const.ScreenSizeY = 500
-  GR.Asteroids.Const.ColSize = 25
+  GR.Asteroids.Const.ShipSize = 30
   GR.Asteroids.Const.BulletSize = 20
   GR.Asteroids.Const.BulletThickness = 4
-  GR.Asteroids.Const.BulletSpeed = 120
+  GR.Asteroids.Const.BulletSpeed = 200
   
   -- Asteroids Frame
   GR_GUI.Main.Asteroids = CreateFrame("Frame", Asteroids, GR_GUI.Main, "ThinBorderTemplate")
@@ -229,7 +228,7 @@ function GR:SizeAsteroidsShip(WidthRatio, HeightRatio)
   Ship.Line2:SetThickness(3 * ((WidthRatio + HeightRatio) / 2))
   Ship.Line3:SetThickness(3 * ((WidthRatio + HeightRatio) / 2))
   Ship.Line4:SetThickness(3 * ((WidthRatio + HeightRatio) / 2))
-  Ship.Col:SetSize(GR.Asteroids.Const.ColSize * GR.Asteroids.ScreenXRatio, GR.Asteroids.Const.ColSize * GR.Asteroids.ScreenYRatio)
+  Ship.Col:SetSize(GR.Asteroids.ShipSize, GR.Asteroids.ShipSize)
 
   GR.Asteroids.ShipSize = GR.Asteroids.Const.ShipSize * ((WidthRatio + HeightRatio) / 2)
   GR:AsteroidsRotateShip(Ship)
@@ -515,12 +514,13 @@ end
 -- Collision
 function GR:AsteroidsColShipWall(Asteroids, Ship)
   local point, relativeTo, relativePoint, xOfs, yOfs = Ship:GetPoint()
+  local Cpoint, CrelativeTo, CrelativePoint, CxOfs, CyOfs = Ship.Col:GetPoint()
 
   local Shipx = {
-    LLx = xOfs,
-    LLy = yOfs,
-    URx = xOfs + Ship:GetWidth(),
-    URy = yOfs + Ship:GetHeight()
+    LLx = xOfs +CxOfs - GR.Asteroids.ShipSize / 2,
+    LLy = yOfs +CyOfs - GR.Asteroids.ShipSize / 2,
+    URx = xOfs +CxOfs + GR.Asteroids.ShipSize / 2,
+    URy = yOfs +CyOfs + GR.Asteroids.ShipSize / 2
   }
   local Border = {
     LLx = 0,
@@ -530,20 +530,20 @@ function GR:AsteroidsColShipWall(Asteroids, Ship)
   }
   
   -- check if ship is outside of border
-  -- ship right past border left
-  if (Shipx.URx < Border.LLx) then 
+  -- ship left past border left
+  if (Shipx.LLx < Border.LLx) then 
     GR.Asteroids.ShipPosX = Asteroids:GetWidth() - GR.Asteroids.ShipSize
   end
-  -- ship left past border right
-  if (Shipx.LLx > Border.URx) then 
+  -- ship right past border right
+  if (Shipx.URx > Border.URx) then 
     GR.Asteroids.ShipPosX = 0 + GR.Asteroids.ShipSize
   end
-  -- ship top past border bottom
-  if (Shipx.URy < Border.LLy) then 
+  -- ship bottom past border bottom
+  if (Shipx.LLy < Border.LLy) then 
     GR.Asteroids.ShipPosY = Asteroids:GetHeight() - GR.Asteroids.ShipSize
   end
-  -- ship bottom past border top
-  if (Shipx.LLy > Border.URy) then 
+  -- ship top past border top
+  if (Shipx.URy > Border.URy) then 
     GR.Asteroids.ShipPosY = 0 + GR.Asteroids.ShipSize
   end
 end
