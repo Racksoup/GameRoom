@@ -398,6 +398,11 @@ function GR:AsteroidsUpdateShip(elapsed)
 
   -- collisions
   GR:AsteroidsColShipWall(Asteroids, Ship)
+  for i=1, #Asteroids.Bullets, 1 do
+    if(Asteroids.Bullets[i]:IsVisible()) then
+      GR:AsteroidsColBulletWall(Asteroids, Asteroids.Bullets[i])
+    end
+  end
 end
 
 function GR:AsteroidsAccelerateShip(elapsed, Asteroids, Ship)
@@ -540,6 +545,39 @@ function GR:AsteroidsColShipWall(Asteroids, Ship)
   -- ship bottom past border top
   if (Shipx.LLy > Border.URy) then 
     GR.Asteroids.ShipPosY = 0 + GR.Asteroids.ShipSize
+  end
+end
+
+function GR:AsteroidsColBulletWall(Asteroids, Bullet)
+  local Bulletx = {
+    LLx = Bullet.PosX,
+    LLy = Bullet.PosY,
+    URx = Bullet.PosX + Bullet:GetWidth(),
+    URy = Bullet.PosY + Bullet:GetHeight()
+  }
+  local Border = {
+    LLx = 0,
+    LLy = 0,
+    URx = Asteroids:GetWidth(),
+    URy = Asteroids:GetHeight()
+  }
+  
+  -- check if ship is outside of border
+  -- ship right past border left
+  if (Bulletx.URx < Border.LLx) then 
+    Bullet.PosX = Asteroids:GetWidth() - GR.Asteroids.BulletSize
+  end
+  -- ship left past border right
+  if (Bulletx.LLx > Border.URx) then 
+    Bullet.PosX = 0 + GR.Asteroids.BulletSize
+  end
+  -- ship top past border bottom
+  if (Bulletx.URy < Border.LLy) then 
+    Bullet.PosY = Asteroids:GetHeight() - GR.Asteroids.BulletSize
+  end
+  -- ship bottom past border top
+  if (Bulletx.LLy > Border.URy) then 
+    Bullet.PosY = 0 + GR.Asteroids.BulletSize
   end
 end
 
