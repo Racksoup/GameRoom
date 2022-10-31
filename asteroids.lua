@@ -8,6 +8,7 @@ function GR:CreateAsteroids()
   GR.Asteroids.Const.ShipAcceleration = 100
   GR.Asteroids.Const.ScreenSizeX = 750
   GR.Asteroids.Const.ScreenSizeY = 500
+  GR.Asteroids.Const.ColSize = 25
 
   -- Asteroids Frame
   GR_GUI.Main.Asteroids = CreateFrame("Frame", Asteroids, GR_GUI.Main, "ThinBorderTemplate")
@@ -28,6 +29,8 @@ function GR:CreateAsteroids()
   GR.Asteroids.ShipYVelocity = 0
   GR.Asteroids.ShipPosX = Asteroids:GetWidth() / 2
   GR.Asteroids.ShipPosY = Asteroids:GetHeight() / 2
+  GR.Asteroids.ScreenXRatio = Asteroids:GetWidth() / GR.Asteroids.Const.ScreenSizeX
+  GR.Asteroids.ScreenYRatio = Asteroids:GetHeight() / GR.Asteroids.Const.ScreenSizeY
   
   -- Create
   GR:CreateAsteroidsGameLoop()
@@ -135,6 +138,9 @@ function GR:CreateAsteroidsShip()
   local Ship = Asteroids.Ship
   Ship:SetPoint("BOTTOMLEFT", GR.Asteroids.ShipXPos, GR.Asteroids.ShipYPos)
   Ship:SetSize(2,2)
+  
+  -- Collision Frame
+  Ship.Col = CreateFrame("Frame", Col, Ship)
 
   -- top-left line
   Ship.Line1 = Ship:CreateLine()
@@ -160,8 +166,10 @@ function GR:SizeAsteroids()
   -- Main Window
   Asteroids:SetPoint("BOTTOM", 0, 25 * (Main:GetHeight() / 640))
   Asteroids:SetSize(Main:GetWidth() * (GR.Asteroids.Const.ScreenSizeX / 800), Main:GetHeight() * (GR.Asteroids.Const.ScreenSizeY / 640))
-  local WidthRatio = Asteroids:GetWidth() / 770
-  local HeightRatio = Asteroids:GetHeight() / 450
+  GR.Asteroids.ScreenXRatio = Asteroids:GetWidth() / GR.Asteroids.Const.ScreenSizeX
+  GR.Asteroids.ScreenYRatio = Asteroids:GetHeight() / GR.Asteroids.Const.ScreenSizeY
+  local WidthRatio = GR.Asteroids.ScreenXRatio
+  local HeightRatio = GR.Asteroids.ScreenYRatio
   
   -- pause button
   PauseBtn:SetPoint("TOPLEFT", 15 * WidthRatio, 40 * HeightRatio)
@@ -190,6 +198,7 @@ function GR:SizeAsteroidsShip(WidthRatio, HeightRatio)
   Ship.Line2:SetThickness(3 * ((WidthRatio + HeightRatio) / 2))
   Ship.Line3:SetThickness(3 * ((WidthRatio + HeightRatio) / 2))
   Ship.Line4:SetThickness(3 * ((WidthRatio + HeightRatio) / 2))
+  Ship.Col:SetSize(GR.Asteroids.Const.ColSize * GR.Asteroids.ScreenXRatio, GR.Asteroids.Const.ColSize * GR.Asteroids.ScreenYRatio)
 
   GR.Asteroids.ShipSize = GR.Asteroids.Const.ShipSize * ((WidthRatio + HeightRatio) / 2)
   GR:AsteroidsRotateShip(Ship)
@@ -288,6 +297,7 @@ function GR:AsteroidsUpdateShip(elapsed)
   end
 
   GR:AsteroidsApplySpeed(elapsed, Asteroids, Ship)
+  GR:AsteroidsColShipWall(Asteroids, Ship)
 end
 
 function GR:AsteroidsAccelerateShip(elapsed, Asteroids, Ship)
@@ -380,5 +390,48 @@ function GR:AsteroidsRotateShip(Ship)
   line4.LRx, line4.LRy = RotateCoordPair(coords.br.x,coords.br.y -1,origin.x,origin.y,angle3,aspect)
   Ship.Line4:SetStartPoint("CENTER", ((line4.LLx + line4.LRx) / 2 * ShipSize) - ShipSize / 2, ((line4.LLy + line4.LRy) / 2 * ShipSize) - ShipSize) 
   Ship.Line4:SetEndPoint("CENTER", ((line4.URx + line4.ULx) / 2 * ShipSize) - ShipSize / 2, ((line4.URy + line4.ULy) / 2 * ShipSize) - ShipSize) 
+
+  -- Collision Frame
+  Ship.Col:SetPoint("CENTER", ((line4.LLx + line4.LRx) / 2 * ShipSize) - ShipSize / 2, ((line4.LLy + line4.LRy) / 2 * ShipSize) - ShipSize)
+end
+
+-- Collision
+function GR:AsteroidsColShipWall(Asteroids, Ship)
+  local point, relativeTo, relativePoint, xOfs, yOfs = Ship:GetPoint()
+
+  local Shipx = {
+    LLx = xOfs,
+    LLy = yOfs,
+    URx = xOfs + Ship:GetWidth(),
+    URy = yOfs + Ship:GetHeight()
+  }
+  local Border = {
+    LLx = 0,
+    LLy = 0,
+    URx = Asteroids:GetWidth(),
+    URy = Asteroids:GetHeight()
+  }
+  
+  -- check if ship is outside of border
+  -- ship right past border left
+  if (Shipx.URx < Border.LLx) then 
+    GR.Asteroids.ShipPosX = Asteroids:GetWidth() - GR.Asteroids.ShipSize
+    print('Left')
+  end
+  -- ship left past border right
+  if (Shipx.LLx > Border.URx) then 
+    GR.Asteroids.ShipPosX = 0 + GR.Asteroids.ShipSize
+    print('Right')
+  end
+  -- ship top past border bottom
+  if (Shipx.URy < Border.LLy) then 
+    GR.Asteroids.ShipPosY = Asteroids:GetHeight() - GR.Asteroids.ShipSize
+    print('Bottom')
+  end
+  -- ship bottom past border top
+  if (Shipx.LLy > Border.URy) then 
+    GR.Asteroids.ShipPosY = 0 + GR.Asteroids.ShipSize
+    print('Top')
+  end
 end
 
