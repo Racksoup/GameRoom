@@ -687,7 +687,6 @@ function GR:CheckOutOfBoundsRects(Rect1, Rect2)
     return false
 end
 
--- 2048 game before release
 -- asteroids
 -- death rolls
-
+-- flappy bird
