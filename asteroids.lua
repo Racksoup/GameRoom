@@ -509,7 +509,7 @@ end
 function GR:AsteroidsAccelerateShip(elapsed, Asteroids, Ship)
   local ShipRotation = GR.Asteroids.ShipRotation
 
-  local Angle = (3.14159 * ((-ShipRotation -.66) % 4)) / 2
+  local Angle = (3.14159 * ((-ShipRotation -.5) % 4)) / 2
 
   -- apply acceleration
   GR.Asteroids.ShipYVelocity = GR.Asteroids.ShipYVelocity + (math.cos(Angle) - math.sin(Angle)) * elapsed * GR.Asteroids.ShipAcceleration
@@ -532,8 +532,6 @@ end
 
 function GR:AsteroidsApplySpeed(elapsed, Asteroids, Ship)
   local ShipRotation = GR.Asteroids.ShipRotation
-
-  local Angle = (3.14159 * ((-ShipRotation -.66) % 4)) / 2
 
   GR.Asteroids.ShipPosY = GR.Asteroids.ShipPosY + elapsed * GR.Asteroids.ShipYVelocity
   GR.Asteroids.ShipPosX = GR.Asteroids.ShipPosX + elapsed * GR.Asteroids.ShipXVelocity
@@ -687,11 +685,13 @@ function GR:AsteroidsColShipWall(Asteroids, Ship)
 end
 
 function GR:AsteroidsColBulletWall(Asteroids, Bullet)
+  local relativePoint, relativeTo, SxOfs, SyOfs = Bullet.Line:GetStartPoint()
+  local relativePoint, relativeTo, ExOfs, EyOfs = Bullet.Line:GetEndPoint()
   local Bulletx = {
-    LLx = Bullet.PosX,
-    LLy = Bullet.PosY,
-    URx = Bullet.PosX + Bullet:GetWidth(),
-    URy = Bullet.PosY + Bullet:GetHeight()
+    LLx = Bullet.PosX + SxOfs,
+    LLy = Bullet.PosY + SyOfs,
+    URx = Bullet.PosX + SxOfs +5 * ((GR.Asteroids.ScreenXRatio * GR.Asteroids.ScreenYRatio) /2),
+    URy = Bullet.PosY + SyOfs +5 * ((GR.Asteroids.ScreenXRatio * GR.Asteroids.ScreenYRatio) /2)
   }
   local Border = {
     LLx = 0,
@@ -700,21 +700,21 @@ function GR:AsteroidsColBulletWall(Asteroids, Bullet)
     URy = Asteroids:GetHeight()
   }
   
-  -- check if ship is outside of border
-  -- ship right past border left
-  if (Bulletx.URx < Border.LLx) then 
+  -- check if bullet is outside of border
+  -- bullet left past border left
+  if (Bulletx.LLx < Border.LLx) then 
     Bullet.PosX = Asteroids:GetWidth() - GR.Asteroids.BulletSize
   end
-  -- ship left past border right
-  if (Bulletx.LLx > Border.URx) then 
+  -- bullet right past border right
+  if (Bulletx.URx > Border.URx) then 
     Bullet.PosX = 0 + GR.Asteroids.BulletSize
   end
-  -- ship top past border bottom
-  if (Bulletx.URy < Border.LLy) then 
+  -- bullet bottom past border bottom
+  if (Bulletx.LLy < Border.LLy) then 
     Bullet.PosY = Asteroids:GetHeight() - GR.Asteroids.BulletSize
   end
-  -- ship bottom past border top
-  if (Bulletx.LLy > Border.URy) then 
+  -- bullet top past border top
+  if (Bulletx.URy > Border.URy) then 
     Bullet.PosY = 0 + GR.Asteroids.BulletSize
   end
 end
@@ -780,5 +780,4 @@ function GR:AsteroidsColCometBullet(Asteroids, Comet, Bullet)
   end
 end
 
--- ship could rotate around center
-
+-- bullets disapear if they destroyed a asteroid, are refired and reach the timeout set on them that never expired because it hit a asteroid
