@@ -176,7 +176,7 @@ function GR:CreateAsteroidsBullets()
   Asteroids.Bullets = {}
   local Bullets = Asteroids.Bullets
 
-  for i=1, 4, 1 do
+  for i=1, 10, 1 do
     Bullets[i] = CreateFrame("Frame", nil, Asteroids)
     Bullets[i]:SetPoint("BOTTOMLEFT", 0, 0)
     Bullets[i]:SetSize(2,2)
@@ -409,13 +409,37 @@ end
 -- Bullet
 function GR:AsteroidsShootBullet()
   local Bullets = GR_GUI.Main.Asteroids.Bullets
+  local Ship = GR_GUI.Main.Asteroids.Ship
   local BulletShot = false
 
+  local function RotateCoordPair (x,y,ox,oy,a,asp)
+    y=y/asp
+    oy=oy/asp
+    return ox + (x-ox)*math.cos(a) - (y-oy)*math.sin(a),
+      (oy + (y-oy)*math.cos(a) + (x-ox)*math.sin(a))*asp
+  end
+
+  local BulletSize = GR.Asteroids.BulletSize
+  local ShipSize = GR.Asteroids.ShipSize  
+  local coords={tl={x=0,y=0},
+  bl={x=0,y=1},
+  tr={x=1,y=0},
+  br={x=1,y=1}}
+  local origin={x=0.5,y=.5}
+  local aspect=1
+  angle= (3.14159 * GR.Asteroids.ShipRotation) / 2
+
+  -- Bullet Start Pos
+  local shooter = {}
+  shooter.LLx, shooter.LLy = RotateCoordPair(coords.bl.x,coords.bl.y,origin.x,origin.y,angle,aspect)
+  shooter.LRx, shooter.LRy = RotateCoordPair(coords.br.x,coords.br.y,origin.x,origin.y,angle,aspect)
+  
   for i=1, #Bullets, 1 do 
     if (Bullets[i]:IsVisible() == false and BulletShot == false) then
+      local point, relativeTo, relativePoint, xOfs, yOfs = Ship:GetPoint()
       BulletShot = true
-      Bullets[i].PosX = GR.Asteroids.ShipPosX
-      Bullets[i].PosY = GR.Asteroids.ShipPosY
+      Bullets[i].PosX = (((shooter.LLx + shooter.LRx) / 2 * ShipSize) - ShipSize / 2) *1.5 + xOfs
+      Bullets[i].PosY = (((shooter.LLy + shooter.LRy) / 2 * ShipSize) - ShipSize) *1.5 + yOfs + (20 * ((GR.Asteroids.ScreenXRatio + GR.Asteroids.ScreenYRatio) / 2))
       Bullets[i].Angle = (3.14159 * ((-GR.Asteroids.ShipRotation -.5) % 4)) / 2
       GR:AsteroidsRotateBullet(Bullets[i])
       Bullets[i]:Show()
@@ -436,7 +460,6 @@ function GR:AsteroidsRotateBullet(Bullet)
   end
 
   local BulletSize = GR.Asteroids.BulletSize
-  local ShipSize = GR.Asteroids.ShipSize
   local coords={tl={x=0,y=0},
   bl={x=0,y=1},
   tr={x=1,y=0},
