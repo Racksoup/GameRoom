@@ -12,7 +12,12 @@ function GR:CreateAsteroids()
   GR.Asteroids.Const.BulletThickness = 4
   GR.Asteroids.Const.BulletSpeed = 200
   GR.Asteroids.Const.CometSize = 20
-  GR.Asteroids.Const.CometMaxSpeed = 50
+  GR.Asteroids.Const.CometMaxSpeed = 80
+  GR.Asteroids.Const.NumOfComets = 20
+  GR.Asteroids.Const.NumOfBullets = 6
+  GR.Asteroids.Const.CometMaxLines = 12
+  GR.Asteroids.Const.CometMinLines = 8
+  GR.Asteroids.Const.CometMaxRotationSpeed = 5
   
   -- Asteroids Frame
   GR_GUI.Main.Asteroids = CreateFrame("Frame", Asteroids, GR_GUI.Main, "ThinBorderTemplate")
@@ -40,6 +45,7 @@ function GR:CreateAsteroids()
   GR.Asteroids.BulletSpeed = GR.Asteroids.Const.BulletSpeed
   GR.Asteroids.CometSize = GR.Asteroids.Const.CometSize
   GR.Asteroids.CometMaxSpeed = GR.Asteroids.Const.CometMaxSpeed 
+  GR.Asteroids.ShipHit = false
 
   -- Create
   GR:CreateAsteroidsGameLoop()
@@ -197,7 +203,14 @@ function GR:CreateAsteroidsComets()
   Asteroids.Comets = {}
   local Comets = Asteroids.Comets
 
-  for i=1, 12, 1 do
+  local function RotateCoordPair (x,y,ox,oy,a,asp)
+    y=y/asp
+    oy=oy/asp
+    return ox + (x-ox)*math.cos(a) - (y-oy)*math.sin(a),
+      (oy + (y-oy)*math.cos(a) + (x-ox)*math.sin(a))*asp
+  end
+
+  for i=1, GR.Asteroids.Const.NumOfComets, 1 do
     local randX = (Asteroids:GetWidth() - GR.Asteroids.CometSize - 4) * (math.random(0, 10000) / 10000)
     local randY = (Asteroids:GetHeight() - GR.Asteroids.CometSize - 4) * (math.random(0, 10000) / 10000)
     local randVelX = GR.Asteroids.CometMaxSpeed * (math.random(-10000, 10000) / 10000)
@@ -212,6 +225,28 @@ function GR:CreateAsteroidsComets()
     Comets[i].PosY = randY
     Comets[i].VelX = randVelX
     Comets[i].VelY = randVelY
+
+    Comets[i].Lines = {}
+    Comets[i].Points = {}
+    local NumOfLines = math.random(GR.Asteroids.Const.CometMinLines, GR.Asteroids.Const.CometMaxLines)
+    for j=1, NumOfLines, 1 do 
+      
+      local angle = (3.14159 * (4 * (j / NumOfLines))) / 2
+      print(angle)
+      local y = 10
+      local x = 0
+      Comets[i].Points[j] = {}
+      Comets[i].Points[j].PosX = x
+      Comets[i].Points[j].PosY = y
+      Comets[i].Points[j].Angle = angle
+      Comets[i].Points[j].RotationSpeed = GR.Asteroids.Const.CometMaxRotationSpeed * (math.random(0, 10000) / 10000)
+      Comets[i].Lines[j] = {}
+      Comets[i].Lines[j] = CreateFrame("Frame", nil, Comets[i])
+      local x2, y2 = RotateCoordPair(x,y, .5, .5, angle, 1)
+      Comets[i].Lines[j]:SetPoint("CENTER", x2, y2)
+      Comets[i].Lines[j]:SetSize(3, 3)
+    end
+
   end
 end
 
@@ -331,6 +366,7 @@ function GR:AsteroidsGameLoop(self, elapsed)
   GR:AsteroidsUpdateBullets(elapsed)
   GR:AsteroidsUpdateComets(elapsed)
   GR:AsteroidsCheckForWin()
+  GR:AsteroidsCheckForLose()
 end
 
 function GR:AsteroidsStartGame()
@@ -374,15 +410,24 @@ function GR:AsteroidsStopGame()
   GR.Asteroids.ShipPosY = Asteroids:GetHeight() / 2
   GR.Asteroids.ShipXVelocity = 0
   GR.Asteroids.ShipYVelocity = 0
+  GR.Asteroids.ShipHit = false
 
   -- reset ship
   Ship:SetPoint("BOTTOMLEFT", GR.Asteroids.ShipPosX, GR.Asteroids.ShipPosY)
   GR:AsteroidsRotateShip(Ship)
 
+  local ratio = (GR.Asteroids.ScreenXRatio + GR.Asteroids.ScreenYRatio) / 2
+
   -- reset comets
   for i=1, #Comets, 1 do
     local randX = (Asteroids:GetWidth() - GR.Asteroids.CometSize - 4) * (math.random(0, 10000) / 10000)
     local randY = (Asteroids:GetHeight() - GR.Asteroids.CometSize - 4) * (math.random(0, 10000) / 10000)
+    while (randX > Asteroids:GetWidth() / 2 - 35 * ratio and randX < Asteroids:GetWidth() / 2 + 35 * ratio) do
+      randX = (Asteroids:GetWidth() - GR.Asteroids.CometSize - 4) * (math.random(0, 10000) / 10000)
+    end
+    while (randY > Asteroids:GetHeight() / 2 - 35 * ratio and randY < Asteroids:GetHeight() / 2 + 35 * ratio) do
+      randY = (Asteroids:GetHeight() - GR.Asteroids.CometSize - 4) * (math.random(0, 10000) / 10000)
+    end
     local randVelX = GR.Asteroids.CometMaxSpeed * (math.random(-10000, 10000) / 10000)
     local randVelY = GR.Asteroids.CometMaxSpeed * (math.random(-10000, 10000) / 10000)
     Comets[i]:SetPoint("BOTTOMLEFT", randX, randY)
@@ -504,6 +549,11 @@ function GR:AsteroidsUpdateShip(elapsed)
       GR:AsteroidsColBulletWall(Asteroids, Asteroids.Bullets[i])
     end
   end
+  for i=1, #Asteroids.Comets, 1 do
+    if(Asteroids.Comets[i]:IsVisible()) then
+      GR:AsteroidsColShipComet(Ship, Asteroids.Comets[i])
+    end
+  end
 end
 
 function GR:AsteroidsAccelerateShip(elapsed, Asteroids, Ship)
@@ -617,11 +667,30 @@ end
 function GR:AsteroidsUpdateComets(elapsed)
   local Comets = GR_GUI.Main.Asteroids.Comets
   local Bullets = GR_GUI.Main.Asteroids.Bullets
+
+  local function RotateCoordPair (x,y,ox,oy,a,asp)
+    y=y/asp
+    oy=oy/asp
+    return ox + (x-ox)*math.cos(a) - (y-oy)*math.sin(a),
+      (oy + (y-oy)*math.cos(a) + (x-ox)*math.sin(a))*asp
+  end
   
   for i=1, #Comets, 1 do 
     Comets[i].PosX = Comets[i].PosX + Comets[i].VelX * elapsed
     Comets[i].PosY = Comets[i].PosY + Comets[i].VelY * elapsed
     Comets[i]:SetPoint("BOTTOMLEFT", Comets[i].PosX, Comets[i].PosY)
+    
+    for j=1, #Comets[i].Points, 1 do
+      local Point = Comets[i].Points[j]
+      Point.Angle = Point.Angle + elapsed * Point.RotationSpeed
+      local x, y = RotateCoordPair(0,Point.PosY, .5,.5, Point.Angle, 1)
+      Point.PosX = x
+      Point.PosY = y
+      Comets[i].Lines[j]:SetPoint("CENTER", x, y)
+    end
+    
+    
+    
     GR:AsteroidsColCometWall(GR_GUI.Main.Asteroids, Comets[i])
 
     for j=1, #Bullets, 1 do 
@@ -642,9 +711,19 @@ function GR:AsteroidsCheckForWin()
 
   if (GameOver) then 
     GR_GUI.Main.Asteroids.FS:SetText("Winner!")
+    GR_GUI.Main.Asteroids.FS:SetTextColor(0,1,0, 1)
     GR_GUI.Main.Asteroids.FS:Show()
     GR:AsteroidsStopGame()
   end 
+end
+
+function GR:AsteroidsCheckForLose()
+  if (GR.Asteroids.ShipHit == true) then
+    GR_GUI.Main.Asteroids.FS:SetText("Game Over")
+    GR_GUI.Main.Asteroids.FS:SetTextColor(1,0,0, .8)
+    GR_GUI.Main.Asteroids.FS:Show()
+    GR:AsteroidsStopGame()
+  end
 end
 
 -- Collision
@@ -758,18 +837,19 @@ end
 function GR:AsteroidsColCometBullet(Asteroids, Comet, Bullet)
   if (Comet:IsVisible() and Bullet:IsVisible()) then
     local point, relativeTo, relativePoint, xOfs, yOfs = Comet:GetPoint()
-    local Bpoint, BrelativeTo, BrelativePoint, BxOfs, ByOfs = Bullet:GetPoint()
     local Cometx = {
       LLx = xOfs,
       LLy = yOfs,
       URx = xOfs + Comet:GetWidth(),
       URy = yOfs + Comet:GetHeight()
     }
+    local relativePoint, relativeTo, SxOfs, SyOfs = Bullet.Line:GetStartPoint()
+    local relativePoint, relativeTo, ExOfs, EyOfs = Bullet.Line:GetEndPoint()
     local Bulletx = {
-      LLx = BxOfs,
-      LLy = ByOfs,
-      URx = BxOfs + Bullet:GetWidth(),
-      URy = ByOfs + Bullet:GetHeight()
+      LLx = Bullet.PosX + SxOfs,
+      LLy = Bullet.PosY + SyOfs,
+      URx = Bullet.PosX + SxOfs +0 * ((GR.Asteroids.ScreenXRatio * GR.Asteroids.ScreenYRatio) /2),
+      URy = Bullet.PosY + SyOfs +0 * ((GR.Asteroids.ScreenXRatio * GR.Asteroids.ScreenYRatio) /2)
     }
 
       -- check if bullet is inside of comet
@@ -780,4 +860,31 @@ function GR:AsteroidsColCometBullet(Asteroids, Comet, Bullet)
   end
 end
 
+function GR:AsteroidsColShipComet(Ship, Comet)
+  local Apoint, ArelativeTo, ArelativePoint, AxOfs, AyOfs = Comet:GetPoint()
+  local Cometx = {
+    LLx = AxOfs,
+    LLy = AyOfs,
+    URx = AxOfs + Comet:GetWidth(),
+    URy = AyOfs + Comet:GetHeight()
+  }
+
+  local point, relativeTo, relativePoint, xOfs, yOfs = Ship:GetPoint()
+  local Cpoint, CrelativeTo, CrelativePoint, CxOfs, CyOfs = Ship.Col:GetPoint()
+  local Shipx = {
+    LLx = (xOfs +CxOfs - GR.Asteroids.ShipSize / 2) + 10 * ((GR.Asteroids.ScreenXRatio + GR.Asteroids.ScreenYRatio) / 2),
+    LLy = (yOfs +CyOfs - GR.Asteroids.ShipSize / 2) + 10 * ((GR.Asteroids.ScreenXRatio + GR.Asteroids.ScreenYRatio) / 2),
+    URx = (xOfs +CxOfs + GR.Asteroids.ShipSize / 2) - 10 * ((GR.Asteroids.ScreenXRatio + GR.Asteroids.ScreenYRatio) / 2),
+    URy = (yOfs +CyOfs + GR.Asteroids.ShipSize / 2) - 10 * ((GR.Asteroids.ScreenXRatio + GR.Asteroids.ScreenYRatio) / 2)
+  }
+
+    -- check if ship is inside of comet
+    if ((Shipx.URx > Cometx.LLx and Shipx.LLx < Cometx.URx) and (Shipx.URy > Cometx.LLy and Shipx.LLy < Cometx.URy)) then 
+      GR.Asteroids.ShipHit = true
+    end
+end
+
+
+
 -- bullets disapear if they destroyed a asteroid, are refired and reach the timeout set on them that never expired because it hit a asteroid
+-- asteroids need to not appear in center of screen
