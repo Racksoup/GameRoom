@@ -56,6 +56,7 @@ function GR:CreateAsteroids()
   GR:CreateAsteroidsBullets()
   GR:CreateAsteroidsComets()
   GR:CreateAsteroidsFS()
+  GR:CreateAsteroidsTimer()
 
   -- Size
   GR:SizeAsteroids()
@@ -278,6 +279,15 @@ function GR:CreateAsteroidsFS()
   Asteroids.FS:SetTextColor(0,1,0, 1)
 end
 
+function GR:CreateAsteroidsTimer()
+  local Asteroids = GR_GUI.Main.Asteroids
+  Asteroids.Timer = Asteroids:CreateFontString(Asteroids, "HIGH", "GameTooltipText")
+  local Timer = Asteroids.Timer
+  Timer:SetText(GR.Asteroids.GameTime)
+  Timer:SetTextColor(.8,.8,.8, 1)
+  GR:SizeAsteroidsTimer()
+end
+
 -- resize
 function GR:SizeAsteroids()
   local Main = GR_GUI.Main
@@ -308,6 +318,7 @@ function GR:SizeAsteroids()
   GR:SizeAsteroidsBullets()
   GR:SizeAsteroidsComets()
   GR:SizeAsteroidsFS()
+  GR:SizeAsteroidsTimer()
 end
 
 function GR:SizeAsteroidsShip(WidthRatio, HeightRatio)
@@ -406,6 +417,12 @@ function GR:SizeAsteroidsFS()
   FS:SetPoint("TOP", 0, -100 * GR.Asteroids.ScreenYRatio)
 end
 
+function GR:SizeAsteroidsTimer()
+  local Timer = GR_GUI.Main.Asteroids.Timer
+  Timer:SetPoint("BOTTOMLEFT", GR_GUI.Main.Asteroids, "TOPRIGHT", -200 * GR.Asteroids.ScreenXRatio, 6 * GR.Asteroids.ScreenYRatio)
+  Timer:SetTextScale(2 * GR.Asteroids.ScreenRatio)
+end
+
 -- hide / show
 function GR:AsteroidsHide()
   local Main = GR_GUI.Main
@@ -429,6 +446,7 @@ end
 -- functionality
 function GR:AsteroidsGameLoop(self, elapsed)
   GR.Asteroids.GameTime = GR.Asteroids.GameTime + elapsed
+  GR_GUI.Main.Asteroids.Timer:SetText(math.floor(GR.Asteroids.GameTime * 100) / 100)
 
   GR:AsteroidsUpdateShip(elapsed)
   GR:AsteroidsUpdateBullets(elapsed)
@@ -483,6 +501,7 @@ function GR:AsteroidsStopGame()
   
   -- ends game loop
   Asteroids.Game:Hide()
+  Asteroids.Timer:SetText("0")
   GR.Asteroids.GameTime = 0
   GR.Asteroids.ShipRotation = 0
   GR.Asteroids.ShipXVelocity = 0

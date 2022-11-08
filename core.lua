@@ -174,17 +174,7 @@ function GR:CreateMainWindow()
         GR:ResizeBattleships()
         GR:SizeAsteroids()
     end)
-
-    -- GR_GUI.Main.Tex = GR_GUI.Main:CreateTexture()
-    -- local tex = GR_GUI.Main.Tex
-    -- tex:SetAllPoints(GR_GUI.Main)
-    -- tex:SetTexture("Interface\\AddOns\\ZUI_GameRoom\\images\\BlackWhiteBorder.blp")
-    -- tex:SetTexCoord(0,0, 0,.586, .731,0, .731,.586)
-    -- tex:SetAlpha(GR.db.realm.windowAlpha)
-    -- C_Timer.After(8, function() tex:SetTexCoord(.7324,0, 0,0, .7324,.586, 0,.586) end)
-    -- C_Timer.After(10, function() tex:SetTexCoord(.7324,.586, .7324,0, 0,.586, 0,0) end)
-    -- C_Timer.After(12, function() tex:SetTexCoord(0,.586, .7324,.586, 0,0, .7324,0) end)
-    -- C_Timer.After(14, function() tex:SetTexCoord(0,0, 0,.586, .7324,0, .7324,.586) end)
+    
     GR_GUI.Main.H1 =  GR_GUI.Main:CreateFontString(GR_GUI.Main, "HIGH", "GameTooltipText")
     local H1 = GR_GUI.Main.H1
     H1:SetPoint("TOP", 0, -18)
