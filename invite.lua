@@ -13,37 +13,14 @@ function GR:CreateInvite()
 
     GR_GUI.Main.Invite = CreateFrame("Frame", Invite, GR_GUI.Main)
     local Invite = GR_GUI.Main.Invite
-    Invite:SetPoint("TOP", 0, -66)
-    Invite:SetSize(650,420)
-    local H2 = Invite:CreateFontString(nil, "ARTWORK", "GameTooltipText")
-    H2:SetPoint("TOP", 0, 0)
-    H2:SetTextColor(.8, .8, .8, 1)
-    H2:SetTextScale(1.7)
-    H2:SetText("Invite!")
-    
-    Invite.Settings = CreateFrame("Button", Settings, Invite, "UIPanelButtonTemplate")
-    Invite.Settings:SetPoint("TOPRIGHT", -120, -92)
-    Invite.Settings:SetSize(100, 30)
-    Invite.Settings:SetScript("OnClick", function(self, button, down) 
-        if (button == "LeftButton" and down == false) then
-            GR.db.realm.tab = 7
-            GR:TabSelect()
-        end
-    end)
-    
-    local SettingsFS = Invite.Settings:CreateFontString(nil, "ARTWORK", "GameTooltipText")
-    SettingsFS:SetPoint("CENTER")
-    SettingsFS:SetTextColor(.8, .8, .8, 1)
-    SettingsFS:SetTextScale(1.1)
-    SettingsFS:SetText("Settings")
 
     -- listen for party changes
-    GR_GUI.Main.Invite:RegisterEvent("GROUP_ROSTER_UPDATE")
-    GR_GUI.Main.Invite:RegisterEvent("BN_FRIEND_LIST_SIZE_CHANGED")
-    GR_GUI.Main.Invite:RegisterEvent("FRIENDLIST_UPDATE")
-    GR_GUI.Main.Invite:RegisterEvent("WHO_LIST_UPDATE")
-    GR_GUI.Main.Invite:RegisterEvent("GUILD_ROSTER_UPDATE")
-    GR_GUI.Main.Invite:SetScript("OnEvent", function(self, event, ...)
+    Invite:RegisterEvent("GROUP_ROSTER_UPDATE")
+    Invite:RegisterEvent("BN_FRIEND_LIST_SIZE_CHANGED")
+    Invite:RegisterEvent("FRIENDLIST_UPDATE")
+    Invite:RegisterEvent("WHO_LIST_UPDATE")
+    Invite:RegisterEvent("GUILD_ROSTER_UPDATE")
+    Invite:SetScript("OnEvent", function(self, event, ...)
         if (event == "GROUP_ROSTER_UPDATE") then
             GR.Party = {}
             GR:RefreshPartyList()
@@ -88,159 +65,106 @@ function GR:CreateInvite()
         end
     end)
 
-    GR:CreateManualInvite()
+    --GR:CreateManualInvite()
     GR:CreateInviteFriends()
     GR:CreateInviteParty()
     GR:CreateInviteZone()
-    GR:CreateMultiGameButtons()
-    GR:CreateSoloGameButtons()
+    --GR:CreateMultiGameButtons()
 end
 
-function GR:CreateManualInvite()
-    GR_GUI.Main.Invite.ManualInput = CreateFrame("EditBox", ManualInput, GR_GUI.Main.Invite, "InputBoxInstructionsTemplate")
-    local ManualInput = GR_GUI.Main.Invite.ManualInput
-    ManualInput:SetPoint("TOPLEFT", 50, -80)
-    ManualInput:SetWidth(200)
-    ManualInput:SetFontObject("ChatFontNormal")
-    ManualInput:SetMultiLine(true)
-    ManualInput:SetAutoFocus(false)
+-- function GR:CreateManualInvite()
+--     GR_GUI.Main.Invite.ManualInput = CreateFrame("EditBox", ManualInput, GR_GUI.Main.Invite, "InputBoxInstructionsTemplate")
+--     local ManualInput = GR_GUI.Main.Invite.ManualInput
+--     ManualInput:SetPoint("TOPLEFT", 50, -80)
+--     ManualInput:SetWidth(200)
+--     ManualInput:SetFontObject("ChatFontNormal")
+--     ManualInput:SetMultiLine(true)
+--     ManualInput:SetAutoFocus(false)
 
-    local ManualInputString = ManualInput:CreateFontString(nil, "ARTWORK", "GameTooltipText")
-    ManualInputString:SetPoint("TOP", 0, 23)
-    ManualInputString:SetTextScale(1.1)
-    ManualInputString:SetTextColor(.8,.8,.8, 1)
-    ManualInputString:SetText("Challenge Target or Enter Name")
+--     local ManualInputString = ManualInput:CreateFontString(nil, "ARTWORK", "GameTooltipText")
+--     ManualInputString:SetPoint("TOP", 0, 23)
+--     ManualInputString:SetTextScale(1.1)
+--     ManualInputString:SetTextColor(.8,.8,.8, 1)
+--     ManualInputString:SetText("Challenge Target or Enter Name")
 
-    ManualInput.Btn = CreateFrame("Button", ManualBtn, ManualInput, "UIPanelButtonTemplate")
-    local ManualBtn = ManualInput.Btn
-    ManualBtn:SetPoint("BOTTOM", 0, -37)
-    ManualBtn:SetSize(120, 30)
-    local ManualBtnString = ManualBtn:CreateFontString(nil, "ARTWORK", "GameTooltipText")
-    ManualBtnString:SetPoint("CENTER")
-    ManualBtnString:SetTextScale(1.1)
-    ManualBtnString:SetTextColor(.8,.8,.8,1)
-    ManualBtnString:SetText("Challenge")
-    ManualBtn:SetScript("OnClick", function(self, button, down)
-        local TarName = ManualInput:GetText()
-        if (string.match(TarName, "")) then
-            TarName = UnitName("target")
-        end
-        GR.Target = TarName
-        GR:ToggleGameBtns()
-    end)
-end
+--     ManualInput.Btn = CreateFrame("Button", ManualBtn, ManualInput, "UIPanelButtonTemplate")
+--     local ManualBtn = ManualInput.Btn
+--     ManualBtn:SetPoint("BOTTOM", 0, -37)
+--     ManualBtn:SetSize(120, 30)
+--     local ManualBtnString = ManualBtn:CreateFontString(nil, "ARTWORK", "GameTooltipText")
+--     ManualBtnString:SetPoint("CENTER")
+--     ManualBtnString:SetTextScale(1.1)
+--     ManualBtnString:SetTextColor(.8,.8,.8,1)
+--     ManualBtnString:SetText("Challenge")
+--     ManualBtn:SetScript("OnClick", function(self, button, down)
+--         local TarName = ManualInput:GetText()
+--         if (string.match(TarName, "")) then
+--             TarName = UnitName("target")
+--         end
+--         GR.Target = TarName
+--     end)
+-- end
 
-function GR:ToggleGameBtns()
-    if (GR.Target == nil) then
-        GR_GUI.Main.Invite.GameBtns:Hide()
-        GR_GUI.Main.Invite.SoloGameBtns:Show()
-    else
-        GR_GUI.Main.Invite.GameBtns.H4:SetText(GR.Target)
-        GR_GUI.Main.Invite.GameBtns:Show()
-        C_Timer.After(45, function() 
-            GR.Target = nil
-            GR:ToggleGameBtns()
-        end)
-    end
-end
-
-function GR:HideGameBtnsIfSentInvite()
-    if (GR.CanSendInvite) then
-        GR_GUI.Main.Invite.GameBtns:Show()
-        GR_GUI.Main.Invite.SoloGameBtns:Hide()
-      else
-        GR_GUI.Main.Invite.GameBtns:Hide()
-        GR_GUI.Main.Invite.SoloGameBtns:Show()
-    end
-end
-
-function GR:CreateSoloGameButtons() 
-  local Invite = GR_GUI.Main.Invite
-  Invite.SoloGameBtns = CreateFrame("Frame", SoloGameBtns, Invite, "ThinBorderTemplate")
-  local Btns = Invite.SoloGameBtns
-  Btns:SetPoint("TOP", 0, -155)
-  Btns:SetSize(500, 100)
-  Btns.H3 = Btns:CreateFontString(nil, "ARTWORK", "GameTooltipText")
-  Btns.H3:SetPoint("TOP", 0, 48)
-  Btns.H3:SetText("Solo Games")
-
-  Btns.Asteroids = CreateFrame("Button", Asteroids, Btns, "UIPanelButtonTemplate")
-  Btns.Asteroids:SetPoint("TOPLEFT", 0, 0)
-  Btns.Asteroids:SetSize(120, 30)
-  Btns.Asteroids:SetScript("OnClick", function(self, button, down)
-    if (button == "LeftButton" and down == false) then 
-      GR_GUI.Main.HeaderInfo.H2:SetText("Asteroids")
-      GR:AsteroidsShow()
-    end
-  end)
-  local AsteroidsFS = Btns.Asteroids:CreateFontString(nil, "ARTWORK", "GameTooltipText")
-  AsteroidsFS:SetPoint("CENTER")
-  AsteroidsFS:SetTextScale(1.1)
-  AsteroidsFS:SetTextColor(.8,.8,.8, 1)
-  AsteroidsFS:SetText("Asteroids")
-
-end
-
-function GR:CreateMultiGameButtons()
-    local Invite = GR_GUI.Main.Invite
-    Invite.GameBtns = CreateFrame("Frame", GameBtns, Invite, "ThinBorderTemplate")
-    local Btns = Invite.GameBtns
-    Btns:SetPoint("TOP", 0, -155)
-    Btns:SetSize(500, 100)
-    Btns.H3 = Btns:CreateFontString(nil, "ARTWORK", "GameTooltipText")
-    Btns.H3:SetPoint("TOP", 0, 48)
-    Btns.H3:SetTextScale(1.5)
-    Btns.H3:SetTextColor(.8,.8,.8, 1)
-    Btns.H3:SetText("Challenge Opponent")
-    Btns.H4 = Btns:CreateFontString(nil, "ARTWORK", "GameTooltipText")
-    Btns.H4:SetPoint("TOP", 0, 23)
-    Btns.H4:SetTextScale(1.1)
-    Btns.H4:SetTextColor(.8,.8,.8, 1)
+-- function GR:CreateMultiGameButtons()
+--     local Invite = GR_GUI.Main.Invite
+--     Invite.GameBtns = CreateFrame("Frame", GameBtns, Invite, "ThinBorderTemplate")
+--     local Btns = Invite.GameBtns
+--     Btns:SetPoint("TOP", 0, -155)
+--     Btns:SetSize(500, 100)
+--     Btns.H3 = Btns:CreateFontString(nil, "ARTWORK", "GameTooltipText")
+--     Btns.H3:SetPoint("TOP", 0, 48)
+--     Btns.H3:SetTextScale(1.5)
+--     Btns.H3:SetTextColor(.8,.8,.8, 1)
+--     Btns.H3:SetText("Challenge Opponent")
+--     Btns.H4 = Btns:CreateFontString(nil, "ARTWORK", "GameTooltipText")
+--     Btns.H4:SetPoint("TOP", 0, 23)
+--     Btns.H4:SetTextScale(1.1)
+--     Btns.H4:SetTextColor(.8,.8,.8, 1)
     
-    Btns.Tic = CreateFrame("Button", Tic, Btns, "UIPanelButtonTemplate")
-    Btns.Tic:SetPoint("TOPLEFT", 0, 0)
-    Btns.Tic:SetSize(120, 30)
-    Btns.Tic:SetScript("OnClick", function(self, button, down)
-        if (button == "LeftButton" and down == false) then
-            local UserName = UnitName("player")
-            GR:SendCommMessage("ZUI_GameRoom_Inv", "TicTacToe_Challenge, " .. UserName, "WHISPER", GR.Target)
-            GR.CanSendInvite = false
-            GR:HideGameBtnsIfSentInvite()
-            C_Timer.After(4, function() 
-                GR.CanSendInvite = true
-                GR:HideGameBtnsIfSentInvite()
-            end)
-        end
-    end)
-    local TicFS = Btns.Tic:CreateFontString(nil, "ARTWORK", "GameTooltipText")
-    TicFS:SetPoint("CENTER")
-    TicFS:SetTextScale(1.1)
-    TicFS:SetTextColor(.8,.8,.8, 1)
-    TicFS:SetText("Tic-Tac-Toe")
+--     Btns.Tic = CreateFrame("Button", Tic, Btns, "UIPanelButtonTemplate")
+--     Btns.Tic:SetPoint("TOPLEFT", 0, 0)
+--     Btns.Tic:SetSize(120, 30)
+--     Btns.Tic:SetScript("OnClick", function(self, button, down)
+--         if (button == "LeftButton" and down == false) then
+--             local UserName = UnitName("player")
+--             GR:SendCommMessage("ZUI_GameRoom_Inv", "TicTacToe_Challenge, " .. UserName, "WHISPER", GR.Target)
+--             GR.CanSendInvite = false
+--             GR:HideGameBtnsIfSentInvite()
+--             C_Timer.After(4, function() 
+--                 GR.CanSendInvite = true
+--                 GR:HideGameBtnsIfSentInvite()
+--             end)
+--         end
+--     end)
+--     local TicFS = Btns.Tic:CreateFontString(nil, "ARTWORK", "GameTooltipText")
+--     TicFS:SetPoint("CENTER")
+--     TicFS:SetTextScale(1.1)
+--     TicFS:SetTextColor(.8,.8,.8, 1)
+--     TicFS:SetText("Tic-Tac-Toe")
 
-    Btns.Battleships = CreateFrame("Button", Battleships, Btns, "UIPanelButtonTemplate")
-    Btns.Battleships:SetPoint("TOPLEFT", 130, 0)
-    Btns.Battleships:SetSize(120, 30)
-    Btns.Battleships:SetScript("OnClick", function(self, button, down)
-        if (button == "LeftButton" and down == false) then
-            local UserName = UnitName("player")
-            GR:SendCommMessage("ZUI_GameRoom_Inv", "Battleships_Challenge, " .. UserName, "WHISPER", GR.Target)
-            GR.CanSendInvite = false
-            GR:HideGameBtnsIfSentInvite()
-            C_Timer.After(4, function() 
-                GR.CanSendInvite = true
-                GR:HideGameBtnsIfSentInvite()
-            end)
-        end
-    end)
-    local BattleshipsFS = Btns.Battleships:CreateFontString(nil, "ARTWORK", "GameTooltipText")
-    BattleshipsFS:SetPoint("CENTER")
-    BattleshipsFS:SetTextScale(1.1)
-    BattleshipsFS:SetTextColor(.8,.8,.8, 1)
-    BattleshipsFS:SetText("Battleships")
+--     Btns.Battleships = CreateFrame("Button", Battleships, Btns, "UIPanelButtonTemplate")
+--     Btns.Battleships:SetPoint("TOPLEFT", 130, 0)
+--     Btns.Battleships:SetSize(120, 30)
+--     Btns.Battleships:SetScript("OnClick", function(self, button, down)
+--         if (button == "LeftButton" and down == false) then
+--             local UserName = UnitName("player")
+--             GR:SendCommMessage("ZUI_GameRoom_Inv", "Battleships_Challenge, " .. UserName, "WHISPER", GR.Target)
+--             GR.CanSendInvite = false
+--             GR:HideGameBtnsIfSentInvite()
+--             C_Timer.After(4, function() 
+--                 GR.CanSendInvite = true
+--                 GR:HideGameBtnsIfSentInvite()
+--             end)
+--         end
+--     end)
+--     local BattleshipsFS = Btns.Battleships:CreateFontString(nil, "ARTWORK", "GameTooltipText")
+--     BattleshipsFS:SetPoint("CENTER")
+--     BattleshipsFS:SetTextScale(1.1)
+--     BattleshipsFS:SetTextColor(.8,.8,.8, 1)
+--     BattleshipsFS:SetText("Battleships")
 
-    Btns:Hide()
-end
+--     Btns:Hide()
+-- end
 
 function GR:CreateInviteFriends()
     GR_GUI.Main.Invite.FriendsScrollFrame = CreateFrame("ScrollFrame", FriendsScrollFrame, GR_GUI.Main.Invite, "UIPanelScrollFrameTemplate")
@@ -273,48 +197,6 @@ function GR:CreateInviteFriends()
         -- sends Register Friend message on login
         GR:RegisterFriends()
     end)
-end
-
-function GR:RegisterFriends()
-    local PlayerName = UnitName("player")
-    local NumFriends = C_FriendList.GetNumFriends()
-    if (type(NumFriends) == "number") then
-        for i = 1, NumFriends, 1 do
-            local IsInFriends = false
-            local OGFriend = C_FriendList.GetFriendInfoByIndex(i)
-            for j,v in ipairs(GR.Friends) do
-                if (v == OGFriend.name and OGFriend.connected) then
-                    IsInFriends = true
-                end
-            end
-            if (IsInFriends == false) then
-                GR:SendCommMessage("ZUI_GameRoom_Reg", "Register Friend, " .. PlayerName, "WHISPER", OGFriend.name)
-            end
-        end
-    end
-    -- add battle.net account friends
-    if (BNConnected() and GR.db.realm.showBN) then
-        local NumBNFriends = BNGetNumFriends()
-        if (type(NumBNFriends) == "number") then
-            for i = 1, NumBNFriends, 1 do
-                local IsInFriends = false
-                local Character = select(5, BNGetFriendInfo(i))
-                local Client = select(7, BNGetFriendInfo(i))
-                for j,v in ipairs(GR.Friends) do
-                    if (v == Character) then
-                        IsInFriends = true
-                    end
-                end
-                if (Client == "WoW" and type(Character) == "string" and IsInFriends == false) then
-                    GR:SendCommMessage("ZUI_GameRoom_Reg", "Register Friend, " .. PlayerName, "WHISPER", Character)
-                end
-            end
-        end
-    end 
-    -- add rivals
-    for i,v in ipairs(GR.db.realm.Rivals) do
-        GR:SendCommMessage("ZUI_GameRoom_Reg", "Register Friend, " .. PlayerName, "WHISPER", v)
-    end
 end
 
 function GR:CreateInviteParty()
@@ -420,6 +302,125 @@ function GR:CreateInviteZone()
     RegisterYell()
 end
 
+function GR:RegisterFriends()
+  local PlayerName = UnitName("player")
+  local NumFriends = C_FriendList.GetNumFriends()
+  if (type(NumFriends) == "number") then
+      for i = 1, NumFriends, 1 do
+          local IsInFriends = false
+          local OGFriend = C_FriendList.GetFriendInfoByIndex(i)
+          for j,v in ipairs(GR.Friends) do
+              if (v == OGFriend.name and OGFriend.connected) then
+                  IsInFriends = true
+              end
+          end
+          if (IsInFriends == false) then
+              GR:SendCommMessage("ZUI_GameRoom_Reg", "Register Friend, " .. PlayerName, "WHISPER", OGFriend.name)
+          end
+      end
+  end
+  -- add battle.net account friends
+  if (BNConnected() and GR.db.realm.showBN) then
+      local NumBNFriends = BNGetNumFriends()
+      if (type(NumBNFriends) == "number") then
+          for i = 1, NumBNFriends, 1 do
+              local IsInFriends = false
+              local Character = select(5, BNGetFriendInfo(i))
+              local Client = select(7, BNGetFriendInfo(i))
+              for j,v in ipairs(GR.Friends) do
+                  if (v == Character) then
+                      IsInFriends = true
+                  end
+              end
+              if (Client == "WoW" and type(Character) == "string" and IsInFriends == false) then
+                  GR:SendCommMessage("ZUI_GameRoom_Reg", "Register Friend, " .. PlayerName, "WHISPER", Character)
+              end
+          end
+      end
+  end 
+  -- add rivals
+  for i,v in ipairs(GR.db.realm.Rivals) do
+      GR:SendCommMessage("ZUI_GameRoom_Reg", "Register Friend, " .. PlayerName, "WHISPER", v)
+  end
+end
+
+function GR:RefreshFriendsList()
+  local Btns = GR_GUI.Main.Invite.Friends.Btns
+  for i = 1, 100, 1 do
+      Btns[i]:Hide()
+  end
+
+  for i,v in ipairs(GR.Friends) do
+      Btns[i].fs:SetText(v)
+      Btns[i]:Show()
+      Btns[i]:SetScript("OnClick", function(self, button, down)
+          if (button == "LeftButton" and down == false) then
+              GR.Target = v
+              GR:ToggleGameBtns()
+              GR:HideGameBtnsIfSentInvite()
+          end
+      end)
+  end
+
+end
+
+function GR:RemoveFromFriendsList()
+  -- remove old friends
+  local NumBNFriends = BNGetNumFriends()
+  local NumFriends = C_FriendList.GetNumFriends()
+  for i,v in ipairs(GR.Friends) do
+      local IsInFriendList = false
+      if (GR.db.realm.showBN) then
+          for j = 1, NumBNFriends, 1 do
+              local Friend = select(5,BNGetFriendInfo(j))
+              if (type(Friend) == "string") then
+                  if (string.match(v, Friend)) then
+                      IsInFriendList = true
+                  end
+              end
+          end
+      end
+      -- remove all BNFriends
+      if (GR.db.realm.showBN == false) then
+          for j = 1, NumBNFriends, 1 do
+              local Friend = select(5,BNGetFriendInfo(j))
+              if (type(Friend) == "string") then
+                  if (string.match(v, Friend)) then
+                      IsInFriendList = false
+                  end
+              end
+          end
+      end
+      -- add from normal friends list after BNFriends dealt with
+      for j = 1, NumFriends, 1 do
+          local Friend = C_FriendList.GetFriendInfoByIndex(j)
+          if (string.match(v, Friend.name) and Friend.connected) then
+              IsInFriendList = true
+          end
+      end
+      for j,k in ipairs(GR.db.realm.Rivals) do
+          if (string.match(v, k)) then
+              IsInFriendList = true
+          end
+      end
+      if (IsInFriendList == false) then
+          table.remove(GR.Friends, i)
+      end
+  end
+end
+
+function GR:AddToFriendsList(Value)
+  local IsInTable = false
+  for i,v in ipairs(GR.Friends) do
+      if (string.match(v, Value)) then
+          IsInTable = true
+      end
+  end
+  if (IsInTable == false) then
+      table.insert(GR.Friends, Value)
+  end
+end
+
 function GR:RefreshZoneList()
     local Btns = GR_GUI.Main.Invite.Zone.Btns
     for i = 1, 100, 1 do
@@ -437,83 +438,6 @@ function GR:RefreshZoneList()
             end
         end)
     end 
-end
-
-function GR:RefreshFriendsList()
-    local Btns = GR_GUI.Main.Invite.Friends.Btns
-    for i = 1, 100, 1 do
-        Btns[i]:Hide()
-    end
-
-    for i,v in ipairs(GR.Friends) do
-        Btns[i].fs:SetText(v)
-        Btns[i]:Show()
-        Btns[i]:SetScript("OnClick", function(self, button, down)
-            if (button == "LeftButton" and down == false) then
-                GR.Target = v
-                GR:ToggleGameBtns()
-                GR:HideGameBtnsIfSentInvite()
-            end
-        end)
-    end
-
-end
-
-function GR:RemoveFromFriendsList()
-    -- remove old friends
-    local NumBNFriends = BNGetNumFriends()
-    local NumFriends = C_FriendList.GetNumFriends()
-    for i,v in ipairs(GR.Friends) do
-        local IsInFriendList = false
-        if (GR.db.realm.showBN) then
-            for j = 1, NumBNFriends, 1 do
-                local Friend = select(5,BNGetFriendInfo(j))
-                if (type(Friend) == "string") then
-                    if (string.match(v, Friend)) then
-                        IsInFriendList = true
-                    end
-                end
-            end
-        end
-        -- remove all BNFriends
-        if (GR.db.realm.showBN == false) then
-            for j = 1, NumBNFriends, 1 do
-                local Friend = select(5,BNGetFriendInfo(j))
-                if (type(Friend) == "string") then
-                    if (string.match(v, Friend)) then
-                        IsInFriendList = false
-                    end
-                end
-            end
-        end
-        -- add from normal friends list after BNFriends dealt with
-        for j = 1, NumFriends, 1 do
-            local Friend = C_FriendList.GetFriendInfoByIndex(j)
-            if (string.match(v, Friend.name) and Friend.connected) then
-                IsInFriendList = true
-            end
-        end
-        for j,k in ipairs(GR.db.realm.Rivals) do
-            if (string.match(v, k)) then
-                IsInFriendList = true
-            end
-        end
-        if (IsInFriendList == false) then
-            table.remove(GR.Friends, i)
-        end
-    end
-end
-
-function GR:AddToFriendsList(Value)
-    local IsInTable = false
-    for i,v in ipairs(GR.Friends) do
-        if (string.match(v, Value)) then
-            IsInTable = true
-        end
-    end
-    if (IsInTable == false) then
-        table.insert(GR.Friends, Value)
-    end
 end
 
 function GR:RefreshPartyList()
@@ -725,13 +649,13 @@ function GR:AcceptDeclineChal(...)
         end
         if (AcceptChallenger) then
             if (string.match(BSChallenge, "Battleships_Challenge")) then
-                GR_GUI.Main.Accept.Fs2:SetText(BSOpponent .. " - " .. AcceptGameString)
-                GR_GUI.Accept.Fs2:SetText(BSOpponent .. " - " .. AcceptGameString)
+                GR_GUI.Main.Accept.FS2:SetText(BSOpponent .. " - " .. AcceptGameString)
+                GR_GUI.Accept.FS2:SetText(BSOpponent .. " - " .. AcceptGameString)
                 GR.Opponent = BSOpponent
             end
             if (string.match(TicChallenge, "TicTacToe_Challenge")) then
-                GR_GUI.Main.Accept.Fs2:SetText(TicOpponent .. " - " .. AcceptGameString)
-                GR_GUI.Accept.Fs2:SetText(TicOpponent .. " - " .. AcceptGameString)
+                GR_GUI.Main.Accept.FS2:SetText(TicOpponent .. " - " .. AcceptGameString)
+                GR_GUI.Accept.FS2:SetText(TicOpponent .. " - " .. AcceptGameString)
                 GR.Opponent = TicOpponent
             end
             if (GR.InGame == false and GR_GUI.Main.Battleships:IsVisible() == false and GR_GUI.Main.Tictactoe:IsVisible() == false) then
@@ -761,7 +685,7 @@ function GR:AcceptDeclineChal(...)
                         end
                     else
                         GR:Print(GR.Opponent .. " has challenged you to play " .. AcceptGameString .. "!")
-                        GR_GUI.Accept.Fs2:SetText(GR.Opponent .. " - " .. AcceptGameString)
+                        GR_GUI.Accept.FS2:SetText(GR.Opponent .. " - " .. AcceptGameString)
                         if (GR_GUI.Main:IsVisible() == true) then
                             GR_GUI.Main.Accept:Show()
                             GR_GUI.Main.DeclineBtn:Show()
