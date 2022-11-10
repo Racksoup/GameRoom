@@ -117,7 +117,7 @@ function GR:CreateAsteroidsGameButtons()
   -- pause button
   Asteroids.PauseBtn = CreateFrame("Button", PauseBtn, Asteroids, "UIPanelButtonTemplate")
   local PauseBtn = Asteroids.PauseBtn
-  PauseBtn.FS = PauseBtn:CreateFontString(PauseBtn, "HIGH", "GameTooltipText")
+  PauseBtn.FS = PauseBtn:CreateFontString(nil, "ARTWORK", "GameTooltipText")
   PauseBtn.FS:SetPoint("CENTER")
   PauseBtn.FS:SetTextColor(.8,.8,.8, 1)
   PauseBtn.FS:SetText("Start")
@@ -136,7 +136,7 @@ function GR:CreateAsteroidsGameButtons()
   -- stop button
   Asteroids.StopBtn = CreateFrame("Button", StopBtn, Asteroids, "UIPanelButtonTemplate")
   local StopBtn = Asteroids.StopBtn
-  StopBtn.FS = StopBtn:CreateFontString(StopBtn, "HIGH", "GameTooltipText")
+  StopBtn.FS = StopBtn:CreateFontString(nil, "ARTWORK", "GameTooltipText")
   StopBtn.FS:SetPoint("CENTER")
   StopBtn.FS:SetTextColor(.8,.8,.8, 1)
   StopBtn.FS:SetText("Stop")
@@ -275,13 +275,13 @@ end
 function GR:CreateAsteroidsFS()
   local Asteroids = GR_GUI.Main.Asteroids
 
-  Asteroids.FS = Asteroids:CreateFontString(Asteroids, "HIGH", "GameTooltipText")
+  Asteroids.FS = Asteroids:CreateFontString(nil, "ARTWORK", "GameTooltipText")
   Asteroids.FS:SetTextColor(0,1,0, 1)
 end
 
 function GR:CreateAsteroidsTimer()
   local Asteroids = GR_GUI.Main.Asteroids
-  Asteroids.Timer = Asteroids:CreateFontString(Asteroids, "HIGH", "GameTooltipText")
+  Asteroids.Timer = Asteroids:CreateFontString(nil, "ARTWORK", "GameTooltipText")
   local Timer = Asteroids.Timer
   Timer:SetText(GR.Asteroids.GameTime)
   Timer:SetTextColor(.8,.8,.8, 1)
