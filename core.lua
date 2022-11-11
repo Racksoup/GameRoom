@@ -52,9 +52,9 @@ function GR:OnInitialize()
     GR.Win.Const = {}
     GR.Win.Const.Tab1Width = 750
     GR.Win.Const.Tab1Height = 600
-    GR.Win.Const.Tab2Width = 300
+    GR.Win.Const.Tab2Width = 310
     GR.Win.Const.Tab2Height = 250
-    GR.Win.Const.Tab3Width = 350
+    GR.Win.Const.Tab3Width = 310
     GR.Win.Const.Tab3Height = 450
 
     -- Window Varibales
@@ -92,7 +92,7 @@ function GR:CreateMainWindow()
   Main:SetSize(GR.Win.Const.Tab2Width, GR.Win.Const.Tab2Height)
   Main:SetMinResize(100,120)
   Main:SetFrameStrata("HIGH")
-  Main:SetPoint("TOP", UIParent, "TOP", 0, -130)
+  Main:SetPoint("TOPLEFT", UIParent, "TOPLEFT", UIParent:GetWidth() / 2 - GR.Win.Const.Tab2Width / 2, -130)
   Main:SetMovable(true)
   Main:EnableMouse(true)
   Main:SetResizable(true)
@@ -466,12 +466,24 @@ function GR:CreateSoloGames()
   local MultiFS = MultiBtn.FS
   MultiFS:SetText("Multiplayer")
   MultiFS:SetTextColor(.8,.8,.8, 1)
+  MultiBtn:SetScript("OnClick", function(self, button, down) 
+    if (button == "LeftButton" and down == false) then
+      GR.db.realm.tab = 3
+      GR:TabSelect()
+    end
+  end)
   Nav.SettingsBtn = CreateFrame("Button", SettingsBtn, Nav, "UIPanelButtonTemplate")
   local SettingsBtn = Nav.SettingsBtn
   SettingsBtn.FS = SettingsBtn:CreateFontString(nil, "OVERLAY", "GameTooltipText")
   local SettingsFS = SettingsBtn.FS
   SettingsFS:SetText("Settings")
   SettingsFS:SetTextColor(.8,.8,.8, 1)
+  SettingsBtn:SetScript("OnClick", function(self, button, down) 
+    if (button == "LeftButton" and down == false) then
+      GR.db.realm.tab = 4
+      GR:TabSelect()
+    end
+  end)
   
   -- Game Buttons
   Tab2.SoloGames = CreateFrame("Frame", SoloGames, Tab2)
@@ -499,18 +511,30 @@ function GR:CreateMultiGames()
   --Nav
   Tab3.Nav = CreateFrame("Frame", Nav, Tab3)
   local Nav = Tab3.Nav
-  Nav.MultiBtn = CreateFrame("Button", MultiBtn, Nav, "UIPanelButtonTemplate")
-  local MultiBtn = Nav.MultiBtn
-  MultiBtn.FS = MultiBtn:CreateFontString(nil, "OVERLAY", "GameTooltipText")
-  local MultiFS = MultiBtn.FS
-  MultiFS:SetText("Multiplayer")
-  MultiFS:SetTextColor(.8,.8,.8, 1)
+  Nav.SoloBtn = CreateFrame("Button", SoloBtn, Nav, "UIPanelButtonTemplate")
+  local SoloBtn = Nav.SoloBtn
+  SoloBtn.FS = SoloBtn:CreateFontString(nil, "OVERLAY", "GameTooltipText")
+  local SoloFS = SoloBtn.FS
+  SoloFS:SetText("Single Player")
+  SoloFS:SetTextColor(.8,.8,.8, 1)
+  SoloBtn:SetScript("OnClick", function(self, button, down) 
+    if (button == "LeftButton" and down == false) then
+      GR.db.realm.tab = 2
+      GR:TabSelect()
+    end
+  end)
   Nav.SettingsBtn = CreateFrame("Button", SettingsBtn, Nav, "UIPanelButtonTemplate")
   local SettingsBtn = Nav.SettingsBtn
   SettingsBtn.FS = SettingsBtn:CreateFontString(nil, "OVERLAY", "GameTooltipText")
   local SettingsFS = SettingsBtn.FS
   SettingsFS:SetText("Settings")
   SettingsFS:SetTextColor(.8,.8,.8, 1)
+  SettingsBtn:SetScript("OnClick", function(self, button, down) 
+    if (button == "LeftButton" and down == false) then
+      GR.db.realm.tab = 4
+      GR:TabSelect()
+    end
+  end)
   
   -- Game Buttons
   Tab3.MultiGames = CreateFrame("Frame", MultiGames, Tab3)
@@ -556,6 +580,12 @@ function GR:ResizeMain()
   if (GR.db.realm.tab == 2) then
     Main.XRatio = Main:GetWidth() / GR.Win.Const.Tab2Width 
     Main.YRatio = Main:GetHeight() / GR.Win.Const.Tab2Height
+    Main.ScreenRatio = (Main.XRatio + Main.YRatio) / 2
+  end
+  -- Mutli Games
+  if (GR.db.realm.tab == 3) then
+    Main.XRatio = Main:GetWidth() / GR.Win.Const.Tab3Width 
+    Main.YRatio = Main:GetHeight() / GR.Win.Const.Tab3Height
     Main.ScreenRatio = (Main.XRatio + Main.YRatio) / 2
   end
   
@@ -612,6 +642,7 @@ function GR:ResizeMainNoRatioChange()
   
   GR:ResizeHeaderInfo()
   GR:ResizeSoloGames()
+  GR:ResizeMultiGames()
 end
 
 function GR:ResizeHeaderInfo()
@@ -665,16 +696,16 @@ function GR:ResizeSoloGames()
   -- Nav
   local Nav = Tab2.Nav
   Nav:SetPoint("TOP", 0, 0)
-  Nav:SetSize(220 * Main.XRatio, 40 * Main.YRatio)
+  Nav:SetSize(240 * Main.XRatio, 40 * Main.YRatio)
   local MultiBtn = Nav.MultiBtn
   MultiBtn:SetPoint("TOPLEFT", 5 * Main.XRatio, -5 * Main.YRatio)
-  MultiBtn:SetSize(100 * Main.XRatio, 30 * Main.YRatio)
+  MultiBtn:SetSize(110 * Main.XRatio, 30 * Main.YRatio)
   local MultiFS = MultiBtn.FS
   MultiFS:SetPoint("CENTER", 0, 0)
   MultiFS:SetTextScale(1.3 * Main.ScreenRatio)
   local SettingsBtn = Nav.SettingsBtn
   SettingsBtn:SetPoint("TOPRIGHT", -5 * Main.XRatio, -5 * Main.YRatio)
-  SettingsBtn:SetSize(100 * Main.XRatio, 30 * Main.YRatio)
+  SettingsBtn:SetSize(110 * Main.XRatio, 30 * Main.YRatio)
   local SettingsFS = SettingsBtn.FS
   SettingsFS:SetPoint("CENTER", 0, 0)
   SettingsFS:SetTextScale(1.3 * Main.ScreenRatio)
@@ -694,29 +725,29 @@ end
 function GR:ResizeMultiGames()
   local Main = GR_GUI.Main
   local Tab3 = Main.Tab3
-  Tab3:SetPoint("TOP", 0, -65 * Main.YRatio)
-  Tab3:SetSize(200 * Main.XRatio, 200 * Main.YRatio)
+  Tab3:SetPoint("TOP", 0, -50 * Main.YRatio)
+  Tab3:SetSize(250 * Main.XRatio, 200 * Main.YRatio)
   
   -- Nav
   local Nav = Tab3.Nav
-  Nav:SetPoint("TOP", 0, -65 * Main.YRatio)
-  Nav:SetSize(200 * Main.XRatio, 40 * Main.YRatio)
-  local MultiBtn = Nav.MultiBtn
-  MultiBtn:SetPoint("TOPLEFT", 5 * Main.XRatio, -5 * Main.YRatio)
-  MultiBtn:SetSize(90 * Main.XRatio, 30 * Main.YRatio)
-  local MultiFS = MultiBtn.FS
-  MultiFS:SetPoint("CENTER", 0, 0)
-  MultiFS:SetTextScale(1.3 * Main.ScreenRatio)
+  Nav:SetPoint("TOP", 0, 0)
+  Nav:SetSize(240 * Main.XRatio, 40 * Main.YRatio)
+  local SoloBtn = Nav.SoloBtn
+  SoloBtn:SetPoint("TOPLEFT", 5 * Main.XRatio, -5 * Main.YRatio)
+  SoloBtn:SetSize(110 * Main.XRatio, 30 * Main.YRatio)
+  local SoloFS = SoloBtn.FS
+  SoloFS:SetPoint("CENTER", 0, 0)
+  SoloFS:SetTextScale(1.3 * Main.ScreenRatio)
   local SettingsBtn = Nav.SettingsBtn
   SettingsBtn:SetPoint("TOPRIGHT", -5 * Main.XRatio, -5 * Main.YRatio)
-  SettingsBtn:SetSize(90 * Main.XRatio, 30 * Main.YRatio)
+  SettingsBtn:SetSize(110 * Main.XRatio, 30 * Main.YRatio)
   local SettingsFS = SettingsBtn.FS
   SettingsFS:SetPoint("CENTER", 0, 0)
   SettingsFS:SetTextScale(1.3 * Main.ScreenRatio)
 
   -- Game Buttons
-  local MultiGames = Nav.MultiGames
-  MultiGames:SetPoint("TOP", 0 * Main.XRatio, -135 * Main.YRatio)
+  local MultiGames = Tab3.MultiGames
+  MultiGames:SetPoint("TOP", 0 * Main.XRatio, -75 * Main.YRatio)
   MultiGames:SetSize(250 * Main.XRatio, 100 * Main.YRatio)
   local TicTacToeBtn = MultiGames.TicTacToeBtn
   TicTacToeBtn:SetPoint("TOPLEFT", 5 * Main.XRatio, -5 * Main.YRatio)
@@ -770,7 +801,10 @@ function GR:TabSelect()
   -- In Game
   if (tab == 1) then
     local Width, Height, Change = CheckWidthHeight(GR.Win.Const.Tab1Width * Main.XRatio, GR.Win.Const.Tab1Height * Main.YRatio)
+    local point, relativeTo, relativePoint, xOfs, yOfs = Main:GetPoint()
+
     Main:SetSize(Width, Height)
+    Main:SetPoint(point, relativeTo, relativePoint, xOfs, yOfs)
 
     if (Change) then
       GR:ResizeMain()
@@ -786,7 +820,10 @@ function GR:TabSelect()
   -- Solo Games
   if (tab == 2) then
     local Width, Height, Change = CheckWidthHeight(GR.Win.Const.Tab2Width * Main.XRatio, GR.Win.Const.Tab2Height * Main.YRatio)
+    local point, relativeTo, relativePoint, xOfs, yOfs = Main:GetPoint()
+
     Main:SetSize(Width, Height)
+    Main:SetPoint(point, relativeTo, relativePoint, xOfs, yOfs)
     
     if (Change) then
       GR:ResizeMain()
@@ -800,7 +837,10 @@ function GR:TabSelect()
   -- Multiplayer Games
   if (tab == 3) then
     local Width, Height, Change = CheckWidthHeight(GR.Win.Const.Tab3Width * Main.XRatio, GR.Win.Const.Tab3Height * Main.YRatio)
+    local point, relativeTo, relativePoint, xOfs, yOfs = Main:GetPoint()
+
     Main:SetSize(Width, Height)
+    Main:SetPoint(point, relativeTo, relativePoint, xOfs, yOfs)
     
     if (Change) then
       GR:ResizeMain()
@@ -921,7 +961,7 @@ function GR:ShowMain()
   GR_GUI.Main:ClearAllPoints()
 
   if (GR:CheckOutOfBoundsRects(GR_GUI.Main, UIParent)) then
-      GR_GUI.Main:SetPoint("TOP", UIParent, "TOP", 0, -130)
+    Main:SetPoint("TOPLEFT", UIParent, "TOPLEFT", UIParent:GetWidth() / 2 - GR.Win.Const.Tab2Width / 2, -130)
   end
 
   -- if main is bigger than screen, reset main size
