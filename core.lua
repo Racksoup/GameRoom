@@ -47,6 +47,21 @@ function GR:OnInitialize()
     icon:Register("ZUI_GameRoom", GR_LDB, self.db.realm.minimap)
     GR:RegisterChatCommand("gr", "OpenClose")
 
+    -- Window Consts
+    GR.Win = {}
+    GR.Win.Const = {}
+    GR.Win.Const.Tab1Width = 750
+    GR.Win.Const.Tab1Height = 600
+    GR.Win.Const.Tab2Width = 300
+    GR.Win.Const.Tab2Height = 250
+    GR.Win.Const.Tab3Width = 350
+    GR.Win.Const.Tab3Height = 450
+
+    -- Window Varibales
+    GR.Win.XRatio = 1
+    GR.Win.YRatio = 1
+    GR.Win.ScreenRatio = 1
+
     -- Game Varibales
     GR.PlayerPos = nil
     GR.IsPlayerTurn = nil
@@ -61,7 +76,7 @@ function GR:OnInitialize()
     GR:CreateBattleships()
     GR:CreateAsteroids()
     
-    GR.db.realm.tab = 1
+    GR.db.realm.tab = 2
     GR:TabSelect()
 
     GR:RegisterComm("ZUI_GameRoom_Reg", function(...) GR:RegisterPlayers(...) end)
@@ -74,8 +89,8 @@ function GR:CreateMainWindow()
   -- Main Window
   GR_GUI.Main = CreateFrame("Frame", GameRoom, UIParent, "TranslucentFrameTemplate")
   local Main = GR_GUI.Main
-  Main:SetSize(750, 510)
-  Main:SetMinResize(220,220)
+  Main:SetSize(GR.Win.Const.Tab2Width, GR.Win.Const.Tab2Height)
+  Main:SetMinResize(100,120)
   Main:SetFrameStrata("HIGH")
   Main:SetPoint("TOP", UIParent, "TOP", 0, -130)
   Main:SetMovable(true)
@@ -124,6 +139,11 @@ function GR:CreateMainWindow()
   H1:SetTextColor(.8,.8,.8,1)
   H1:SetText("Game Room")
 
+  -- Header 2
+  Main.H2 = Main:CreateFontString(nil, "OVERLAY", "GameTooltipText")
+  local H2 = Main.H2
+  H2:SetTextColor(.8,.8,.8,1)
+
   -- Close XButton
   Main.xButton = CreateFrame("Button", XButton, Main)
   local xButton = Main.xButton
@@ -153,28 +173,13 @@ function GR:CreateMainWindow()
       Main.xButton.tex:SetTexture("Interface\\AddOns\\ZUI_GameRoom\\images\\XButton.blp")
   end)
 
-  GR:CreateAcceptDecline()
-  GR:CreateHeaderInfo()
-  GR:ResizeMain()
-end
-
-function GR:CreateHeaderInfo()
-  -- Frame
-  GR_GUI.Main.HeaderInfo = CreateFrame("Frame", HeaderInfo, GR_GUI.Main)
-  local HeaderInfo = GR_GUI.Main.HeaderInfo
-
-  -- Header
-  GR_GUI.Main.HeaderInfo.H2 = HeaderInfo:CreateFontString(nil, "OVERLAY", "GameTooltipText")
-  local H2 = GR_GUI.Main.HeaderInfo.H2
-  H2:SetTextColor(.8,.8,.8,1)
-  
   -- Exit Button
-  HeaderInfo.ExitBtn = CreateFrame("Button", ExitBtn, HeaderInfo, "UIPanelButtonTemplate")
-  local ExitBtn = HeaderInfo.ExitBtn
-  HeaderInfo.ExitBtnFS = ExitBtn:CreateFontString(nil, "OVERLAY", "GameTooltipText")
-  local ExitBtnFS = HeaderInfo.ExitBtnFS 
-  ExitBtnFS:SetTextColor(.8,.8,.8, 1)
-  ExitBtnFS:SetText("Exit Game")
+  Main.ExitBtn = CreateFrame("Button", ExitBtn, Main, "UIPanelButtonTemplate")
+  local ExitBtn = Main.ExitBtn
+  ExitBtn.FS = ExitBtn:CreateFontString(nil, "OVERLAY", "GameTooltipText")
+  local ExitFS = ExitBtn.FS 
+  ExitFS:SetTextColor(.8,.8,.8, 1)
+  ExitFS:SetText("Exit Game")
   ExitBtn:SetScript("OnClick", function(self, button, down)
     if (button == "LeftButton" and down == false) then 
       if (GR.GameType == "Tictactoe") then
@@ -189,8 +194,23 @@ function GR:CreateHeaderInfo()
         GR:AsteroidsHide()    
       end
       GR.GameType = nil
+      GR.db.realm.tab = 2
+      GR:TabSelect()
     end
   end)
+  Main.ExitBtn:Hide()
+
+  GR:CreateAcceptDecline()
+  GR:CreateHeaderInfo()
+  GR:CreateSoloGames()
+  GR:CreateMultiGames()
+  GR:ResizeMainNoRatioChange()
+end
+
+function GR:CreateHeaderInfo()
+  -- Frame
+  GR_GUI.Main.HeaderInfo = CreateFrame("Frame", HeaderInfo, GR_GUI.Main)
+  local HeaderInfo = GR_GUI.Main.HeaderInfo
   
   -- Turn String
   HeaderInfo.TurnString = HeaderInfo:CreateFontString(nil, "OVERLAY", "GameTooltipText")
@@ -270,7 +290,6 @@ function GR:CreateHeaderInfo()
       end
   end)
 
-  GR:ResizeHeaderInfo()
   HeaderInfo:Hide()
 end
 
@@ -433,14 +452,121 @@ function GR:CreateAcceptDecline()
   CreateGROpenAcceptBtns()
 end
 
+function GR:CreateSoloGames()
+  local Main = GR_GUI.Main
+  Main.Tab2 = CreateFrame("Frame", Tab2, Main)
+  local Tab2 = Main.Tab2
+
+  -- Nav
+  Tab2.Nav = CreateFrame("Frame", Nav, Tab2)
+  local Nav = Tab2.Nav
+  Nav.MultiBtn = CreateFrame("Button", MultiBtn, Nav, "UIPanelButtonTemplate")
+  local MultiBtn = Nav.MultiBtn
+  MultiBtn.FS = MultiBtn:CreateFontString(nil, "OVERLAY", "GameTooltipText")
+  local MultiFS = MultiBtn.FS
+  MultiFS:SetText("Multiplayer")
+  MultiFS:SetTextColor(.8,.8,.8, 1)
+  Nav.SettingsBtn = CreateFrame("Button", SettingsBtn, Nav, "UIPanelButtonTemplate")
+  local SettingsBtn = Nav.SettingsBtn
+  SettingsBtn.FS = SettingsBtn:CreateFontString(nil, "OVERLAY", "GameTooltipText")
+  local SettingsFS = SettingsBtn.FS
+  SettingsFS:SetText("Settings")
+  SettingsFS:SetTextColor(.8,.8,.8, 1)
+  
+  -- Game Buttons
+  Tab2.SoloGames = CreateFrame("Frame", SoloGames, Tab2)
+  local SoloGames = Tab2.SoloGames
+  SoloGames.AsteroidsBtn = CreateFrame("Button", AsteroidsBtn, SoloGames, "UIPanelButtonTemplate")
+  local AsteroidsBtn = SoloGames.AsteroidsBtn
+  AsteroidsBtn.FS = AsteroidsBtn:CreateFontString(nil, "OVERLAY", "GameTooltipText")
+  local AsteroidsFS = AsteroidsBtn.FS
+  AsteroidsFS:SetTextColor(.8,.8,.8, 1)
+  AsteroidsFS:SetText("Asteroids")
+  AsteroidsBtn:SetScript("OnClick", function(self, button, down) 
+    if (button == "LeftButton" and down == false) then
+      GR:AsteroidsShow()
+    end
+  end)
+
+  Tab2:Hide()
+end
+
+function GR:CreateMultiGames()
+  local Main = GR_GUI.Main
+  Main.Tab3 = CreateFrame("Frame", Tab3, Main)
+  local Tab3 = Main.Tab3
+
+  --Nav
+  Tab3.Nav = CreateFrame("Frame", Nav, Tab3)
+  local Nav = Tab3.Nav
+  Nav.MultiBtn = CreateFrame("Button", MultiBtn, Nav, "UIPanelButtonTemplate")
+  local MultiBtn = Nav.MultiBtn
+  MultiBtn.FS = MultiBtn:CreateFontString(nil, "OVERLAY", "GameTooltipText")
+  local MultiFS = MultiBtn.FS
+  MultiFS:SetText("Multiplayer")
+  MultiFS:SetTextColor(.8,.8,.8, 1)
+  Nav.SettingsBtn = CreateFrame("Button", SettingsBtn, Nav, "UIPanelButtonTemplate")
+  local SettingsBtn = Nav.SettingsBtn
+  SettingsBtn.FS = SettingsBtn:CreateFontString(nil, "OVERLAY", "GameTooltipText")
+  local SettingsFS = SettingsBtn.FS
+  SettingsFS:SetText("Settings")
+  SettingsFS:SetTextColor(.8,.8,.8, 1)
+  
+  -- Game Buttons
+  Tab3.MultiGames = CreateFrame("Frame", MultiGames, Tab3)
+  local MultiGames = Tab3.MultiGames
+  MultiGames.TicTacToeBtn = CreateFrame("Button", TicTacToeBtn, MultiGames, "UIPanelButtonTemplate")
+  local TicTacToeBtn = MultiGames.TicTacToeBtn
+  TicTacToeBtn.FS = TicTacToeBtn:CreateFontString(nil, "OVERLAY", "GameTooltipText")
+  local TicTacToeFS = TicTacToeBtn.FS
+  TicTacToeFS:SetTextColor(.8,.8,.8, 1)
+  TicTacToeFS:SetText("TicTacToe")
+  TicTacToeBtn:SetScript("OnClick", function(self, button, down) 
+    if (button == "LeftButton" and down == false) then
+      GR:ShowTictactoe()
+    end
+  end)
+  MultiGames.BattleshipsBtn = CreateFrame("Button", BattleshipsBtn, MultiGames, "UIPanelButtonTemplate")
+  local BattleshipsBtn = MultiGames.BattleshipsBtn
+  BattleshipsBtn.FS = BattleshipsBtn:CreateFontString(nil, "OVERLAY", "GameTooltipText")
+  local BattleshipsFS = BattleshipsBtn.FS
+  BattleshipsFS:SetTextColor(.8,.8,.8, 1)
+  BattleshipsFS:SetText("Battleships")
+  BattleshipsBtn:SetScript("OnClick", function(self, button, down) 
+    if (button == "LeftButton" and down == false) then
+      GR:BattleshipsShowContent()
+    end
+  end)
+
+  Tab3:Hide()
+end
+
 -- Resize
 function GR:ResizeMain()
+  local Main = GR_GUI.Main
+
+  -- Resize Main Ratios
+  -- In Game
+  if (GR.db.realm.tab == 1) then
+    Main.XRatio = Main:GetWidth() / GR.Win.Const.Tab1Width
+    Main.YRatio = Main:GetHeight() / GR.Win.Const.Tab1Height
+    Main.ScreenRatio = (Main.XRatio + Main.YRatio) / 2
+  end
+  -- Solo Games
+  if (GR.db.realm.tab == 2) then
+    Main.XRatio = Main:GetWidth() / GR.Win.Const.Tab2Width 
+    Main.YRatio = Main:GetHeight() / GR.Win.Const.Tab2Height
+    Main.ScreenRatio = (Main.XRatio + Main.YRatio) / 2
+  end
+  
+
+  GR:ResizeMainNoRatioChange()
+end
+
+function GR:ResizeMainNoRatioChange()
   -- resize FontStrings
   local Main = GR_GUI.Main
   local HeaderInfo = Main.HeaderInfo
-  Main.XRatio = Main:GetWidth() / 750
-  Main.YRatio = Main:GetHeight() / 510
-  Main.ScreenRatio = (Main:GetWidth() / 750 + Main:GetHeight() / 510) / 2
 
   -- Main
   Main.ResizeBtn:SetPoint("BOTTOMRIGHT", -11 * Main.XRatio, 10 * Main.YRatio)
@@ -449,8 +575,21 @@ function GR:ResizeMain()
   Main.H1:SetPoint("TOP", 0, -18 * Main.YRatio)
   Main.H1:SetTextScale(2.8 * Main.ScreenRatio)
 
+  if (GR.db.realm.tab == 2 or GR.db.realm.tab == 3) then
+    Main.H2:SetPoint("TOP", 0, -105 * Main.YRatio)
+  else
+    Main.H2:SetPoint("TOP", 0, -65 * Main.YRatio)
+  end
+  Main.H2:SetTextScale(1.7 * Main.ScreenRatio)
+
   Main.xButton:SetSize(25 * Main.XRatio, 25 * Main.YRatio)
   Main.xButton:SetPoint("TOPRIGHT", -13 * Main.XRatio, -13 * Main.YRatio)
+
+  -- Exit Button
+  Main.ExitBtn:SetPoint("TOPRIGHT", -40 * Main.XRatio, -58 * Main.YRatio)
+  Main.ExitBtn:SetSize(100 * Main.XRatio, 30 * Main.YRatio)
+  Main.ExitBtn.FS:SetPoint("CENTER", 0, 0)
+  Main.ExitBtn.FS:SetTextScale(1.1 * Main.ScreenRatio)
 
   -- Accept Button
   local Accept = GR_GUI.Main.Accept
@@ -472,6 +611,7 @@ function GR:ResizeMain()
   DeclineFS:SetTextScale(1.1 * Main.ScreenRatio)
   
   GR:ResizeHeaderInfo()
+  GR:ResizeSoloGames()
 end
 
 function GR:ResizeHeaderInfo()
@@ -480,19 +620,6 @@ function GR:ResizeHeaderInfo()
   local HeaderInfo = GR_GUI.Main.HeaderInfo
   HeaderInfo:SetPoint("TOP", 0, -56 * Main.YRatio)
   HeaderInfo:SetSize(700 * Main.XRatio, 100 * Main.YRatio)
-
-  -- Header
-  local H2 = GR_GUI.Main.HeaderInfo.H2
-  H2:SetPoint("TOP", 0, 0)
-  H2:SetTextScale(2.1 * Main.ScreenRatio)
-  
-  -- Exit Button
-  local ExitBtn = HeaderInfo.ExitBtn
-  ExitBtn:SetPoint("TOPRIGHT", 0, 0)
-  ExitBtn:SetSize(100 * Main.XRatio, 30 * Main.YRatio)
-  local ExitBtnFS = HeaderInfo.ExitBtnFS 
-  ExitBtnFS:SetPoint("CENTER", 0, 0)
-  ExitBtnFS:SetTextScale(1.1 * Main.ScreenRatio)
   
   -- Turn String
   local TurnString = HeaderInfo.TurnString
@@ -529,25 +656,167 @@ function GR:ResizeHeaderInfo()
   RivalFS:SetTextScale(1.1 * Main.ScreenRatio)
 end
 
+function GR:ResizeSoloGames()
+  local Main = GR_GUI.Main
+  local Tab2 = Main.Tab2
+  Tab2:SetPoint("TOP", 0, -50 * Main.YRatio)
+  Tab2:SetSize(250 * Main.XRatio, 200 * Main.YRatio)
+
+  -- Nav
+  local Nav = Tab2.Nav
+  Nav:SetPoint("TOP", 0, 0)
+  Nav:SetSize(220 * Main.XRatio, 40 * Main.YRatio)
+  local MultiBtn = Nav.MultiBtn
+  MultiBtn:SetPoint("TOPLEFT", 5 * Main.XRatio, -5 * Main.YRatio)
+  MultiBtn:SetSize(100 * Main.XRatio, 30 * Main.YRatio)
+  local MultiFS = MultiBtn.FS
+  MultiFS:SetPoint("CENTER", 0, 0)
+  MultiFS:SetTextScale(1.3 * Main.ScreenRatio)
+  local SettingsBtn = Nav.SettingsBtn
+  SettingsBtn:SetPoint("TOPRIGHT", -5 * Main.XRatio, -5 * Main.YRatio)
+  SettingsBtn:SetSize(100 * Main.XRatio, 30 * Main.YRatio)
+  local SettingsFS = SettingsBtn.FS
+  SettingsFS:SetPoint("CENTER", 0, 0)
+  SettingsFS:SetTextScale(1.3 * Main.ScreenRatio)
+
+  -- Game Buttons
+  local SoloGames = Tab2.SoloGames
+  SoloGames:SetPoint("TOP", 0 * Main.XRatio, -75 * Main.YRatio)
+  SoloGames:SetSize(250 * Main.XRatio, 100 * Main.YRatio)
+  local AsteroidsBtn = SoloGames.AsteroidsBtn
+  AsteroidsBtn:SetPoint("TOPLEFT", 5 * Main.XRatio, -5 * Main.YRatio)
+  AsteroidsBtn:SetSize(120 * Main.XRatio, 30 * Main.YRatio)
+  local AsteroidsFS = AsteroidsBtn.FS
+  AsteroidsFS:SetPoint("CENTER", 0, 0)
+  AsteroidsFS:SetTextScale(1.4 * Main.ScreenRatio)
+end
+
+function GR:ResizeMultiGames()
+  local Main = GR_GUI.Main
+  local Tab3 = Main.Tab3
+  Tab3:SetPoint("TOP", 0, -65 * Main.YRatio)
+  Tab3:SetSize(200 * Main.XRatio, 200 * Main.YRatio)
+  
+  -- Nav
+  local Nav = Tab3.Nav
+  Nav:SetPoint("TOP", 0, -65 * Main.YRatio)
+  Nav:SetSize(200 * Main.XRatio, 40 * Main.YRatio)
+  local MultiBtn = Nav.MultiBtn
+  MultiBtn:SetPoint("TOPLEFT", 5 * Main.XRatio, -5 * Main.YRatio)
+  MultiBtn:SetSize(90 * Main.XRatio, 30 * Main.YRatio)
+  local MultiFS = MultiBtn.FS
+  MultiFS:SetPoint("CENTER", 0, 0)
+  MultiFS:SetTextScale(1.3 * Main.ScreenRatio)
+  local SettingsBtn = Nav.SettingsBtn
+  SettingsBtn:SetPoint("TOPRIGHT", -5 * Main.XRatio, -5 * Main.YRatio)
+  SettingsBtn:SetSize(90 * Main.XRatio, 30 * Main.YRatio)
+  local SettingsFS = SettingsBtn.FS
+  SettingsFS:SetPoint("CENTER", 0, 0)
+  SettingsFS:SetTextScale(1.3 * Main.ScreenRatio)
+
+  -- Game Buttons
+  local MultiGames = Nav.MultiGames
+  MultiGames:SetPoint("TOP", 0 * Main.XRatio, -135 * Main.YRatio)
+  MultiGames:SetSize(250 * Main.XRatio, 100 * Main.YRatio)
+  local TicTacToeBtn = MultiGames.TicTacToeBtn
+  TicTacToeBtn:SetPoint("TOPLEFT", 5 * Main.XRatio, -5 * Main.YRatio)
+  TicTacToeBtn:SetSize(120 * Main.XRatio, 30 * Main.YRatio)
+  local TicTacToeFS = TicTacToeBtn.FS
+  TicTacToeFS:SetPoint("CENTER", 0, 0)
+  TicTacToeFS:SetTextScale(1.4 * Main.ScreenRatio)
+  local BattleshipsBtn = MultiGames.BattleshipsBtn
+  BattleshipsBtn:SetPoint("TOPRIGHT", -5 * Main.XRatio, -5 * Main.YRatio)
+  BattleshipsBtn:SetSize(120 * Main.XRatio, 30 * Main.YRatio)
+  local BattleshipsFS = BattleshipsBtn.FS
+  BattleshipsFS:SetPoint("CENTER", 0, 0)
+  BattleshipsFS:SetTextScale(1.4 * Main.ScreenRatio)
+end
+
 -- Functionality
 function GR:TabSelect()
   local Main = GR_GUI.Main
   local tab = GR.db.realm.tab
-
-  Main.Tictactoe:Hide() 
-  Main.HeaderInfo:Hide() 
+  
   Main.Settings:Hide() 
+  Main.Tab2:Hide()
+  Main.Tab3:Hide()
+  Main.HeaderInfo:Hide() 
   Main.Asteroids:Hide() 
+  Main.Tictactoe:Hide() 
+  Main.Battleships:Hide()
 
+  local function CheckWidthHeight(Width, Height)
+    local Change = false
+    if (Width > UIParent:GetWidth()) then
+      Width = UIParent:GetWidth() - 100
+      Change = true
+    end
+    if (Width < 150) then
+      Width = 150
+      Change = true
+    end
+    if (Height > UIParent:GetHeight()) then
+      Height = UIParent:GetHeight() - 100
+      Change = true
+    end
+    if (Height < 150) then
+      Height = 150
+      Change = true
+    end
+
+    return Width, Height, Change
+  end
+  
   -- In Game
-  if tab == 2 then 
-      Main.HeaderInfo:Show() 
-  end 
-  -- In Settings
-  if tab == 7 then 
-      Main.SettingsScroll:Show() 
-      Main.Settings:Show() 
-  end 
+  if (tab == 1) then
+    local Width, Height, Change = CheckWidthHeight(GR.Win.Const.Tab1Width * Main.XRatio, GR.Win.Const.Tab1Height * Main.YRatio)
+    Main:SetSize(Width, Height)
+
+    if (Change) then
+      GR:ResizeMain()
+    else
+      GR:ResizeMainNoRatioChange()
+    end
+    
+    if (GR.GameType == "Asteroids") then
+      Main.Asteroids:Show()
+      GR:SizeAsteroids()
+    end
+  end
+  -- Solo Games
+  if (tab == 2) then
+    local Width, Height, Change = CheckWidthHeight(GR.Win.Const.Tab2Width * Main.XRatio, GR.Win.Const.Tab2Height * Main.YRatio)
+    Main:SetSize(Width, Height)
+    
+    if (Change) then
+      GR:ResizeMain()
+    else
+      GR:ResizeMainNoRatioChange()
+    end
+
+    Main.Tab2:Show()
+    Main.H2:SetText("Solo Games")
+  end
+  -- Multiplayer Games
+  if (tab == 3) then
+    local Width, Height, Change = CheckWidthHeight(GR.Win.Const.Tab3Width * Main.XRatio, GR.Win.Const.Tab3Height * Main.YRatio)
+    Main:SetSize(Width, Height)
+    
+    if (Change) then
+      GR:ResizeMain()
+    else
+      GR:ResizeMainNoRatioChange()
+    end
+
+    Main.Tab3:Show()
+    Main.H2:SetText("Multi-Player Games")
+  end
+  -- Settings
+  if (tab == 4) then
+    
+  end
+  
+  
 end
 
 function GR:SetTurnString()
@@ -577,33 +846,13 @@ end
 
 -- Show/Hide Game
 function GR:ShowGame()
-    GR.InGame = true
-
-    GR_GUI.Main.HeaderInfo:Show()
-    GR_GUI.Main.HeaderInfo.OpponentString:Show()
-    GR_GUI.Main.HeaderInfo.TurnString:Show()
-    GR_GUI.Main.HeaderInfo.ExitBtn:Show()
-
-    GR_GUI.Accept:Hide()
-    GR_GUI.Main.SettingsScroll:Hide()
-    GR_GUI.Main.Settings:Hide()
-    GR_GUI.Main.HeaderInfo.ReInvite:Hide()
-    GR_GUI.Main.HeaderInfo.ReMatch:Hide()
-    GR_GUI.Main.HeaderInfo.Rival:Hide()
-    GR_GUI.Main.Invite:Hide()
-
-    if (GR.Opponent) then 
-      GR_GUI.Main.HeaderInfo.OpponentString:SetText("Opponent: " .. GR.Opponent)
-    end
-    GR:SetTurnString()
-end
-
-function GR:ShowSoloGame()
   GR.InGame = true
+
   GR_GUI.Main.HeaderInfo:Show()
-  GR_GUI.Main.HeaderInfo.OpponentString:Hide()
-  GR_GUI.Main.HeaderInfo.TurnString:Hide()
-  GR_GUI.Main.HeaderInfo.ExitBtn:Show()
+  GR_GUI.Main.HeaderInfo.OpponentString:Show()
+  GR_GUI.Main.HeaderInfo.TurnString:Show()
+  GR_GUI.Main.ExitBtn:Show()
+  
   GR_GUI.Accept:Hide()
   GR_GUI.Main.SettingsScroll:Hide()
   GR_GUI.Main.Settings:Hide()
@@ -611,22 +860,38 @@ function GR:ShowSoloGame()
   GR_GUI.Main.HeaderInfo.ReMatch:Hide()
   GR_GUI.Main.HeaderInfo.Rival:Hide()
   GR_GUI.Main.Invite:Hide()
+  
+  if (GR.Opponent) then 
+    GR_GUI.Main.HeaderInfo.OpponentString:SetText("Opponent: " .. GR.Opponent)
+  end
+  GR:SetTurnString()
+end
+  
+function GR:ShowSoloGame()
+  GR.InGame = true
+  GR_GUI.Accept:Hide()
+  
+  GR_GUI.Main.ExitBtn:Show()
+  GR_GUI.Main.H2:SetText(GR.GameType)
+
+  GR.db.realm.tab = 1
+  GR:TabSelect()
 end
 
 function GR:HideGame()
-    GR.PlayerPos = nil
-    GR.IsPlayerTurn = nil
-    GR.InGame = false
-    GR.GameOver = false
-    GR.db.realm.tab = 1
-    GR.CanSendInvite = true
-    GR.IsChallenged = false
-    GR.Opponent = nil
-    GR_GUI.Main.HeaderInfo:Hide()
-    GR_GUI.Main.HeaderInfo.ExitBtn:Hide()
-    GR_GUI.Main.HeaderInfo.OpponentString:Hide()
-    GR_GUI.Main.Invite:Show()
-    GR_GUI.Main:SetSize(750, 510)
+  GR.PlayerPos = nil
+  GR.IsPlayerTurn = nil
+  GR.InGame = false
+  GR.GameOver = false
+  GR.db.realm.tab = 2
+  GR.CanSendInvite = true
+  GR.IsChallenged = false
+  GR.Opponent = nil
+  GR_GUI.Main.HeaderInfo:Hide()
+  GR_GUI.Main.ExitBtn:Hide()
+  GR_GUI.Main.Invite:Show()
+
+  GR:TabSelect()
 end
 
 -- Show/Hide Main
