@@ -51,11 +51,13 @@ function GR:OnInitialize()
     GR.Win = {}
     GR.Win.Const = {}
     GR.Win.Const.Tab1Width = 750
-    GR.Win.Const.Tab1Height = 600
+    GR.Win.Const.Tab1Height = 510
     GR.Win.Const.Tab2Width = 310
     GR.Win.Const.Tab2Height = 250
     GR.Win.Const.Tab3Width = 310
-    GR.Win.Const.Tab3Height = 450
+    GR.Win.Const.Tab3Height = 460
+    GR.Win.Const.Tab4Width = 450
+    GR.Win.Const.Tab4Height = 570
 
     -- Window Varibales
     GR.Win.XRatio = 1
@@ -68,9 +70,9 @@ function GR:OnInitialize()
     GR.GameOver = false
     GR.IsChallenged = false
     GR.PlayerName = UnitName("player")
+    GR.Retail = true
     
     GR:CreateMainWindow()
-    GR:CreateSettings()
     GR:CreateInvite()
     GR:CreateTicTacToe()
     GR:CreateBattleships()
@@ -90,9 +92,13 @@ function GR:CreateMainWindow()
   GR_GUI.Main = CreateFrame("Frame", GameRoom, UIParent, "TranslucentFrameTemplate")
   local Main = GR_GUI.Main
   Main:SetSize(GR.Win.Const.Tab2Width, GR.Win.Const.Tab2Height)
-  Main:SetMinResize(100,120)
+  if (GR.Retail) then 
+    Main:SetResizeBounds(100,120)
+  else
+    Main:SetMinResize(100,120)
+  end
   Main:SetFrameStrata("HIGH")
-  Main:SetPoint("TOPLEFT", UIParent, "TOPLEFT", UIParent:GetWidth() / 2 - GR.Win.Const.Tab2Width / 2, -130)
+  Main:SetPoint("TOP", UIParent, "TOP", 0, -130)
   Main:SetMovable(true)
   Main:EnableMouse(true)
   Main:SetResizable(true)
@@ -128,7 +134,7 @@ function GR:CreateMainWindow()
   ResizeBtn:SetScript("OnMouseUp", function()
       Main:StopMovingOrSizing("BOTTOMRIGHT")
       GR:ResizeMain()
-      GR:ResizeTictactoe()
+      GR:SizeTictactoe()
       GR:ResizeBattleships()
       GR:SizeAsteroids()
   end)
@@ -204,6 +210,7 @@ function GR:CreateMainWindow()
   GR:CreateHeaderInfo()
   GR:CreateSoloGames()
   GR:CreateMultiGames()
+  GR:CreateSettings()
   GR:ResizeMainNoRatioChange()
 end
 
@@ -225,9 +232,8 @@ function GR:CreateHeaderInfo()
   HeaderInfo.ReInvite = CreateFrame("Button", ReInvite, HeaderInfo, "UIPanelButtonTemplate")
   local ReInvite = HeaderInfo.ReInvite
   ReInvite.FS = ReInvite:CreateFontString(nil, "OVERLAY", "GameTooltipText")
-  local ReInviteFS = ReInvite:CreateFontString(nil, "OVERLAY", "GameTooltipText")
-  ReInviteFS:SetTextColor(.8,.8,.8, 1)
-  ReInviteFS:SetText("Rematch?")
+  ReInvite.FS:SetTextColor(.8,.8,.8, 1)
+  ReInvite.FS:SetText("Rematch?")
   ReInvite:SetScript("OnClick", function(self, button, down)
       if (button == "LeftButton" and down == false) then
           local UserName = UnitName("player")
@@ -255,7 +261,8 @@ function GR:CreateHeaderInfo()
   ReMatch:SetScript("OnClick", function(self, button, down)
       if (button == "LeftButton" and down == false) then 
           local Opponent = GR.Opponent
-          GR.PlayerPos = random(1,2)
+          local Rand = random(1,2)
+          GR.PlayerPos = Rand
           if (GR.PlayerPos == 2) then
               GR.IsPlayerTurn = false
           else
@@ -263,14 +270,15 @@ function GR:CreateHeaderInfo()
           end
           if (GR.GameType == "Tictactoe") then
               GR:TicTacToeHideContent()
-              GR_GUI.Main:SetSize(750, 620)
-              GR:SendCommMessage("ZUI_GameRoom_Inv", "TicTacToe_Accept, " .. GR.PlayerPos .. ", " .. UnitName("player"), "WHISPER", Opponent)
-              GR:ShowTictactoe()
-          end
-          if (GR.GameType == "Battleships") then
+              GR:SendCommMessage("ZUI_GameRoom_Inv", "TicTacToe_Accept, " .. Rand .. ", " .. UnitName("Player"), "WHISPER", Opponent)
+              GR.db.realm.tab = 1
+              GR:TabSelect()
+            end
+            if (GR.GameType == "Battleships") then
               GR:BattleshipsHideContent()
-              GR:SendCommMessage("ZUI_GameRoom_Inv", "Battleships_Accept, " .. GR.PlayerPos .. ", " .. UnitName("player"), "WHISPER", Opponent)
-              GR:BattleshipsShowContent()
+              GR:SendCommMessage("ZUI_GameRoom_Inv", "Battleships_Accept, " .. Rand .. ", " .. UnitName("player"), "WHISPER", Opponent)
+              GR.db.realm.tab = 1
+              GR:TabSelect()
           end
           GR.Opponent = Opponent
       end
@@ -320,13 +328,17 @@ function GR:CreateAcceptDecline()
         else
             GR.IsPlayerTurn = true
         end
-        if (GR.GameType == "Tictactoe") then
-            GR:SendCommMessage("ZUI_GameRoom_Inv", "TicTacToe_Accept, " .. GR.PlayerPos .. ", " .. PlayerName, "WHISPER", GR.Opponent)
-            GR:ShowTictactoe()
-        end
-        if (GR.GameType == "Battleships") then
-            GR:SendCommMessage("ZUI_GameRoom_Inv", "Battleships_Accept, " .. GR.PlayerPos .. ", " .. PlayerName, "WHISPER", GR.Opponent)
-            GR:BattleshipsShowContent()
+        if (GR.IncGameType == "Tictactoe") then
+          GR:SendCommMessage("ZUI_GameRoom_Inv", "TicTacToe_Accept, " .. GR.PlayerPos .. ", " .. UnitName("Player"), "WHISPER", GR.Opponent)
+          GR.GameType = "Tictactoe"
+          GR.db.realm.tab = 1
+          GR:TabSelect()
+          end
+        if (GR.IncGameType == "Battleships") then
+          GR:SendCommMessage("ZUI_GameRoom_Inv", "Battleships_Accept, " .. GR.PlayerPos .. ", " .. UnitName("Player"), "WHISPER", GR.Opponent)
+          GR.GameType = "Battleships"
+          GR.db.realm.tab = 1
+          GR:TabSelect()
         end
     end)
 
@@ -386,48 +398,42 @@ function GR:CreateAcceptDecline()
     -- Accept Button
     GR_GUI.Main.Accept = CreateFrame("Button", Accept, GR_GUI.Main, "UIPanelButtonTemplate")
     local Accept = GR_GUI.Main.Accept
-    Accept:SetPoint("TOPLEFT", 30, -50)
-    Accept:SetSize(214, 58)
     Accept.FS = Accept:CreateFontString(nil, "OVERLAY", "GameTooltipText")
     local AcceptFS = Accept.FS
-    AcceptFS:SetPoint("TOP", 0, -11)
-    AcceptFS:SetTextScale(1.5)
     AcceptFS:SetTextColor(.8,1,0, 1)
     AcceptFS:SetText("Incoming Challenge!")
     Accept.FS2 = Accept:CreateFontString(nil, "OVERLAY", "GameTooltipText")
     local AcceptFS2 = Accept.FS2
-    AcceptFS2:SetPoint("BOTTOM", 0, 10)
-    AcceptFS2:SetTextScale(1.3)
     AcceptFS2:SetTextColor(.8,1,0, 1)
     Accept:SetScript("OnClick", function(self, button, down) 
-        -- send message to show other user board
-        GR_GUI.Main.Accept:Hide()
-        GR_GUI.Main.DeclineBtn:Hide()
-        GR.PlayerPos = random(1,2)
-        if (GR.PlayerPos == 2) then
-            GR.IsPlayerTurn = false
-        else
-            GR.IsPlayerTurn = true
+      -- send message to show other user board
+      GR_GUI.Main.Accept:Hide()
+      GR_GUI.Main.DeclineBtn:Hide()
+      GR.PlayerPos = random(1,2)
+      if (GR.PlayerPos == 2) then
+        GR.IsPlayerTurn = false
+      else
+        GR.IsPlayerTurn = true
+      end
+      if (GR.IncGameType == "Tictactoe") then
+        GR:SendCommMessage("ZUI_GameRoom_Inv", "TicTacToe_Accept, " .. GR.PlayerPos .. ", " .. UnitName("Player"), "WHISPER", GR.Opponent)
+        GR.GameType = "Tictactoe"
+        GR.db.realm.tab = 1
+        GR:TabSelect()
         end
-        if (GR.GameType == "Tictactoe") then
-            GR:SendCommMessage("ZUI_GameRoom_Inv", "TicTacToe_Accept, " .. GR.PlayerPos .. ", " .. PlayerName, "WHISPER", GR.Opponent)
-            GR:ShowTictactoe()
-        end
-        if (GR.GameType == "Battleships") then
-            GR:SendCommMessage("ZUI_GameRoom_Inv", "Battleships_Accept, " .. GR.PlayerPos .. ", " .. PlayerName, "WHISPER", GR.Opponent)
-            GR:BattleshipsShowContent()
-        end
+      if (GR.IncGameType == "Battleships") then
+        GR:SendCommMessage("ZUI_GameRoom_Inv", "Battleships_Accept, " .. GR.PlayerPos .. ", " .. UnitName("Player"), "WHISPER", GR.Opponent)
+        GR.GameType = "Battleships"
+        GR.db.realm.tab = 1
+        GR:TabSelect()
+      end
     end)
 
     -- Decline Button
     GR_GUI.Main.DeclineBtn = CreateFrame("Button", DeclineBtn, GR_GUI.Main, "UIPanelButtonTemplate")
     local DeclineBtn = GR_GUI.Main.DeclineBtn
-    DeclineBtn:SetPoint("TOPRIGHT", -150, -65)
-    DeclineBtn:SetSize(70, 20)
     DeclineBtn.FS = DeclineBtn:CreateFontString(nil, "OVERLAY", "GameTooltipText")
     local DeclineFS = DeclineBtn.FS
-    DeclineFS:SetPoint("CENTER", 0, 0)
-    DeclineFS:SetTextScale(1.1)
     DeclineFS:SetTextColor(.8,.8,.8, 1)
     DeclineFS:SetText("Decline")
     DeclineBtn:SetScript("OnClick", function(self, button, down)
@@ -503,68 +509,6 @@ function GR:CreateSoloGames()
   Tab2:Hide()
 end
 
-function GR:CreateMultiGames()
-  local Main = GR_GUI.Main
-  Main.Tab3 = CreateFrame("Frame", Tab3, Main)
-  local Tab3 = Main.Tab3
-
-  --Nav
-  Tab3.Nav = CreateFrame("Frame", Nav, Tab3)
-  local Nav = Tab3.Nav
-  Nav.SoloBtn = CreateFrame("Button", SoloBtn, Nav, "UIPanelButtonTemplate")
-  local SoloBtn = Nav.SoloBtn
-  SoloBtn.FS = SoloBtn:CreateFontString(nil, "OVERLAY", "GameTooltipText")
-  local SoloFS = SoloBtn.FS
-  SoloFS:SetText("Single Player")
-  SoloFS:SetTextColor(.8,.8,.8, 1)
-  SoloBtn:SetScript("OnClick", function(self, button, down) 
-    if (button == "LeftButton" and down == false) then
-      GR.db.realm.tab = 2
-      GR:TabSelect()
-    end
-  end)
-  Nav.SettingsBtn = CreateFrame("Button", SettingsBtn, Nav, "UIPanelButtonTemplate")
-  local SettingsBtn = Nav.SettingsBtn
-  SettingsBtn.FS = SettingsBtn:CreateFontString(nil, "OVERLAY", "GameTooltipText")
-  local SettingsFS = SettingsBtn.FS
-  SettingsFS:SetText("Settings")
-  SettingsFS:SetTextColor(.8,.8,.8, 1)
-  SettingsBtn:SetScript("OnClick", function(self, button, down) 
-    if (button == "LeftButton" and down == false) then
-      GR.db.realm.tab = 4
-      GR:TabSelect()
-    end
-  end)
-  
-  -- Game Buttons
-  Tab3.MultiGames = CreateFrame("Frame", MultiGames, Tab3)
-  local MultiGames = Tab3.MultiGames
-  MultiGames.TicTacToeBtn = CreateFrame("Button", TicTacToeBtn, MultiGames, "UIPanelButtonTemplate")
-  local TicTacToeBtn = MultiGames.TicTacToeBtn
-  TicTacToeBtn.FS = TicTacToeBtn:CreateFontString(nil, "OVERLAY", "GameTooltipText")
-  local TicTacToeFS = TicTacToeBtn.FS
-  TicTacToeFS:SetTextColor(.8,.8,.8, 1)
-  TicTacToeFS:SetText("TicTacToe")
-  TicTacToeBtn:SetScript("OnClick", function(self, button, down) 
-    if (button == "LeftButton" and down == false) then
-      GR:ShowTictactoe()
-    end
-  end)
-  MultiGames.BattleshipsBtn = CreateFrame("Button", BattleshipsBtn, MultiGames, "UIPanelButtonTemplate")
-  local BattleshipsBtn = MultiGames.BattleshipsBtn
-  BattleshipsBtn.FS = BattleshipsBtn:CreateFontString(nil, "OVERLAY", "GameTooltipText")
-  local BattleshipsFS = BattleshipsBtn.FS
-  BattleshipsFS:SetTextColor(.8,.8,.8, 1)
-  BattleshipsFS:SetText("Battleships")
-  BattleshipsBtn:SetScript("OnClick", function(self, button, down) 
-    if (button == "LeftButton" and down == false) then
-      GR:BattleshipsShowContent()
-    end
-  end)
-
-  Tab3:Hide()
-end
-
 -- Resize
 function GR:ResizeMain()
   local Main = GR_GUI.Main
@@ -588,6 +532,12 @@ function GR:ResizeMain()
     Main.YRatio = Main:GetHeight() / GR.Win.Const.Tab3Height
     Main.ScreenRatio = (Main.XRatio + Main.YRatio) / 2
   end
+  -- Settings
+  if (GR.db.realm.tab == 4) then
+    Main.XRatio = Main:GetWidth() / GR.Win.Const.Tab4Width 
+    Main.YRatio = Main:GetHeight() / GR.Win.Const.Tab4Height
+    Main.ScreenRatio = (Main.XRatio + Main.YRatio) / 2
+  end
   
 
   GR:ResizeMainNoRatioChange()
@@ -605,7 +555,7 @@ function GR:ResizeMainNoRatioChange()
   Main.H1:SetPoint("TOP", 0, -18 * Main.YRatio)
   Main.H1:SetTextScale(2.8 * Main.ScreenRatio)
 
-  if (GR.db.realm.tab == 2 or GR.db.realm.tab == 3) then
+  if (GR.db.realm.tab == 2 or GR.db.realm.tab == 3 or GR.db.realm.tab == 4) then
     Main.H2:SetPoint("TOP", 0, -105 * Main.YRatio)
   else
     Main.H2:SetPoint("TOP", 0, -65 * Main.YRatio)
@@ -616,50 +566,33 @@ function GR:ResizeMainNoRatioChange()
   Main.xButton:SetPoint("TOPRIGHT", -13 * Main.XRatio, -13 * Main.YRatio)
 
   -- Exit Button
-  Main.ExitBtn:SetPoint("TOPRIGHT", -40 * Main.XRatio, -58 * Main.YRatio)
+  Main.ExitBtn:SetPoint("TOPRIGHT", -40 * Main.XRatio, -56 * Main.YRatio)
   Main.ExitBtn:SetSize(100 * Main.XRatio, 30 * Main.YRatio)
   Main.ExitBtn.FS:SetPoint("CENTER", 0, 0)
   Main.ExitBtn.FS:SetTextScale(1.1 * Main.ScreenRatio)
-
-  -- Accept Button
-  local Accept = GR_GUI.Main.Accept
-  Accept:SetPoint("TOPLEFT", 30 * Main.XRatio, -50 * Main.YRatio)
-  Accept:SetSize(214 * Main.XRatio, 58 * Main.YRatio)
-  local AcceptFS = Accept.FS
-  AcceptFS:SetPoint("TOP", 0 * Main.XRatio, -11 * Main.YRatio)
-  AcceptFS:SetTextScale(1.5 * Main.ScreenRatio)
-  local AcceptFS2 = Accept.FS2
-  AcceptFS2:SetPoint("BOTTOM", 0 * Main.XRatio, 10 * Main.YRatio)
-  AcceptFS2:SetTextScale(1.3 * Main.ScreenRatio)
-
-  -- Decline Button
-  local DeclineBtn = GR_GUI.Main.DeclineBtn
-  DeclineBtn:SetPoint("TOPRIGHT", -150 * Main.XRatio, -65 * Main.YRatio)
-  DeclineBtn:SetSize(70 * Main.XRatio, 20 * Main.YRatio)
-  local DeclineFS = DeclineBtn.FS
-  DeclineFS:SetPoint("CENTER", 0 * Main.XRatio, 0 * Main.YRatio)
-  DeclineFS:SetTextScale(1.1 * Main.ScreenRatio)
   
   GR:ResizeHeaderInfo()
   GR:ResizeSoloGames()
-  GR:ResizeMultiGames()
+  GR:SizeMultiGames()
+  GR:SizeSettings()
+  GR:SizeAcceptDecline()
 end
 
 function GR:ResizeHeaderInfo()
   -- Frame
   local Main = GR_GUI.Main
   local HeaderInfo = GR_GUI.Main.HeaderInfo
-  HeaderInfo:SetPoint("TOP", 0, -56 * Main.YRatio)
+  HeaderInfo:SetPoint("TOP", 0, -60 * Main.YRatio)
   HeaderInfo:SetSize(700 * Main.XRatio, 100 * Main.YRatio)
   
   -- Turn String
   local TurnString = HeaderInfo.TurnString
-  TurnString:SetPoint("TOP", 0, -90 * Main.YRatio)
+  TurnString:SetPoint("TOP", 0, 0 * Main.YRatio)
   TurnString:SetTextScale(2 * Main.ScreenRatio)
 
   -- Opponet String
   local Opp = HeaderInfo.OpponentString
-  Opp:SetPoint("TOPLEFT", 0, 0)
+  Opp:SetPoint("TOPLEFT", 0, -2 * Main.YRatio)
   Opp:SetTextScale(1.5 * Main.ScreenRatio)
 
   -- Reinvite Button
@@ -722,45 +655,26 @@ function GR:ResizeSoloGames()
   AsteroidsFS:SetTextScale(1.4 * Main.ScreenRatio)
 end
 
-function GR:ResizeMultiGames()
+function GR:SizeAcceptDecline()
+  -- Accept Button
   local Main = GR_GUI.Main
-  local Tab3 = Main.Tab3
-  Tab3:SetPoint("TOP", 0, -50 * Main.YRatio)
-  Tab3:SetSize(250 * Main.XRatio, 200 * Main.YRatio)
+  local Accept = GR_GUI.Main.Accept
+  Accept:SetPoint("BOTTOMLEFT", 13 * Main.XRatio, 14 * Main.YRatio)
+  Accept:SetSize(210 * Main.XRatio, 55 * Main.YRatio)
+  local AcceptFS = Accept.FS
+  AcceptFS:SetPoint("TOP", 0, -11 * Main.YRatio)
+  AcceptFS:SetTextScale(1.5 * Main.ScreenRatio)
+  local AcceptFS2 = Accept.FS2
+  AcceptFS2:SetPoint("BOTTOM", 0, 10 * Main.YRatio)
+  AcceptFS2:SetTextScale(1.3 * Main.ScreenRatio)
   
-  -- Nav
-  local Nav = Tab3.Nav
-  Nav:SetPoint("TOP", 0, 0)
-  Nav:SetSize(240 * Main.XRatio, 40 * Main.YRatio)
-  local SoloBtn = Nav.SoloBtn
-  SoloBtn:SetPoint("TOPLEFT", 5 * Main.XRatio, -5 * Main.YRatio)
-  SoloBtn:SetSize(110 * Main.XRatio, 30 * Main.YRatio)
-  local SoloFS = SoloBtn.FS
-  SoloFS:SetPoint("CENTER", 0, 0)
-  SoloFS:SetTextScale(1.3 * Main.ScreenRatio)
-  local SettingsBtn = Nav.SettingsBtn
-  SettingsBtn:SetPoint("TOPRIGHT", -5 * Main.XRatio, -5 * Main.YRatio)
-  SettingsBtn:SetSize(110 * Main.XRatio, 30 * Main.YRatio)
-  local SettingsFS = SettingsBtn.FS
-  SettingsFS:SetPoint("CENTER", 0, 0)
-  SettingsFS:SetTextScale(1.3 * Main.ScreenRatio)
-
-  -- Game Buttons
-  local MultiGames = Tab3.MultiGames
-  MultiGames:SetPoint("TOP", 0 * Main.XRatio, -75 * Main.YRatio)
-  MultiGames:SetSize(250 * Main.XRatio, 100 * Main.YRatio)
-  local TicTacToeBtn = MultiGames.TicTacToeBtn
-  TicTacToeBtn:SetPoint("TOPLEFT", 5 * Main.XRatio, -5 * Main.YRatio)
-  TicTacToeBtn:SetSize(120 * Main.XRatio, 30 * Main.YRatio)
-  local TicTacToeFS = TicTacToeBtn.FS
-  TicTacToeFS:SetPoint("CENTER", 0, 0)
-  TicTacToeFS:SetTextScale(1.4 * Main.ScreenRatio)
-  local BattleshipsBtn = MultiGames.BattleshipsBtn
-  BattleshipsBtn:SetPoint("TOPRIGHT", -5 * Main.XRatio, -5 * Main.YRatio)
-  BattleshipsBtn:SetSize(120 * Main.XRatio, 30 * Main.YRatio)
-  local BattleshipsFS = BattleshipsBtn.FS
-  BattleshipsFS:SetPoint("CENTER", 0, 0)
-  BattleshipsFS:SetTextScale(1.4 * Main.ScreenRatio)
+  -- Decline Button
+  local DeclineBtn = GR_GUI.Main.DeclineBtn
+  DeclineBtn:SetPoint("BOTTOMRIGHT", -25 * Main.XRatio, 14 * Main.YRatio)
+  DeclineBtn:SetSize(50 * Main.XRatio, 25 * Main.YRatio)
+  local DeclineFS = DeclineBtn.FS
+  DeclineFS:SetPoint("CENTER", 0, 0)
+  DeclineFS:SetTextScale(1.1  * Main.ScreenRatio)
 end
 
 -- Functionality
@@ -768,9 +682,9 @@ function GR:TabSelect()
   local Main = GR_GUI.Main
   local tab = GR.db.realm.tab
   
-  Main.Settings:Hide() 
   Main.Tab2:Hide()
   Main.Tab3:Hide()
+  Main.Tab4:Hide() 
   Main.HeaderInfo:Hide() 
   Main.Asteroids:Hide() 
   Main.Tictactoe:Hide() 
@@ -816,6 +730,12 @@ function GR:TabSelect()
       Main.Asteroids:Show()
       GR:SizeAsteroids()
     end
+    if (GR.GameType == "Tictactoe") then
+      GR:ShowTictactoe()
+    end
+    if (GR.GameType == "Battleships") then
+      GR:BattleshipsShowContent()
+    end
   end
   -- Solo Games
   if (tab == 2) then
@@ -832,7 +752,7 @@ function GR:TabSelect()
     end
 
     Main.Tab2:Show()
-    Main.H2:SetText("Solo Games")
+    Main.H2:SetText("Single Player Games")
   end
   -- Multiplayer Games
   if (tab == 3) then
@@ -849,14 +769,28 @@ function GR:TabSelect()
     end
 
     Main.Tab3:Show()
+    Main.Tab3.Invite:Hide()
+    Main.Tab3.Invite.Tab:Hide()
+    Main.Tab3.Invite.SendBtn:Hide()
     Main.H2:SetText("Multi-Player Games")
   end
   -- Settings
   if (tab == 4) then
+    local Width, Height, Change = CheckWidthHeight(GR.Win.Const.Tab4Width * Main.XRatio, GR.Win.Const.Tab4Height * Main.YRatio)
+    local point, relativeTo, relativePoint, xOfs, yOfs = Main:GetPoint()
+
+    Main:SetSize(Width, Height)
+    Main:SetPoint(point, relativeTo, relativePoint, xOfs, yOfs)
     
+    if (Change) then
+      GR:ResizeMain()
+    else
+      GR:ResizeMainNoRatioChange()
+    end
+
+    Main.Tab4:Show()
+    Main.H2:SetText("Settings")
   end
-  
-  
 end
 
 function GR:SetTurnString()
@@ -894,8 +828,6 @@ function GR:ShowGame()
   GR_GUI.Main.ExitBtn:Show()
   
   GR_GUI.Accept:Hide()
-  GR_GUI.Main.SettingsScroll:Hide()
-  GR_GUI.Main.Settings:Hide()
   GR_GUI.Main.HeaderInfo.ReInvite:Hide()
   GR_GUI.Main.HeaderInfo.ReMatch:Hide()
   GR_GUI.Main.HeaderInfo.Rival:Hide()
@@ -976,7 +908,7 @@ function GR:ShowMain()
   end
   GR:ResizeMain()
   GR:ResizeBattleships()
-  GR:ResizeTictactoe()
+  GR:SizeTictactoe()
   GR:SizeAsteroids()
   GR:ShowChallengeIfChallenged() 
   GR_GUI.Main:Show() 
