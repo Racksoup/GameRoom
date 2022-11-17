@@ -3,88 +3,103 @@ L = LibStub("AceLocale-3.0"):GetLocale("ZUI_GameRoomLocale")
 GR_GUI = {}
 local icon = LibStub("LibDBIcon-1.0")
 local GR_LDB = LibStub("LibDataBroker-1.1"):NewDataObject("GR", {
-    type = "data source",
-    text = "GameRoom",
-    icon = "interface/icons/inv_misc_ticket_tarot_maelstrom_01.blp",
-    OnClick = function()
-        if (GR_GUI.Main:IsVisible()) then 
-            --GR:HideMain()
-            GR_GUI.Main:Hide()
-        else 
-            GR:ShowMain()
-        end
-    end,
-    OnTooltipShow = function(tooltip)
-        tooltip:SetText("Game Room")
-    end,
+  type = "data source",
+  text = "GameRoom",
+  icon = "interface/icons/inv_misc_ticket_tarot_maelstrom_01.blp",
+  OnClick = function()
+    if (GR_GUI.Main:IsVisible()) then 
+      --GR:HideMain()
+      GR_GUI.Main:Hide()
+    else 
+      if (GR.FirstOpen) then
+        GR.FirstOpen = false
+        GR_GUI.Main:Show()
+      else
+        GR:ShowMain()
+      end
+    end
+  end,
+  OnTooltipShow = function(tooltip)
+    tooltip:SetText("Game Room")
+  end,
 })
 
 local defaults = {
-    realm = {
-        minimap = { hide = false },
-        HideInCombat = false,
-        windowAlpha = 1,
-        tab = 1,
-        showBN = true,
-        disableChallenges = false,
-        showChallengeAsMsg = false,
-        Xpos = 200,
-        Ypos = -150,
-        Point = "TOPLEFT",
-        Blacklist = {},
-        Whitelist = {},
-        Rivals = {},
-        onlyWhitelist = false,
-        WhitelistGuild = false,
-        WhitelistParty = false,
-        WhitelistFriends = false
-    }
+  realm = {
+    minimap = { hide = false },
+    HideInCombat = false,
+    windowAlpha = 1,
+    tab = 1,
+    showBN = true,
+    disableChallenges = false,
+    showChallengeAsMsg = false,
+    Xpos = 200,
+    Ypos = -150,
+    Point = "TOPLEFT",
+    Blacklist = {},
+    Whitelist = {},
+    Rivals = {},
+    onlyWhitelist = false,
+    WhitelistGuild = false,
+    WhitelistParty = false,
+    WhitelistFriends = false
+  }
 }
 
 -- Create
 function GR:OnInitialize()
-    self.db = LibStub("AceDB-3.0"):New("ZUI_GameRoomDB", defaults, true)
-    icon:Register("ZUI_GameRoom", GR_LDB, self.db.realm.minimap)
-    GR:RegisterChatCommand("gr", "OpenClose")
+  self.db = LibStub("AceDB-3.0"):New("ZUI_GameRoomDB", defaults, true)
+  icon:Register("ZUI_GameRoom", GR_LDB, self.db.realm.minimap)
+  GR:RegisterChatCommand("gr", "OpenClose")
 
-    -- Window Consts
-    GR.Win = {}
-    GR.Win.Const = {}
-    GR.Win.Const.Tab1Width = 750
-    GR.Win.Const.Tab1Height = 510
-    GR.Win.Const.Tab2Width = 310
-    GR.Win.Const.Tab2Height = 250
-    GR.Win.Const.Tab3Width = 310
-    GR.Win.Const.Tab3Height = 460
-    GR.Win.Const.Tab4Width = 450
-    GR.Win.Const.Tab4Height = 570
+  -- Window Consts
+  GR.Win = {}
+  GR.Win.Const = {}
+  GR.Win.Const.Tab1Width = 750
+  GR.Win.Const.Tab1Height = 510
+  GR.Win.Const.Tab2Width = 310
+  GR.Win.Const.Tab2Height = 250
+  GR.Win.Const.Tab3Width = 310
+  GR.Win.Const.Tab3Height = 460
+  GR.Win.Const.Tab4Width = 450
+  GR.Win.Const.Tab4Height = 570
 
-    -- Window Varibales
-    GR.Win.XRatio = 1
-    GR.Win.YRatio = 1
-    GR.Win.ScreenRatio = 1
+  -- Window Varibales
+  GR.Win.XRatio = 1
+  GR.Win.YRatio = 1
+  GR.Win.ScreenRatio = 1
+  GR.FirstOpen = true
 
-    -- Game Varibales
-    GR.PlayerPos = nil
-    GR.IsPlayerTurn = nil
-    GR.GameOver = false
-    GR.IsChallenged = false
-    GR.PlayerName = UnitName("player")
+  -- Game Varibales
+  GR.PlayerPos = nil
+  GR.IsPlayerTurn = nil
+  GR.GameOver = false
+  GR.IsChallenged = false
+  GR.PlayerName = UnitName("player")
+
+  -- Retail or Classic/Wrath
+  version, build, datex, tocversion = GetBuildInfo()
+  if (tocversion > 40000) then 
     GR.Retail = true
-    
-    GR:CreateMainWindow()
-    GR:CreateInvite()
-    GR:CreateTicTacToe()
-    GR:CreateBattleships()
-    GR:CreateAsteroids()
-    
-    GR.db.realm.tab = 2
-    GR:TabSelect()
+  else
+    GR.Retail = false
+  end
+  
+  GR:CreateMainWindow()
+  GR:CreateInvite()
+  GR:CreateTicTacToe()
+  GR:CreateBattleships()
+  GR:CreateAsteroids()
+  
+  GR.db.realm.tab = 2
+  GR:TabSelect()
 
-    GR:RegisterComm("ZUI_GameRoom_Reg", function(...) GR:RegisterPlayers(...) end)
-    GR:RegisterComm("ZUI_GameRoom_Inv", function(...) GR:AcceptDeclineChal(...) end)
-    GR:RegisterComm("ZUI_GameRoom_TiG", function(...) GR:TicTacToeComm(...) end)
-    GR:RegisterComm("ZUI_GameRoom_BSG", function(...) GR:BattleshipsComm(...) end)
+  GR:RegisterComm("ZUI_GameRoom_Reg", function(...) GR:RegisterPlayers(...) end)
+  GR:RegisterComm("ZUI_GameRoom_Inv", function(...) GR:AcceptDeclineChal(...) end)
+  GR:RegisterComm("ZUI_GameRoom_TiG", function(...) GR:TicTacToeComm(...) end)
+  GR:RegisterComm("ZUI_GameRoom_BSG", function(...) GR:BattleshipsComm(...) end)
+
+  GR_GUI.Main:Hide()
 end
 
 function GR:CreateMainWindow()
@@ -205,7 +220,7 @@ function GR:CreateMainWindow()
     end
   end)
   Main.ExitBtn:Hide()
-
+  
   GR:CreateAcceptDecline()
   GR:CreateHeaderInfo()
   GR:CreateSoloGames()
@@ -743,8 +758,11 @@ function GR:TabSelect()
     local point, relativeTo, relativePoint, xOfs, yOfs = Main:GetPoint()
 
     Main:SetSize(Width, Height)
-    Main:SetPoint(point, relativeTo, relativePoint, xOfs, yOfs)
-    
+    if (point == nil) then
+    else
+      Main:SetPoint(point, relativeTo, relativePoint, xOfs, yOfs)
+    end
+
     if (Change) then
       GR:ResizeMain()
     else
@@ -890,7 +908,7 @@ function GR:HideMain()
 end
 
 function GR:ShowMain()
-  GR_GUI.Main:ClearAllPoints()
+  GR_GUI.Main:Show() 
 
   if (GR:CheckOutOfBoundsRects(GR_GUI.Main, UIParent)) then
     Main:SetPoint("TOPLEFT", UIParent, "TOPLEFT", UIParent:GetWidth() / 2 - GR.Win.Const.Tab2Width / 2, -130)
@@ -898,20 +916,10 @@ function GR:ShowMain()
 
   -- if main is bigger than screen, reset main size
   if (GR_GUI.Main:GetHeight() > UIParent:GetHeight() or GR_GUI.Main:GetWidth() > UIParent:GetWidth()) then
-      GR_GUI.Main:SetSize(750, 510)
-      if (GR.GameType == "Tictactoe" ) then
-          GR_GUI.Main:SetSize(750, 620)
-      end
-      if (GR.GameType == "Battleships" ) then
-          GR_GUI.Main:SetSize(800, 640)
-      end
+      GR_GUI.Main:SetSize(GR.Tab2Width, GR.Tab2Width)
   end
   GR:ResizeMain()
-  GR:ResizeBattleships()
-  GR:SizeTictactoe()
-  GR:SizeAsteroids()
   GR:ShowChallengeIfChallenged() 
-  GR_GUI.Main:Show() 
 end
 
 -- Extra
