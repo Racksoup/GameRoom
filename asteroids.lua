@@ -979,4 +979,6 @@ function GR:AsteroidsColShipComet(Ship, Comet)
     end
 end
 
+-- timer needs to stay on game end, reset at game start
+-- pause shouldn't reset asteroids position
 

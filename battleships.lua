@@ -1578,3 +1578,5 @@ function GR:BattleshipsShowContent()
     GR:ResizeShips(Battleships.Board)
     GR:ResizeBattleships(Battleships.Board)
 end
+
+-- rematch button

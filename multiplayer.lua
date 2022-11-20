@@ -389,3 +389,5 @@ function GR:SizeInviteTab()
   Tab.Zone:SetSize(70 * Main.XRatio, 20 * Main.YRatio)
   Tab.Zone.FS:SetTextScale(1 * Main.ScreenRatio) 
 end
+
+-- fix blacklist, whitelist, rivals
