@@ -75,6 +75,11 @@ function GR:RegisterFriends()
     for i = 1, NumFriends, 1 do
       local IsInFriends = false
       local OGFriend = C_FriendList.GetFriendInfoByIndex(i)
+      
+      if (GR.Friends == nil) then
+        GR.Friends = {}
+      end
+
       for j,v in ipairs(GR.Friends) do
         if (v == OGFriend.name and OGFriend.connected) then
           IsInFriends = true

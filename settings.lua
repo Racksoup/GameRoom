@@ -604,25 +604,25 @@ function GR:SizeSettingsList()
   -- Blacklist
   local Blacklist = Settings.Blacklist
   Blacklist:SetSize(210 * Main.XRatio, 600 * Main.YRatio)
-  for i,v in ipairs(GR.db.realm.Blacklist) do
-    BlackList.Btns[i]:SetPoint("TOPLEFT", 0, i*-14)
-    BlackList.Btns[1]:SetSize(300, 14)
+  for i,v in ipairs(Blacklist.Btns) do
+    v:SetPoint("TOPLEFT", 0, i*-14)
+    v:SetSize(300, 14)
   end
 
   -- Whitelist
   local Whitelist = Settings.Whitelist
   Whitelist:SetSize(210 * Main.XRatio, 600 * Main.YRatio)
-  for i,v in ipairs(GR.db.realm.Whitelist) do
-    WhiteList.Btns[i]:SetPoint("TOPLEFT", 0, i*-14)
-    WhiteList.Btns[1]:SetSize(300, 14)
+  for i,v in ipairs(Whitelist.Btns) do
+    v:SetPoint("TOPLEFT", 0, i*-14)
+    v:SetSize(300, 14)
   end
 
   -- Rivals
   local Rivals = Settings.Rivals
   Rivals:SetSize(210 * Main.XRatio, 600 * Main.YRatio)
-  for i,v in ipairs(GR.db.realm.Rivals) do
-   WhiteList.Btns[i]:SetPoint("TOPLEFT", 0, i*-14)
-   WhiteList.Btns[1]:SetSize(300, 14)
+  for i,v in ipairs(Rivals.Btns) do
+    v:SetPoint("TOPLEFT", 0, i*-14)
+    v:SetSize(300, 14)
   end
 end
 
