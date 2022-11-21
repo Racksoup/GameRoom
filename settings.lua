@@ -571,16 +571,17 @@ function GR:SizeSettingsList()
   RivalsBorder:SetPoint("BOTTOMRIGHT", RivalsScroll, "BOTTOMRIGHT", 24 * Main.XRatio, -2 * Main.YRatio)
 
   -- Add to list
-  Lists.AddInput:SetPoint("TOP", 0, 55 * Main.YRatio)
+  Lists.AddInput:SetPoint("TOP", 0, 60 * Main.YRatio)
   Lists.AddInput:SetWidth(150 * Main.XRatio)
+  Lists.AddInput:SetHeight(30 * Main.YRatio)
   local AddBtn = Lists.AddInput.Btn
-  AddBtn:SetPoint("BOTTOM", 0, -32 * Main.YRatio)
+  AddBtn:SetPoint("BOTTOM", 0, -25 * Main.YRatio)
   AddBtn:SetSize(100 * Main.XRatio, 25 * Main.YRatio)
   AddBtn.FS:SetTextScale(1.1 * Main.ScreenRatio)
 
   -- Delete from list
   local Delete = Lists.AddInput.Delete
-  Delete:SetPoint("BOTTOMRIGHT", 85 * Main.XRatio, -32 * Main.YRatio)
+  Delete:SetPoint("BOTTOMRIGHT", 85 * Main.XRatio, -25 * Main.YRatio)
   Delete:SetSize(100 * Main.XRatio, 25 * Main.YRatio)
   Delete.FS:SetTextScale(1.1 * Main.ScreenRatio)
 
