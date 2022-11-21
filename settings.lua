@@ -223,7 +223,7 @@ function GR:CreateSettingsLists()
   -- Add to list
   Lists.AddInput = CreateFrame("Editbox", AddInput, Lists, "InputBoxInstructionsTemplate")
   Lists.AddInput:SetFontObject("ChatFontNormal")
-  Lists.AddInput:SetMultiLine(true)
+  Lists.AddInput:SetMultiLine(false)
   Lists.AddInput:SetAutoFocus(false)
 
   Lists.AddInput.Btn = CreateFrame("Button", AddBtn, Lists.AddInput, "UIPanelButtonTemplate")
