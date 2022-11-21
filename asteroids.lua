@@ -3,22 +3,22 @@ function GR:CreateAsteroids()
   -- Constants
   GR.Asteroids = {}
   GR.Asteroids.Const = {}
-  GR.Asteroids.Const.ShipMaxSpeed = 150
-  GR.Asteroids.Const.ShipAcceleration = 100
+  GR.Asteroids.Const.ShipMaxSpeed = 170
+  GR.Asteroids.Const.ShipAcceleration = 130
   GR.Asteroids.Const.ScreenSizeX = 750
   GR.Asteroids.Const.ScreenSizeY = 500
-  GR.Asteroids.Const.ShipSize = 33
+  GR.Asteroids.Const.ShipSize = 30
   GR.Asteroids.Const.BulletSize = 20
   GR.Asteroids.Const.BulletThickness = 4
-  GR.Asteroids.Const.BulletSpeed = 200
-  GR.Asteroids.Const.CometSize = 32
-  GR.Asteroids.Const.CometMaxSpeed = 80
-  GR.Asteroids.Const.NumOfComets = 10
-  GR.Asteroids.Const.NumOfBullets = 6
+  GR.Asteroids.Const.BulletSpeed = 180
+  GR.Asteroids.Const.CometSize = 30
+  GR.Asteroids.Const.CometMaxSpeed = 135
+  GR.Asteroids.Const.NumOfComets = 14
+  GR.Asteroids.Const.NumOfBullets = 3
   GR.Asteroids.Const.CometMaxLines = 12
   GR.Asteroids.Const.CometMinLines = 8
   GR.Asteroids.Const.CometMaxRotationSpeed = 5
-  GR.Asteroids.Const.BulletTimeout = 1.95
+  GR.Asteroids.Const.BulletTimeout = 1
   
   -- Asteroids Frame
   GR_GUI.Main.Asteroids = CreateFrame("Frame", Asteroids, GR_GUI.Main, "ThinBorderTemplate")
@@ -1009,6 +1009,5 @@ function GR:AsteroidsColShipComet(Ship, Comet)
     end
 end
 
--- timer needs to stay on game end, reset at game start
--- pause shouldn't reset asteroids position
+
 
