@@ -3,6 +3,7 @@ function GR:CreateSettings()
 
   GR.TargetName = ""      
   GR.CurrList = "Blacklist"
+  GR.WinAlpha = 1
 
   Main.Tab4 = CreateFrame("Frame", Tab4, Main)
   local Tab4 = Main.Tab4    
@@ -36,8 +37,8 @@ function GR:CreateMainSettings()
   AlphaSlider:SetScript("OnClick", function(self, button, down) 
     if (button == "LeftButton" and down == false) then     
       local x,y = GetCursorPosition()
-      GR.db.realm.windowAlpha = (x - 591 * GR_GUI.Main.XRatio) / (188 * GR_GUI.Main.XRatio)
-      GR_GUI.Main:SetAlpha(GR.db.realm.windowAlpha)
+      GR.WinAlpha = (x - 591 * GR_GUI.Main.XRatio) / (188 * GR_GUI.Main.XRatio)
+      GR_GUI.Main:SetAlpha(GR.WinAlpha)
     end
   end)
   Settings.AlphaTex = AlphaSlider:CreateTexture()
@@ -708,3 +709,5 @@ function GR:ResetSettingsListScroll(DB, Btns, Listx)
     end
   end
 end
+
+-- Alpha slidder not working

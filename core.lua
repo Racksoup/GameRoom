@@ -28,7 +28,6 @@ local defaults = {
   realm = {
     minimap = { hide = false },
     HideInCombat = false,
-    windowAlpha = 1,
     tab = 1,
     showBN = true,
     disableChallenges = false,
@@ -131,7 +130,7 @@ function GR:CreateMainWindow()
       end
   end)
   Main:Show()
-  Main:SetAlpha(GR.db.realm.windowAlpha)
+  Main:SetAlpha(1)
   Main.XRatio = 1
   Main.YRatio = 1
   Main.ScreenRatio = 1
