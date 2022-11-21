@@ -48,6 +48,7 @@ function GR:CreateAsteroids()
   GR.Asteroids.CometSize = GR.Asteroids.Const.CometSize
   GR.Asteroids.CometMaxSpeed = GR.Asteroids.Const.CometMaxSpeed 
   GR.Asteroids.ShipHit = false
+  GR.Asteroids.TimerSave = 0 
 
   -- Create
   GR:CreateAsteroidsGameLoop()
@@ -123,9 +124,12 @@ function GR:CreateAsteroidsGameButtons()
   PauseBtn.FS:SetText("Start")
   PauseBtn:SetScript("OnClick", function(self, button, down)
     if (button == "LeftButton" and down == false) then
-      if (GR.Asteroids.Phase == "Stopped" or GR.Asteroids.Phase == "Paused") then
+      if (GR.Asteroids.Phase == "Stopped") then
         -- start game
         GR:AsteroidsStartGame()      
+      elseif (GR.Asteroids.Phase == "Paused") then 
+        -- unpause
+        GR:AsteroidsUnPauseGame()
       elseif (GR.Asteroids.Phase == "Started") then
         -- pause game
         GR:AsteroidsPauseGame()
@@ -465,11 +469,15 @@ function GR:AsteroidsStartGame()
   local Asteroids = GR_GUI.Main.Asteroids
   local Comets = GR_GUI.Main.Asteroids.Comets
   local Bullets = GR_GUI.Main.Asteroids.Bullets
-
+  
   -- game buttons
   GR.Asteroids.Phase = "Started"
   Asteroids.PauseBtn.FS:SetText("Pause")
   Asteroids.StopBtn:Show()
+  
+  Asteroids.Timer:SetText("0")
+  GR.Asteroids.TimerSave = 0 
+  GR.Asteroids.GameTime = 0
 
   -- gameover fontstring
   GR_GUI.Main.Asteroids.FS:Hide()
@@ -488,6 +496,24 @@ function GR:AsteroidsStartGame()
   Asteroids.Game:Show()
 end
 
+function GR:AsteroidsUnPauseGame()
+  local Asteroids = GR_GUI.Main.Asteroids
+
+  -- game buttons
+  GR.Asteroids.Phase = "Started"
+  Asteroids.PauseBtn.FS:SetText("Pause")
+  Asteroids.StopBtn:Show()
+
+  GR.Asteroids.GameTime = GR.Asteroids.TimerSave
+  GR.Asteroids.TimerSave = 0
+
+  -- gameover fontstring
+  GR_GUI.Main.Asteroids.FS:Hide()
+
+  -- start game loop
+  Asteroids.Game:Show()
+end
+
 function GR:AsteroidsStopGame()
   local Asteroids = GR_GUI.Main.Asteroids
   local Ship = Asteroids.Ship
@@ -498,10 +524,8 @@ function GR:AsteroidsStopGame()
   Asteroids.PauseBtn.FS:SetText("Start")
   Asteroids.StopBtn:Hide()
   
-  -- ends game loop
-  Asteroids.Game:Hide()
-  Asteroids.Timer:SetText("0")
-  GR.Asteroids.GameTime = 0
+  GR.Asteroids.GameTime = GR.Asteroids.TimerSave
+  GR.Asteroids.TimerSave = 0
   GR.Asteroids.ShipRotation = 0
   GR.Asteroids.ShipXVelocity = 0
   GR.Asteroids.ShipYVelocity = 0
@@ -513,6 +537,9 @@ function GR:AsteroidsStopGame()
   GR.Asteroids.DownW = false
   GR.Asteroids.DownA = false
   GR.Asteroids.DownD = false
+
+  -- ends game loop
+  Asteroids.Game:Hide()
 
   -- reset ship
   Ship:SetPoint("BOTTOMLEFT", GR.Asteroids.ShipPosX, GR.Asteroids.ShipPosY)
@@ -546,9 +573,12 @@ function GR:AsteroidsPauseGame()
   -- game buttons
   GR.Asteroids.Phase = "Paused"
   Asteroids.PauseBtn.FS:SetText("Start")
+
+  GR.Asteroids.TimerSave = GR.Asteroids.GameTime
   
   -- pause game loop
   Asteroids.Game:Hide()
+  Asteroids.Timer:SetText(math.floor(GR.Asteroids.GameTime * 100) / 100)
 end
 
 -- Bullet

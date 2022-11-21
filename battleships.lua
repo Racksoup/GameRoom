@@ -1579,4 +1579,13 @@ function GR:BattleshipsShowContent()
     GR:ResizeBattleships(Battleships.Board)
 end
 
+function GR:AABB(Rect1, Rect2)
+  local MarginX = 9 * (GR_GUI.Main:GetWidth() / 800)
+  local MarginY = 9 * (GR_GUI.Main:GetHeight() / 640)
+  if (Rect1.tl.x + MarginX > Rect2.br.x - MarginX or Rect1.tl.y - MarginY < Rect2.br.y + MarginY or Rect1.br.x - MarginX < Rect2.tl.x + MarginX or Rect1.br.y + MarginY > Rect2.tl.y - MarginY) then
+      return false
+  end
+  return true
+end
+
 -- rematch button

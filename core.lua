@@ -923,15 +923,6 @@ function GR:ShowMain()
 end
 
 -- Extra
-function GR:AABB(Rect1, Rect2)
-    local MarginX = 9 * (GR_GUI.Main:GetWidth() / 800)
-    local MarginY = 9 * (GR_GUI.Main:GetHeight() / 640)
-    if (Rect1.tl.x + MarginX > Rect2.br.x - MarginX or Rect1.tl.y - MarginY < Rect2.br.y + MarginY or Rect1.br.x - MarginX < Rect2.tl.x + MarginX or Rect1.br.y + MarginY > Rect2.tl.y - MarginY) then
-        return false
-    end
-    return true
-end
-
 function GR:CheckOutOfBoundsRects(Rect1, Rect2)
     local Rect1X, Rect1Y, Rect1Width, Rect1Height = Rect1:GetRect()
     local Rect2X, Rect2Y, Rect2Width, Rect2Height = Rect2:GetRect()
