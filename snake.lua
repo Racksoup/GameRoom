@@ -26,9 +26,13 @@ function GR:CreateSnake()
     Y = math.floor(GR.Snake.Const.NumOfRows / 2),
   }
   Snake.Dir = "Up"
+  Snake.LastDir = "Down"
   Snake.GameTime = 0
-  Snake.MoveInterval = .35
+  Snake.MoveInterval = .11
   Snake.MoveTick = 0
+  Snake.Tail = {}
+  Snake.TailLength = 0
+  Snake.Points = 0
 
 
   -- Create
@@ -81,9 +85,26 @@ end
 function GR:CreateSnakeTimer()
   local Snake = GR_GUI.Main.Snake
 
+  -- Timer
   Snake.Timer = Snake:CreateFontString(nil, "ARTWORK", "GameTooltipText")
   Snake.Timer:SetText(Snake.GameTime)
   Snake.Timer:SetTextColor(.8,.8,.8, 1)
+
+  -- Points
+  Snake.PointsFS = Snake:CreateFontString(nil, "ARTWORK", "GameTooltipText")
+  Snake.PointsFS:SetText(Snake.Points)
+  Snake.PointsFS:SetTextColor(.8,.8,.8, 1)
+
+  -- GameOver
+  Snake.GameOverFS = Snake:CreateFontString(nil, "ARTWORK", "GameTooltipText")
+  Snake.GameOverFS:SetText("Game Over")
+  Snake.GameOverFS:SetTextColor(.8,0,0, 1)
+  Snake.GameOverFS:Hide()
+
+  -- Info
+  Snake.Info = Snake:CreateFontString(nil, "ARTWORK", "GameTooltipText")
+  Snake.Info:SetText("move: w,a,s,d")
+  Snake.Info:SetTextColor(.8,.8,.8, 1)
 end
 
 function GR:CreateSnakeGrid()
@@ -151,9 +172,14 @@ end
 
 function GR:SizeSnakeTimer()
   local Snake = GR_GUI.Main.Snake
-  local Timer = Snake.Timer
-  Timer:SetPoint("BOTTOMLEFT", Snake, "TOPRIGHT", -200 * Snake.XRatio, 6 * Snake.YRatio)
-  Timer:SetTextScale(2 * Snake.ScreenRatio)
+  Snake.Timer:SetPoint("BOTTOMLEFT", Snake, "TOPRIGHT", -200 * Snake.XRatio, 6 * Snake.YRatio)
+  Snake.Timer:SetTextScale(2 * Snake.ScreenRatio)
+  Snake.PointsFS:SetPoint("BOTTOMLEFT", Snake, "TOPLEFT", 200 * Snake.XRatio, 6 * Snake.YRatio)
+  Snake.PointsFS:SetTextScale(2 * Snake.ScreenRatio)
+  Snake.GameOverFS:SetPoint("TOP", 0, -80 * Snake.YRatio)
+  Snake.GameOverFS:SetTextScale(3.7 * Snake.ScreenRatio)
+  Snake.Info:SetPoint("TOP", Snake, "TOPLEFT", 100 * Snake.XRatio, 57 * Snake.YRatio)
+  Snake.Info:SetTextScale(1 * Snake.ScreenRatio)
 end
 
 function GR:SizeSnakeGrid()
@@ -200,17 +226,23 @@ function GR:SnakeStart()
   local Apple = Snake.Apple
 
   Snake.GameTime = 0
+  Snake.Points = 0
   Snake.Dir = "Up"
   Snake.Pos = {
     X = math.floor(GR.Snake.Const.NumOfCols / 2),
     Y = math.floor(GR.Snake.Const.NumOfRows / 2),
   }
+  Snake.Tail = {}
+  Snake.TailLength = 0
   GR:SnakeMoveApple()
+
+  Snake.PointsFS:SetText(Snake.Points)
 
   Snake.Game:Show()
   Snake.Stopx:Show()
-  Snake.Start:Hide()
   Snake.Apple:Show()
+  Snake.Start:Hide()
+  Snake.GameOverFS:Hide()
 end
 
 function GR:SnakeStop()
@@ -231,7 +263,14 @@ function GR:SnakeUpdate(self, elapsed)
 
   local MoveSnake = GR:SnakeUpdatePos(elapsed)
 
-  if (MoveSnake) then GR:SnakeMove() end
+  if (MoveSnake) then 
+    GR:SnakeMove() 
+
+    -- collision
+    if (GR:SnakeHitApple()) then GR:SnakeMoveApple() GR:SnakeAddPoints() GR:SnakeIntervalSpeed() end
+    if (GR:SnakeHitSnake()) then GR:SnakeGameOver() end
+    if (GR:SnakeHitWall()) then GR:SnakeGameOver() end
+  end
 
   local Grid = Snake.Grid
   for i = 1, GR.Snake.Const.NumOfRows, 1 do
@@ -243,6 +282,13 @@ function GR:SnakeUpdate(self, elapsed)
         Tile:Show()
       else
         Tile:Hide()
+      end
+      
+      -- Show Tail
+      for q = 1, #Snake.Tail, 1 do
+        if (i == Snake.Tail[q].Y and j == Snake.Tail[q].X) then
+          Tile:Show()
+        end
       end
 
       -- Light Up Animation
@@ -283,16 +329,16 @@ function GR:SnakeControls()
   local Game = GR_GUI.Main.Snake.Game
 
   Game:SetScript("OnKeyDown", function(self, key) 
-    if (key == "W") then
+    if (key == "W" and Snake.LastDir ~= "Down") then
       Snake.Dir = "Up"
     end
-    if (key == "A") then
+    if (key == "A" and Snake.LastDir ~= "Right") then
       Snake.Dir = "Left"
     end
-    if (key == "S") then
+    if (key == "S" and Snake.LastDir ~= "Up") then
       Snake.Dir = "Down"
     end
-    if (key == "D") then
+    if (key == "D" and Snake.LastDir ~= "Left") then
       Snake.Dir = "Right"
     end
   end)
@@ -301,17 +347,45 @@ end
 function GR:SnakeMove()
   local Snake = GR_GUI.Main.Snake
 
+  local OldSnakePos = {
+    X = Snake.Pos.X,
+    Y = Snake.Pos.Y,
+  }
+
   -- Change Pos
-  if (Snake.Dir == "Up") then Snake.Pos.Y = Snake.Pos.Y + 1 end
-  if (Snake.Dir == "Down") then Snake.Pos.Y = Snake.Pos.Y - 1 end
-  if (Snake.Dir == "Right") then Snake.Pos.X = Snake.Pos.X + 1 end
-  if (Snake.Dir == "Left") then Snake.Pos.X = Snake.Pos.X - 1 end
+  if (Snake.Dir == "Up") then 
+    Snake.Pos.Y = Snake.Pos.Y + 1 
+    Snake.LastDir = "Up"
+  end
+  if (Snake.Dir == "Down") then 
+    Snake.Pos.Y = Snake.Pos.Y - 1 
+    Snake.LastDir = "Down"
+  end
+  if (Snake.Dir == "Right") then
+    Snake.Pos.X = Snake.Pos.X + 1 
+    Snake.LastDir = "Right"
+  end
+  if (Snake.Dir == "Left") then
+    Snake.Pos.X = Snake.Pos.X - 1 
+    Snake.LastDir = "Left"
+  end
   
-  -- Bounds Check
-  if (Snake.Pos.Y > GR.Snake.Const.NumOfRows) then Snake.Pos.Y = 1 end
-  if (Snake.Pos.Y < 1) then Snake.Pos.Y = GR.Snake.Const.NumOfRows end
-  if (Snake.Pos.X > GR.Snake.Const.NumOfCols) then Snake.Pos.X = 1 end
-  if (Snake.Pos.X < 1) then Snake.Pos.X = GR.Snake.Const.NumOfCols end
+  -- -- Bounds Check
+  -- if (Snake.Pos.Y > GR.Snake.Const.NumOfRows) then Snake.Pos.Y = 1 end
+  -- if (Snake.Pos.Y < 1) then Snake.Pos.Y = GR.Snake.Const.NumOfRows end
+  -- if (Snake.Pos.X > GR.Snake.Const.NumOfCols) then Snake.Pos.X = 1 end
+  -- if (Snake.Pos.X < 1) then Snake.Pos.X = GR.Snake.Const.NumOfCols end
+
+  -- Snake Tail
+  if (Snake.TailLength == 1) then
+    Snake.Tail[1] = OldSnakePos
+  end
+  if (Snake.TailLength > 1) then
+    for i = Snake.TailLength, 2, -1 do
+      Snake.Tail[i] = Snake.Tail[i -1]
+    end
+    Snake.Tail[1] = OldSnakePos
+  end
 end
 
 function GR:SnakeMoveApple()
@@ -323,6 +397,82 @@ function GR:SnakeMoveApple()
     Y = math.random(1, GR.Snake.Const.NumOfRows),
   }
 
-  Apple:SetPoint("BOTTOMLEFT", (GR.Snake.Const.Width * Snake.XRatio) * (Apple.Pos.X / GR.Snake.Const.NumOfCols), (GR.Snake.Const.Height * Snake.YRatio) * (Apple.Pos.Y / GR.Snake.Const.NumOfRows))
+  Apple:SetPoint("BOTTOMLEFT", (GR.Snake.Const.Width * Snake.XRatio) * ((Apple.Pos.X -1) / GR.Snake.Const.NumOfCols), (GR.Snake.Const.Height * Snake.YRatio) * ((Apple.Pos.Y -1) / GR.Snake.Const.NumOfRows))
 end
 
+function GR:SnakeGameOver()
+  GR:SnakeStop()
+
+  GR_GUI.Main.Snake.GameOverFS:Show()
+end
+
+function GR:SnakeAddPoints()
+  local Snake = GR_GUI.Main.Snake
+  
+  if (Snake.Points == 0) then
+    Snake.Points = 5
+  end
+  
+  if (Snake.Points > 0 and Snake.Points < 1000) then
+    Snake.Points = math.floor(Snake.Points * 2 - (Snake.Points * .34))
+  end
+  if (Snake.Points > 1000 and Snake.Points < 3000) then
+    Snake.Points = math.floor(Snake.Points * 2 - (Snake.Points * .5))
+  end
+  if (Snake.Points > 3000 and Snake.Points < 10000) then 
+    Snake.Points = math.floor(Snake.Points * 2 - (Snake.Points * .65))
+  end
+  if (Snake.Points > 10000 and Snake.Points < 30000) then
+    Snake.Points = math.floor(Snake.Points * 2 - (Snake.Points * .73))
+  end
+  if (Snake.Points > 30000 and Snake.Points < 70000) then
+    Snake.Points = math.floor(Snake.Points * 2 - (Snake.Points * .83))
+  end
+  if (Snake.Points > 70000 and Snake.Points < 100000) then
+    Snake.Points = math.floor(Snake.Points * 2 - (Snake.Points * .87))
+  end
+  if (Snake.Points > 100000 and Snake.Points < 1000000) then
+    Snake.Points = math.floor(Snake.Points * 2 - (Snake.Points * .91))
+  end
+
+  Snake.PointsFS:SetText(Snake.Points)
+end
+
+function GR:SnakeIntervalSpeed()
+  local Snake = GR_GUI.Main.Snake
+
+  Snake.MoveInterval = Snake.MoveInterval - (Snake.MoveInterval / 35)
+end
+
+-- Collision
+function GR:SnakeHitApple()
+  local Snake = GR_GUI.Main.Snake
+  local Apple = Snake.Apple
+
+  if (Snake.Pos.X == Apple.Pos.X and Snake.Pos.Y == Apple.Pos.Y) then
+    Snake.TailLength = Snake.TailLength + 1
+    return true
+  end
+  return false
+end
+
+function GR:SnakeHitSnake()
+  local Snake = GR_GUI.Main.Snake
+  local Tail = Snake.Tail
+
+  for i = 1, #Tail, 1 do
+    if (Snake.Pos.X == Tail[i].X and Snake.Pos.Y == Tail[i].Y) then
+      return true
+    end
+  end
+  return false
+end
+
+function GR:SnakeHitWall()
+  local Snake = GR_GUI.Main.Snake
+
+  if (Snake.Pos.X < 1 or Snake.Pos.X > GR.Snake.Const.NumOfCols or Snake.Pos.Y < 1 or Snake.Pos.Y > GR.Snake.Const.NumOfRows) then
+    return true
+  end
+  return false
+end
