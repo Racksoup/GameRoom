@@ -89,6 +89,7 @@ function GR:OnInitialize()
   GR:CreateTicTacToe()
   GR:CreateBattleships()
   GR:CreateAsteroids()
+  GR:CreateSnake()
   
   GR.db.realm.tab = 2
   GR:TabSelect()
@@ -151,6 +152,7 @@ function GR:CreateMainWindow()
       GR:SizeTictactoe()
       GR:ResizeBattleships()
       GR:SizeAsteroids()
+      GR:SnakeSize()
   end)
   
   -- Game Room Title
@@ -212,6 +214,9 @@ function GR:CreateMainWindow()
       end
       if (GR.GameType == "Asteroids") then
         GR:AsteroidsHide()    
+      end
+      if (GR.GameType == "Snake") then
+        GR:SnakeHide()    
       end
       GR.GameType = nil
       GR.db.realm.tab = 2
@@ -519,6 +524,18 @@ function GR:CreateSoloGames()
       GR:AsteroidsShow()
     end
   end)
+  SoloGames.SnakeBtn = CreateFrame("Button", SnakeBtn, SoloGames, "UIPanelButtonTemplate")
+  local SnakeBtn = SoloGames.SnakeBtn
+  SnakeBtn.FS = SnakeBtn:CreateFontString(nil, "OVERLAY", "GameTooltipText")
+  local SnakeFS = SnakeBtn.FS
+  SnakeFS:SetTextColor(.8,.8,.8, 1)
+  SnakeFS:SetText("Snake")
+  SnakeBtn:SetScript("OnClick", function(self, button, down) 
+    if (button == "LeftButton" and down == false) then
+      GR.GameType = "Snake"
+      GR:ShowSoloGame()
+    end
+  end)
 
   Tab2:Hide()
 end
@@ -667,6 +684,12 @@ function GR:ResizeSoloGames()
   local AsteroidsFS = AsteroidsBtn.FS
   AsteroidsFS:SetPoint("CENTER", 0, 0)
   AsteroidsFS:SetTextScale(1.4 * Main.ScreenRatio)
+  local SnakeBtn = SoloGames.SnakeBtn
+  SnakeBtn:SetPoint("TOPRIGHT", -5 * Main.XRatio, -5 * Main.YRatio)
+  SnakeBtn:SetSize(120 * Main.XRatio, 30 * Main.YRatio)
+  local SnakeFS = SnakeBtn.FS
+  SnakeFS:SetPoint("CENTER", 0, 0)
+  SnakeFS:SetTextScale(1.4 * Main.ScreenRatio)
 end
 
 function GR:SizeAcceptDecline()
@@ -743,6 +766,9 @@ function GR:TabSelect()
     if (GR.GameType == "Asteroids") then
       Main.Asteroids:Show()
       GR:SizeAsteroids()
+    end
+    if (GR.GameType == "Snake") then
+      GR:SnakeShow()
     end
     if (GR.GameType == "Tictactoe") then
       GR:ShowTictactoe()

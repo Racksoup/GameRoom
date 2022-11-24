@@ -446,25 +446,7 @@ function GR:AsteroidsShow()
   GR:ShowSoloGame()
 end
 
--- functionality
-function GR:AsteroidsGameLoop(self, elapsed)
-  GR.Asteroids.GameTime = GR.Asteroids.GameTime + elapsed
-  GR_GUI.Main.Asteroids.Timer:SetText(math.floor(GR.Asteroids.GameTime * 100) / 100)
-
-  GR:AsteroidsUpdateShip(elapsed)
-  GR:AsteroidsUpdateBullets(elapsed)
-  GR:AsteroidsUpdateComets(elapsed)
-  GR:AsteroidsCheckForWin()
-  GR:AsteroidsCheckForLose()
-end
-
-function GR:RotateCoordPair (x,y,ox,oy,a,asp)
-  y=y/asp
-  oy=oy/asp
-  return ox + (x-ox)*math.cos(a) - (y-oy)*math.sin(a),
-    (oy + (y-oy)*math.cos(a) + (x-ox)*math.sin(a))*asp
-end
-
+-- Start Stop Pause Unpause
 function GR:AsteroidsStartGame()
   local Asteroids = GR_GUI.Main.Asteroids
   local Comets = GR_GUI.Main.Asteroids.Comets
@@ -579,6 +561,25 @@ function GR:AsteroidsPauseGame()
   -- pause game loop
   Asteroids.Game:Hide()
   Asteroids.Timer:SetText(math.floor(GR.Asteroids.GameTime * 100) / 100)
+end
+
+-- functionality
+function GR:AsteroidsGameLoop(self, elapsed)
+  GR.Asteroids.GameTime = GR.Asteroids.GameTime + elapsed
+  GR_GUI.Main.Asteroids.Timer:SetText(math.floor(GR.Asteroids.GameTime * 100) / 100)
+
+  GR:AsteroidsUpdateShip(elapsed)
+  GR:AsteroidsUpdateBullets(elapsed)
+  GR:AsteroidsUpdateComets(elapsed)
+  GR:AsteroidsCheckForWin()
+  GR:AsteroidsCheckForLose()
+end
+
+function GR:RotateCoordPair (x,y,ox,oy,a,asp)
+  y=y/asp
+  oy=oy/asp
+  return ox + (x-ox)*math.cos(a) - (y-oy)*math.sin(a),
+    (oy + (y-oy)*math.cos(a) + (x-ox)*math.sin(a))*asp
 end
 
 -- Bullet
