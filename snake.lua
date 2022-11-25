@@ -9,6 +9,7 @@ function GR:CreateSnake()
   GR.Snake.Const.Height = 395
   GR.Snake.Const.NumOfCols = 60
   GR.Snake.Const.NumOfRows = 30
+  GR.Snake.Const.MoveInterval = .11
 
   -- Snake Frame
   Main.Snake = CreateFrame("Frame", Snake, Main, "ThinBorderTemplate")
@@ -28,11 +29,12 @@ function GR:CreateSnake()
   Snake.Dir = "Up"
   Snake.LastDir = "Down"
   Snake.GameTime = 0
-  Snake.MoveInterval = .11
+  Snake.MoveInterval = GR.Snake.Const.MoveInterval
   Snake.MoveTick = 0
   Snake.Tail = {}
   Snake.TailLength = 0
   Snake.Points = 0
+  Snake.OnState = "Stop"
 
 
   -- Create
@@ -59,27 +61,50 @@ end
 function GR:CreateSnakeStartStop()
   local Snake = GR_GUI.Main.Snake
 
-  Snake.Start = CreateFrame("Button", Start, Snake, "UIPanelButtonTemplate")
-  Snake.Start.FS = Snake.Start:CreateFontString(nil, "OVERLAY", "GameTooltipText")
-  Snake.Start.FS:SetText("Start")
-  Snake.Start.FS:SetTextColor(.8,.8,.8, 1)
-  Snake.Start.FS:SetPoint("CENTER")
+  Snake.Start = CreateFrame("Button", Start, Snake)
+  Snake.Start.Line1 = Snake.Start:CreateLine()
+  Snake.Start.Line1:SetColorTexture(0,1,0, 1)
+  Snake.Start.Line2 = Snake.Start:CreateLine()
+  Snake.Start.Line2:SetColorTexture(0,1,0, 1)
+  Snake.Start.Line3 = Snake.Start:CreateLine()
+  Snake.Start.Line3:SetColorTexture(0,1,0, 1)
   Snake.Start:SetScript("OnClick", function(self, button, down) 
     if (button == "LeftButton" and down == false) then
-      GR.SnakeStart()
+      if (Snake.OnState == "Stop" or Snake.OnState == "Start") then
+        Snake.OnState = "Start"
+        GR.SnakeStart()
+      end
+      if (Snake.OnState == "Pause") then
+        Snake.OnState = "Start"
+        GR.SnakeUnpause()
+      end
     end
   end)
-  Snake.Stopx = CreateFrame("Button", Stopx, Snake, "UIPanelButtonTemplate")
-  Snake.Stopx.FS = Snake.Stopx:CreateFontString(nil, "OVERLAY", "GameTooltipText")
-  Snake.Stopx.FS:SetText("Stop")
-  Snake.Stopx.FS:SetTextColor(.8,.8,.8, 1)
-  Snake.Stopx.FS:SetPoint("CENTER")
+
+  Snake.Stopx = CreateFrame("Button", Stopx, Snake)
+  Snake.Stopx.Tex = Snake.Stopx:CreateTexture()
+  Snake.Stopx.Tex:SetColorTexture(1,0,0, 1)
+  Snake.Stopx.Tex:SetPoint("CENTER")
   Snake.Stopx:SetScript("OnClick", function(self, button, down) 
     if (button == "LeftButton" and down == false) then
+      Snake.OnState = "Stop"
       GR:SnakeStop()
     end
   end)
   Snake.Stopx:Hide()
+
+  Snake.Pausex = CreateFrame("Button", Pausex, Snake)
+  Snake.Pausex.Tex1 = Snake.Pausex:CreateTexture()
+  Snake.Pausex.Tex1:SetColorTexture(1,1,0, 1)
+  Snake.Pausex.Tex2 = Snake.Pausex:CreateTexture()
+  Snake.Pausex.Tex2:SetColorTexture(1,1,0, 1)
+  Snake.Pausex:SetScript("OnClick", function(self, button, down) 
+    if (button == "LeftButton" and down == false) then
+      Snake.OnState = "Pause"
+      GR:SnakePause()
+    end
+  end)
+  Snake.Pausex:Hide()
 end
 
 function GR:CreateSnakeTimer()
@@ -163,18 +188,34 @@ function GR:SnakeSizeStartStop()
   local Snake = GR_GUI.Main.Snake
   
   Snake.Start:SetPoint("TOPLEFT", 50 * Snake.XRatio, 34 * Snake.YRatio)
-  Snake.Start:SetSize(100 * Snake.XRatio, 30 * Snake.YRatio)
-  Snake.Start.FS:SetTextScale(1.1 * Snake.ScreenRatio)
-  Snake.Stopx:SetPoint("TOPLEFT", 50 * Snake.XRatio, 34 * Snake.YRatio)
-  Snake.Stopx:SetSize(100 * Snake.XRatio, 30 * Snake.YRatio)
-  Snake.Stopx.FS:SetTextScale(1.1 * Snake.ScreenRatio)
+  Snake.Start:SetSize(30 * Snake.XRatio, 30 * Snake.YRatio)
+  Snake.Start.Line1:SetStartPoint("CENTER", -8 * Snake.XRatio, 8 * Snake.YRatio)
+  Snake.Start.Line1:SetEndPoint("CENTER", 8 * Snake.XRatio, 0)
+  Snake.Start.Line1:SetThickness(3 * Snake.ScreenRatio)
+  Snake.Start.Line2:SetStartPoint("CENTER", -8 * Snake.XRatio, -8 * Snake.YRatio)
+  Snake.Start.Line2:SetEndPoint("CENTER", 8 * Snake.XRatio, 0)
+  Snake.Start.Line2:SetThickness(3 * Snake.ScreenRatio)
+  Snake.Start.Line3:SetStartPoint("CENTER", -8 * Snake.XRatio, -8 * Snake.YRatio)
+  Snake.Start.Line3:SetEndPoint("CENTER", -8 * Snake.XRatio, 8 * Snake.YRatio)
+  Snake.Start.Line3:SetThickness(3 * Snake.ScreenRatio)
+
+  Snake.Stopx:SetPoint("TOPLEFT", 83 * Snake.XRatio, 34 * Snake.YRatio)
+  Snake.Stopx:SetSize(30 * Snake.XRatio, 30 * Snake.YRatio)
+  Snake.Stopx.Tex:SetSize(15 * Snake.XRatio, 15 * Snake.YRatio)
+  
+  Snake.Pausex:SetPoint("TOPLEFT", 50 * Snake.XRatio, 34 * Snake.YRatio)
+  Snake.Pausex:SetSize(30 * Snake.XRatio, 30 * Snake.YRatio)
+  Snake.Pausex.Tex1:SetSize(6 * Snake.XRatio, 15 * Snake.YRatio)
+  Snake.Pausex.Tex1:SetPoint("CENTER", -6 * Snake.XRatio, 0)
+  Snake.Pausex.Tex2:SetSize(6 * Snake.XRatio, 15 * Snake.YRatio)
+  Snake.Pausex.Tex2:SetPoint("CENTER", 6 * Snake.XRatio, 0)
 end
 
 function GR:SizeSnakeTimer()
   local Snake = GR_GUI.Main.Snake
-  Snake.Timer:SetPoint("BOTTOMLEFT", Snake, "TOPRIGHT", -200 * Snake.XRatio, 6 * Snake.YRatio)
+  Snake.Timer:SetPoint("BOTTOMLEFT", Snake, "TOPRIGHT", -220 * Snake.XRatio, 6 * Snake.YRatio)
   Snake.Timer:SetTextScale(2 * Snake.ScreenRatio)
-  Snake.PointsFS:SetPoint("BOTTOMLEFT", Snake, "TOPLEFT", 200 * Snake.XRatio, 6 * Snake.YRatio)
+  Snake.PointsFS:SetPoint("BOTTOMLEFT", Snake, "TOPLEFT", 160 * Snake.XRatio, 6 * Snake.YRatio)
   Snake.PointsFS:SetTextScale(2 * Snake.ScreenRatio)
   Snake.GameOverFS:SetPoint("TOP", 0, -80 * Snake.YRatio)
   Snake.GameOverFS:SetTextScale(3.7 * Snake.ScreenRatio)
@@ -220,7 +261,7 @@ function GR:SnakeHide()
   Snake:Hide()
 end
 
--- Start Stop
+-- Start Stop Pause Unpause
 function GR:SnakeStart()
   local Snake = GR_GUI.Main.Snake
   local Apple = Snake.Apple
@@ -228,6 +269,8 @@ function GR:SnakeStart()
   Snake.GameTime = 0
   Snake.Points = 0
   Snake.Dir = "Up"
+  Snake.OnState = "Stop"
+  Snake.MoveInterval = GR.Snake.Const.MoveInterval
   Snake.Pos = {
     X = math.floor(GR.Snake.Const.NumOfCols / 2),
     Y = math.floor(GR.Snake.Const.NumOfRows / 2),
@@ -240,6 +283,7 @@ function GR:SnakeStart()
 
   Snake.Game:Show()
   Snake.Stopx:Show()
+  Snake.Pausex:Show()
   Snake.Apple:Show()
   Snake.Start:Hide()
   Snake.GameOverFS:Hide()
@@ -250,7 +294,28 @@ function GR:SnakeStop()
   
   Snake.Game:Hide()
   Snake.Start:Show()
+  Snake.Pausex:Hide()
   Snake.Stopx:Hide()
+end
+
+function GR:SnakePause()
+  local Snake = GR_GUI.Main.Snake
+
+  Snake.Start:Show()
+  Snake.Pausex:Hide()
+  Snake.Stopx:Hide()
+
+  Snake.Game:Hide()
+end
+
+function GR:SnakeUnpause()
+  local Snake = GR_GUI.Main.Snake
+
+  Snake.Start:Hide()
+  Snake.Pausex:Show()
+  Snake.Stopx:Show()
+
+  Snake.Game:Show()
 end
 
 -- Update
