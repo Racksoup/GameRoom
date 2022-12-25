@@ -23,23 +23,39 @@ function GR:CreateInvite()
   Invite:RegisterEvent("GUILD_ROSTER_UPDATE")
   Invite:SetScript("OnEvent", function(self, event, ...)
     if (event == "GROUP_ROSTER_UPDATE") then
+      print('xx')
       GR.Party = {}
       GR:RefreshPartyList()
       -- resends Register Party messages
       local NumParty = GetNumGroupMembers()
+      local isInRaid = IsInRaid()
       for i = 1, NumParty, 1 do
-        local PlayerIndex = "party" .. tostring(i)
-        local PartyMember = UnitName(PlayerIndex)
-        local PlayerName = UnitName("player")
+        local PlayerIndex
+        if (not isInRaid) then 
+          PlayerIndex = "party" .. tostring(i)
+        end
+        if (isInRaid) then
+          PlayerIndex = "raid" .. tostring(i)
+        end
+        local PartyMember = GetUnitName(PlayerIndex, true)
+        local PartyMemberName, PartyMemberRealm = UnitName(PlayerIndex)
+        local PlayerName, PlayerServer = UnitFullName("player")
         C_Timer.After(1, function() 
           if (type(PartyMember) == "string" and UnitIsConnected(PlayerIndex)) then
-            GR:SendCommMessage("ZUI_GameRoom_Reg", "Register Party, " .. PlayerName, "WHISPER", PartyMember)
+            if (PartyMemberRealm == PlayerServer or PartyMemberRealm == nil) then 
+              GR:SendCommMessage("ZUI_GameRoom_Reg", "Register Party, " .. PlayerName, "WHISPER", PartyMemberName)
+              print('same-server, register party')
+            else
+              GR:SendCommMessage("ZUI_GameRoom_Reg", "Register Party, " .. PlayerName .. "-" .. PlayerServer, "WHISPER", PartyMember)
+              print('cross-server, register party')
+            end
           end
         end)
       end
     end
 
     if (event == "FRIENDLIST_UPDATE" or event == "BN_FRIEND_LIST_SIZE_CHANGED") then
+      print('dd')
       C_Timer.After(.5, function()
         GR:RemoveFromFriendsList()
         GR:RefreshFriendsList()
@@ -47,6 +63,7 @@ function GR:CreateInvite()
     end
 
     if (event == "WHO_LIST_UPDATE" and GR_GUI.Main:IsVisible()) then
+      print('ff')
       C_Timer.After(.6, function() 
         local NumWhos, TotalNumWhos = C_FriendList.GetNumWhoResults()
         for i = 1, NumWhos, 1 do
@@ -62,6 +79,8 @@ function GR:CreateInvite()
     end
 
     if (event == "GUILD_ROSTER_UPDATE") then
+      print('l;')
+
       GR:SendCommMessage("ZUI_GameRoom_Reg", "Register Party, " .. UnitName("player"), "GUILD")
     end
   end)
@@ -84,8 +103,14 @@ function GR:RegisterFriends()
         if (v == OGFriend.name and OGFriend.connected) then
           IsInFriends = true
         end
+        if (v == OGFriend.name and not OGFriend.connected) then
+          IsInFriends = true
+          GR:RemoveFromFriendsList()
+        end
       end
-      if (IsInFriends == false) then
+
+      if (IsInFriends == false and OGFriend.connected) then
+        print('register friend, normal friend')
         GR:SendCommMessage("ZUI_GameRoom_Reg", "Register Friend, " .. PlayerName, "WHISPER", OGFriend.name)
       end
     end
@@ -109,6 +134,7 @@ function GR:RegisterFriends()
           end
         end
         if (Client == "WoW" and type(Character) == "string" and IsInFriends == false) then
+          print('register friend, BN friend')
           GR:SendCommMessage("ZUI_GameRoom_Reg", "Register Friend, " .. PlayerName, "WHISPER", Character)
         end
       end
@@ -116,6 +142,7 @@ function GR:RegisterFriends()
   end 
   -- add rivals
   for i,v in ipairs(GR.db.realm.Rivals) do
+    print('register friend, rival')
     GR:SendCommMessage("ZUI_GameRoom_Reg", "Register Friend, " .. PlayerName, "WHISPER", v)
   end
 end
@@ -266,7 +293,7 @@ end
 
 function GR:RegisterPlayers(...)
   local prefix, text, distribution, target = ...
-  local PlayerName = UnitName("player")
+  local PlayerName, PlayerServer = UnitFullName("player")
 
   -- Register Friend
   local Action1 = string.sub(text, 0, 15)
@@ -343,11 +370,21 @@ function GR:RegisterPlayers(...)
       end
     end
     if (IsInTable == false) then
+
+      -- check if server name is appended
+      local IsCrossServer = false
+      if (string.match(Value5, ".-")) then IsCrossServer = true end
+
       table.insert(GR.Party, Value5)
       -- set party and guild arrays for whilelist option
       if (string.match(Action5, "Register Party")) then
+        print(Value5)
         table.insert(GR.OnlyParty, Value5)
-        GR:SendCommMessage("ZUI_GameRoom_Reg", "Party Registered, " .. PlayerName, "WHISPER", Value5)
+        if (IsCrossServer) then
+          GR:SendCommMessage("ZUI_GameRoom_Reg", "Party Registered, " .. PlayerName .. PlayerServer, "WHISPER", Value5)
+        else
+          GR:SendCommMessage("ZUI_GameRoom_Reg", "Party Registered, " .. PlayerName, "WHISPER", Value5)
+        end
       end
       if (string.match(Action5, "Register Guild")) then
         table.insert(GR.OnlyGuild, Value5)
@@ -583,94 +620,6 @@ function GR:AcceptDeclineChal(...)
   end
 end
 
--- function GR:CreateManualInvite()
---     GR_GUI.Main.Tab3.Invite.ManualInput = CreateFrame("EditBox", ManualInput, GR_GUI.Main.Tab3.Invite, "InputBoxInstructionsTemplate")
---     local ManualInput = GR_GUI.Main.Tab3.Invite.ManualInput
---     ManualInput:SetPoint("TOPLEFT", 50, -80)
---     ManualInput:SetWidth(200)
---     ManualInput:SetFontObject("ChatFontNormal")
---     ManualInput:SetMultiLine(true)
---     ManualInput:SetAutoFocus(false)
-
---     local ManualInputString = ManualInput:CreateFontString(nil, "ARTWORK", "GameTooltipText")
---     ManualInputString:SetPoint("TOP", 0, 23)
---     ManualInputString:SetTextScale(1.1)
---     ManualInputString:SetTextColor(.8,.8,.8, 1)
---     ManualInputString:SetText("Challenge Target or Enter Name")
-
---     ManualInput.Btn = CreateFrame("Button", ManualBtn, ManualInput, "UIPanelButtonTemplate")
---     local ManualBtn = ManualInput.Btn
---     ManualBtn:SetPoint("BOTTOM", 0, -37)
---     ManualBtn:SetSize(120, 30)
---     local ManualBtnString = ManualBtn:CreateFontString(nil, "ARTWORK", "GameTooltipText")
---     ManualBtnString:SetPoint("CENTER")
---     ManualBtnString:SetTextScale(1.1)
---     ManualBtnString:SetTextColor(.8,.8,.8,1)
---     ManualBtnString:SetText("Challenge")
---     ManualBtn:SetScript("OnClick", function(self, button, down)
---         local TarName = ManualInput:GetText()
---         if (string.match(TarName, "")) then
---             TarName = UnitName("target")
---         end
---         GR.Target = TarName
---     end)
--- end
-
--- function GR:CreateMultiGameButtons()
---     local Invite = GR_GUI.Main.Tab3.Invite
---     Invite.GameBtns = CreateFrame("Frame", GameBtns, Invite, "ThinBorderTemplate")
---     local Btns = Invite.GameBtns
---     Btns:SetPoint("TOP", 0, -155)
---     Btns:SetSize(500, 100)
---     Btns.H3 = Btns:CreateFontString(nil, "ARTWORK", "GameTooltipText")
---     Btns.H3:SetPoint("TOP", 0, 48)
---     Btns.H3:SetTextScale(1.5)
---     Btns.H3:SetTextColor(.8,.8,.8, 1)
---     Btns.H3:SetText("Challenge Opponent")
---     Btns.H4 = Btns:CreateFontString(nil, "ARTWORK", "GameTooltipText")
---     Btns.H4:SetPoint("TOP", 0, 23)
---     Btns.H4:SetTextScale(1.1)
---     Btns.H4:SetTextColor(.8,.8,.8, 1)
-    
---     Btns.Tic = CreateFrame("Button", Tic, Btns, "UIPanelButtonTemplate")
---     Btns.Tic:SetPoint("TOPLEFT", 0, 0)
---     Btns.Tic:SetSize(120, 30)
---     Btns.Tic:SetScript("OnClick", function(self, button, down)
---         if (button == "LeftButton" and down == false) then
---             local UserName = UnitName("player")
---             GR:SendCommMessage("ZUI_GameRoom_Inv", "TicTacToe_Challenge, " .. UserName, "WHISPER", GR.Target)
---             GR.CanSendInvite = false
---             C_Timer.After(4, function() 
---                 GR.CanSendInvite = true
---             end)
---         end
---     end)
---     local TicFS = Btns.Tic:CreateFontString(nil, "ARTWORK", "GameTooltipText")
---     TicFS:SetPoint("CENTER")
---     TicFS:SetTextScale(1.1)
---     TicFS:SetTextColor(.8,.8,.8, 1)
---     TicFS:SetText("Tic-Tac-Toe")
-
---     Btns.Battleships = CreateFrame("Button", Battleships, Btns, "UIPanelButtonTemplate")
---     Btns.Battleships:SetPoint("TOPLEFT", 130, 0)
---     Btns.Battleships:SetSize(120, 30)
---     Btns.Battleships:SetScript("OnClick", function(self, button, down)
---         if (button == "LeftButton" and down == false) then
---             local UserName = UnitName("player")
---             GR:SendCommMessage("ZUI_GameRoom_Inv", "Battleships_Challenge, " .. UserName, "WHISPER", GR.Target)
---             GR.CanSendInvite = false
---             C_Timer.After(4, function() 
---                 GR.CanSendInvite = true
---             end)
---         end
---     end)
---     local BattleshipsFS = Btns.Battleships:CreateFontString(nil, "ARTWORK", "GameTooltipText")
---     BattleshipsFS:SetPoint("CENTER")
---     BattleshipsFS:SetTextScale(1.1)
---     BattleshipsFS:SetTextColor(.8,.8,.8, 1)
---     BattleshipsFS:SetText("Battleships")
-
---     Btns:Hide()
--- end
+-- refresh party/raid on reload
 
 -- (impossible bug) error message on whisper to offline player (BNFriends and Rivals)

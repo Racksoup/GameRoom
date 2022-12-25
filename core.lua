@@ -970,6 +970,6 @@ function ScrollFrame_OnMouseWheel(self, delta)
   self:SetVerticalScroll(newValue);
 end
 
--- death rolls
+-- chess
 -- flappy bird
--- snake
+-- pin-ball macheine
