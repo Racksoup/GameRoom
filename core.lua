@@ -85,7 +85,7 @@ function GR:OnInitialize()
   end
   
   GR:CreateMainWindow()
-  GR:CreateInvite()
+  GR:CreateRegister()
   GR:CreateTicTacToe()
   GR:CreateBattleships()
   GR:CreateAsteroids()

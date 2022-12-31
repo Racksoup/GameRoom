@@ -11,6 +11,7 @@ embeds.xml
 enUS.lua
 core.lua
 settings.lua
+register.lua
 invite.lua
 tictactoe.lua
 battleships.lua
