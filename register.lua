@@ -410,27 +410,27 @@ end
 
 function GR:PartyRegistered(text, PlayerName)
   -- Party Registered
-  local Action6 = string.sub(text, 0, 16)
-  local Value6 = string.sub(text, 19, 50)
-  if (string.match(Action6, "Party Registered") or string.match(Action6, "Guild Registered")) then
+  local Action = string.sub(text, 0, 16)
+  local Value = string.sub(text, 19, 50)
+  if (string.match(Action, "Party Registered") or string.match(Action, "Guild Registered")) then
     local IsInTable = false
-    if (string.match(Value6, PlayerName)) then
+    if (string.match(Value, PlayerName)) then
       IsInTable = true
     end
 
     for i,v in ipairs(GR.Party) do
-      if (string.match(v, Value6)) then
+      if (string.match(v, Value)) then
         IsInTable = true
       end
     end
     if (IsInTable == false) then
-      table.insert(GR.Party, Value6)
+      table.insert(GR.Party, Value)
       -- set party and guild arrays for whilelist option
-      if (string.match(Action5, "Party Registered")) then
-        table.insert(GR.OnlyParty, Value5)
+      if (string.match(Action, "Party Registered")) then
+        table.insert(GR.OnlyParty, Value)
       end
-      if (string.match(Action5, "Guild Registered")) then
-        table.insert(GR.OnlyGuild, Value5)
+      if (string.match(Action, "Guild Registered")) then
+        table.insert(GR.OnlyGuild, Value)
       end
     end
     GR:RefreshPartyList()
