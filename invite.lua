@@ -23,30 +23,29 @@ function GR:CreateInvite()
   Invite:RegisterEvent("GUILD_ROSTER_UPDATE")
   Invite:SetScript("OnEvent", function(self, event, ...)
     if (event == "GROUP_ROSTER_UPDATE") then
-      print('xx')
       GR.Party = {}
       GR:RefreshPartyList()
       -- resends Register Party messages
-      local NumParty = GetNumGroupMembers()
-      local isInRaid = IsInRaid()
-      for i = 1, NumParty, 1 do
-        local PlayerIndex
-        if (not isInRaid) then 
-          PlayerIndex = "party" .. tostring(i)
+      local NumOfGroupMembers = GetNumGroupMembers()
+      local playerInRaid = IsInRaid()
+      for i = 1, NumOfGroupMembers, 1 do
+        local PartyMemberIndex
+        if (not playerInRaid) then 
+          PartyMemberIndex = "party" .. tostring(i)
         end
-        if (isInRaid) then
-          PlayerIndex = "raid" .. tostring(i)
+        if (playerInRaid) then
+          PartyMemberIndex = "raid" .. tostring(i)
         end
-        local PartyMember = GetUnitName(PlayerIndex, true)
-        local PartyMemberName, PartyMemberRealm = UnitName(PlayerIndex)
+        local PartyMember = GetUnitName(PartyMemberIndex, true)
+        local PartyMemberName, PartyMemberRealm = UnitName(PartyMemberIndex)
         local PlayerName, PlayerServer = UnitFullName("player")
         C_Timer.After(1, function() 
-          if (type(PartyMember) == "string" and UnitIsConnected(PlayerIndex)) then
-            if (PartyMemberRealm == PlayerServer or PartyMemberRealm == nil) then 
-              GR:SendCommMessage("ZUI_GameRoom_Reg", "Register Party, " .. PlayerName, "WHISPER", PartyMemberName)
+          if (type(PartyMember) == "string" and UnitIsConnected(PartyMemberIndex)) then
+            if ((PartyMemberRealm == PlayerServer and PlayerServer ~= nil) or PartyMemberRealm == nil) then 
+              GR:SendCommMessage("ZUI_GameRoom_Reg", "Register Party, " .. PlayerName, "PARTY")
               print('same-server, register party')
             else
-              GR:SendCommMessage("ZUI_GameRoom_Reg", "Register Party, " .. PlayerName .. "-" .. PlayerServer, "WHISPER", PartyMember)
+              GR:SendCommMessage("ZUI_GameRoom_Reg", "Register Party, " .. PlayerName .. "-" .. PlayerServer, "PARTY")
               print('cross-server, register party')
             end
           end
@@ -55,7 +54,6 @@ function GR:CreateInvite()
     end
 
     if (event == "FRIENDLIST_UPDATE" or event == "BN_FRIEND_LIST_SIZE_CHANGED") then
-      print('dd')
       C_Timer.After(.5, function()
         GR:RemoveFromFriendsList()
         GR:RefreshFriendsList()
@@ -63,7 +61,6 @@ function GR:CreateInvite()
     end
 
     if (event == "WHO_LIST_UPDATE" and GR_GUI.Main:IsVisible()) then
-      print('ff')
       C_Timer.After(.6, function() 
         local NumWhos, TotalNumWhos = C_FriendList.GetNumWhoResults()
         for i = 1, NumWhos, 1 do
@@ -79,9 +76,7 @@ function GR:CreateInvite()
     end
 
     if (event == "GUILD_ROSTER_UPDATE") then
-      print('l;')
-
-      GR:SendCommMessage("ZUI_GameRoom_Reg", "Register Party, " .. UnitName("player"), "GUILD")
+      GR:SendCommMessage("ZUI_GameRoom_Reg", "Register Guild, " .. UnitName("player"), "GUILD")
     end
   end)
 end
@@ -294,6 +289,7 @@ end
 function GR:RegisterPlayers(...)
   local prefix, text, distribution, target = ...
   local PlayerName, PlayerServer = UnitFullName("player")
+  print(text)
 
   -- Register Friend
   local Action1 = string.sub(text, 0, 15)
@@ -381,7 +377,7 @@ function GR:RegisterPlayers(...)
         print(Value5)
         table.insert(GR.OnlyParty, Value5)
         if (IsCrossServer) then
-          GR:SendCommMessage("ZUI_GameRoom_Reg", "Party Registered, " .. PlayerName .. PlayerServer, "WHISPER", Value5)
+          GR:SendCommMessage("ZUI_GameRoom_Reg", "Party Registered, " .. PlayerName .. PlayerServer, distribution)
         else
           GR:SendCommMessage("ZUI_GameRoom_Reg", "Party Registered, " .. PlayerName, "WHISPER", Value5)
         end
@@ -620,6 +616,14 @@ function GR:AcceptDeclineChal(...)
   end
 end
 
--- refresh party/raid on reload
+-- who invites work
 
--- (impossible bug) error message on whisper to offline player (BNFriends and Rivals)
+-- guild can send messages with whisper
+-- raid and party need to send game-comm through raid and party channels
+
+-- make bnfriends work cross-server (whispers wont work, needs global channel)
+-- classic disable cross-server bnfriends (whispers wont work, no global channel)
+
+-- build global channel for retail
+
+-- invites need to worry about cross-server (cant whisper) for raid and party
