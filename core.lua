@@ -95,7 +95,7 @@ function GR:OnInitialize()
   GR:TabSelect()
 
   GR:RegisterComm("ZUI_GameRoom_Reg", function(...) GR:RegisterPlayers(...) end)
-  GR:RegisterComm("ZUI_GameRoom_Inv", function(...) GR:AcceptDeclineChal(...) end)
+  GR:RegisterComm("ZUI_GameRoom_Inv", function(...) GR:Invite(...) end)
   GR:RegisterComm("ZUI_GameRoom_TiG", function(...) GR:TicTacToeComm(...) end)
   GR:RegisterComm("ZUI_GameRoom_BSG", function(...) GR:BattleshipsComm(...) end)
 
@@ -874,7 +874,7 @@ function GR:ShowGame()
   GR_GUI.Main.HeaderInfo.ReInvite:Hide()
   GR_GUI.Main.HeaderInfo.ReMatch:Hide()
   GR_GUI.Main.HeaderInfo.Rival:Hide()
-  GR_GUI.Main.Invite:Hide()
+  GR_GUI.Main.Register:Hide()
   
   if (GR.Opponent) then 
     GR_GUI.Main.HeaderInfo.OpponentString:SetText("Opponent: " .. GR.Opponent)
@@ -904,7 +904,7 @@ function GR:HideGame()
   GR.Opponent = nil
   GR_GUI.Main.HeaderInfo:Hide()
   GR_GUI.Main.ExitBtn:Hide()
-  GR_GUI.Main.Invite:Show()
+  GR_GUI.Main.Register:Show()
 
   GR:TabSelect()
 end
@@ -944,7 +944,7 @@ function GR:ShowMain()
       GR_GUI.Main:SetSize(GR.Tab2Width, GR.Tab2Width)
   end
   GR:ResizeMain()
-  GR:ShowChallengeIfChallenged() 
+  GR:ShowChalOnInvite() 
 end
 
 -- Extra

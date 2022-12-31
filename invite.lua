@@ -1,9 +1,15 @@
-function GR:AcceptDeclineChal(...)
+function GR:Invite(...)
   local prefix, text, distribution, target = ...
   local Main = GR_GUI.Main
   local Accept = GR_GUI.Accept
 
-  -- registers incoming challenge
+  GR:IncomingInvite(text, Main, Accept)
+  GR:ChallengeAccepted(text)
+  GR:OpponentEndedGame(text)
+  GR:GameDeclined(text)
+end
+
+function GR:IncomingInvite(text, Main, Accept)
   local TicChallenge = string.sub(text, 0, 19)
   local BSChallenge = string.sub(text, 0, 21)
   local TicOpponent = string.sub(text, 22, 50)
@@ -83,7 +89,7 @@ function GR:AcceptDeclineChal(...)
         GR.IsChallenged = true
         C_Timer.After(15, function()
           GR.IsChallenged = false
-          GR:ShowChallengeIfChallenged()
+          GR:ShowChalOnInvite()
         end)
         local Hide = false
         if (GR.db.realm.HideInCombat and InCombatLockdown()) then
@@ -124,7 +130,9 @@ function GR:AcceptDeclineChal(...)
       end
     end
   end
-  
+end
+
+function GR:ChallengeAccepted(text)
   -- registers challenge accepted, shows game board. sender shows board on accept click
   local TicAccept = string.sub(text, 0, 16)
   local TicPlayerTurn = string.sub(text, 19, 19)
@@ -160,7 +168,9 @@ function GR:AcceptDeclineChal(...)
     GR.db.realm.tab = 1
     GR:TabSelect()
   end
+end
 
+function GR:OpponentEndedGame(text)
   -- ends game if opponent ends game
   local TicEndGame = string.sub(text, 0, 17)
   if (string.match(TicEndGame, "TicTacToe_GameEnd")) then
@@ -172,7 +182,9 @@ function GR:AcceptDeclineChal(...)
     GR.GameType = nil
     GR:BattleshipsHideContent()
   end
-  
+end
+
+function GR:GameDeclined(text)
   -- game declined
   local TicDecline = string.sub(text, 0, 17)
   if (string.match(TicDecline, "TicTacToe_Decline")) then
@@ -186,7 +198,7 @@ function GR:AcceptDeclineChal(...)
   end
 end
 
-function GR:ShowChallengeIfChallenged()
+function GR:ShowChalOnInvite()
   if (GR.IsChallenged and GR_GUI.Main.Tictactoe:IsVisible() == false and GR_GUI.Main.Battleships:IsVisible() == false) then 
     GR_GUI.Main.Accept:Show()
     GR_GUI.Main.DeclineBtn:Show()
