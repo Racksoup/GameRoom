@@ -85,11 +85,49 @@ function GR:CreateMultiInvite()
   Invite.SendBtn.FS:SetTextColor(.8,.8,.8, 1)
   Invite.SendBtn:SetScript("OnClick", function(self, button, down) 
     if (button == "LeftButton" and down == false) then
-      if (GR.GameType == "Battleships") then
-        GR:SendCommMessage("ZUI_GameRoom_Inv", "Battleships_Challenge, " .. UnitName("Player"), "WHISPER", GR.Target)
+      -- needs to comm through party or raid if cross-server
+      local PlayerName, PlayerServer = UnitFullName("player")
+      local PartyMemberName, PartyMemberRealm = UnitName(GR.Target)
+      local IsCrossServer = false
+      local GroupType = "party"
+      if IsInRaid() then GroupType = "raid" end
+      local IsInParty = false
+
+      -- unitname works if target is in party/raid. go through party/raid to find if target is in group. then check if they are cross-server. 
+      for i = 1, GetNumGroupMembers() -1, 1 do
+        local PlayerIndex = GroupType .. tostring(i)
+        local PartyMember = UnitName(PlayerIndex)
+        if (PartyMember == GR.Target) then 
+          if (PartyMemberRealm ~= PlayerServer) then
+            IsCrossServer = true
+          end
+        end
       end
-      if (GR.GameType == "Tictactoe") then
-        GR:SendCommMessage("ZUI_GameRoom_Inv", "TicTacToe_Challenge, " .. UnitName("Player"), "WHISPER", GR.Target)
+
+      if (not IsCrossServer) then
+
+        -- send invite
+        if (GR.GameType == "Battleships") then
+          GR:SendCommMessage("ZUI_GameRoom_Inv", "Battleships_Challenge, " .. UnitName("Player"), "WHISPER", GR.Target)
+        end
+        if (GR.GameType == "Tictactoe") then
+          GR:SendCommMessage("ZUI_GameRoom_Inv", "TicTacToe_Challenge, " .. UnitName("Player"), "WHISPER", GR.Target)
+        end
+        
+      else
+        -- if target is cross-server they are in a party or raid
+        -- check for party or raid for chat channel
+        local ChatChannel = "PARTY"
+        if IsInRaid() then ChatChannel = "RAID" end
+        local distribution = string.sub(ChatChannel, 1, 4)
+
+        -- send invite
+        if (GR.GameType == "Battleships") then
+          GR:SendCommMessage("ZUI_GameRoom_Inv", "Battleships_Challenge, " .. distribution .. UnitName("Player"), ChatChannel)
+        end
+        if (GR.GameType == "Tictactoe") then
+          GR:SendCommMessage("ZUI_GameRoom_Inv", "TicTacToe_Challenge, " .. distribution .. UnitName("Player"), ChatChannel)
+        end
       end
     end
   end)
@@ -155,9 +193,11 @@ function GR:CreateInviteParty()
   end
 
   -- sends Register Party message on login
+  local GroupType = "party"
+  if IsInRaid() then GroupType = "raid" end
   local NumParty = GetNumGroupMembers()
   for i = 1, NumParty, 1 do
-    local PlayerIndex = "party" .. tostring(i)
+    local PlayerIndex = GroupType .. tostring(i)
     local PartyMember = UnitName(PlayerIndex)
     local PlayerName = UnitName("player")
     if (type(PartyMember) == "string"  and UnitIsConnected(PlayerIndex)) then

@@ -11,6 +11,8 @@ function GR:CreateRegister()
   GR.InGame = false
   GR.GameType = nil
   GR.IncGameType = nil
+  GR.GroupType = nil
+  GR.UseGroupChat = false
 
   GR_GUI.Main.Register = CreateFrame("Frame", Register, GR_GUI.Main)
   local Register = GR_GUI.Main.Register
@@ -117,24 +119,16 @@ function GR:RegisterFriends()
   end
 end
 
-function GR:RefreshFriendsList()
-  local Btns = GR_GUI.Main.Tab3.Invite.Friends.Btns
-  for i = 1, 100, 1 do
-    Btns[i]:Hide()
-  end
-
+function GR:AddToFriendsList(Value)
+  local IsInTable = false
   for i,v in ipairs(GR.Friends) do
-    Btns[i].FS:SetText(v)
-    Btns[i]:Show()
-    Btns[i]:SetScript("OnClick", function(self, button, down)
-      if (button == "LeftButton" and down == false) then
-        GR.Target = v
-        GR_GUI.Main.Tab3.Invite.SendBtn.FS:SetText("Invite " .. GR.Target)
-        GR_GUI.Main.Tab3.Invite.SendBtn:Show()
-      end
-    end)
+    if (string.match(v, Value)) then
+      IsInTable = true
+    end
   end
-
+  if (IsInTable == false) then
+    table.insert(GR.Friends, Value)
+  end
 end
 
 function GR:RemoveFromFriendsList()
@@ -190,16 +184,24 @@ function GR:RemoveFromFriendsList()
   end
 end
 
-function GR:AddToFriendsList(Value)
-  local IsInTable = false
+function GR:RefreshFriendsList()
+  local Btns = GR_GUI.Main.Tab3.Invite.Friends.Btns
+  for i = 1, 100, 1 do
+    Btns[i]:Hide()
+  end
+
   for i,v in ipairs(GR.Friends) do
-    if (string.match(v, Value)) then
-      IsInTable = true
-    end
+    Btns[i].FS:SetText(v)
+    Btns[i]:Show()
+    Btns[i]:SetScript("OnClick", function(self, button, down)
+      if (button == "LeftButton" and down == false) then
+        GR.Target = v
+        GR_GUI.Main.Tab3.Invite.SendBtn.FS:SetText("Invite " .. GR.Target)
+        GR_GUI.Main.Tab3.Invite.SendBtn:Show()
+      end
+    end)
   end
-  if (IsInTable == false) then
-    table.insert(GR.Friends, Value)
-  end
+
 end
 
 function GR:FriendslistUpdate()
@@ -223,10 +225,10 @@ end
 
 function GR:FriendRegistered(text)
   -- Friend Registered
-  local Action2 = string.sub(text, 0, 17)
-  local Value2 = string.sub(text, 20, 50)
-  if (string.match(Action2, "Friend Registered")) then
-    GR:AddToFriendsList(Value2)
+  local Action = string.sub(text, 0, 17)
+  local Value = string.sub(text, 20, 50)
+  if (string.match(Action, "Friend Registered")) then
+    GR:AddToFriendsList(Value)
     GR:RemoveFromFriendsList()
     GR:RefreshFriendsList()
   end 
@@ -355,19 +357,13 @@ function GR:GroupRosterUpdate()
     local PlayerName, PlayerServer = UnitFullName("player")
     C_Timer.After(1, function() 
       if (type(PartyMember) == "string" and UnitIsConnected(PartyMemberIndex)) then
-        if ((PartyMemberRealm == PlayerServer and PlayerServer ~= nil) or PartyMemberRealm == nil) then 
-          GR:SendCommMessage("ZUI_GameRoom_Reg", "Register Party, " .. PlayerName, "PARTY")
-          print('same-server, register party')
-        else
-          GR:SendCommMessage("ZUI_GameRoom_Reg", "Register Party, " .. PlayerName .. "-" .. PlayerServer, "PARTY")
-          print('cross-server, register party')
-        end
+        GR:SendCommMessage("ZUI_GameRoom_Reg", "Register Party, " .. PlayerName, "PARTY")
       end
     end)
   end
 end
 
-function GR:RegisterParty(text, PlayerName, distribution)
+function GR:RegisterParty(text, PlayerName, PlayerServer, distribution)
   -- Register Party
   local Action = string.sub(text, 0, 14)
   local Value = string.sub(text, 17, 50)
@@ -384,20 +380,12 @@ function GR:RegisterParty(text, PlayerName, distribution)
     end
     if (IsInTable == false) then
 
-      -- check if server name is appended
-      local IsCrossServer = false
-      if (string.match(Value, ".-")) then IsCrossServer = true end
-
       table.insert(GR.Party, Value)
       -- set party and guild arrays for whilelist option
       if (string.match(Action, "Register Party")) then
         print(Value)
         table.insert(GR.OnlyParty, Value)
-        if (IsCrossServer) then
-          GR:SendCommMessage("ZUI_GameRoom_Reg", "Party Registered, " .. PlayerName .. PlayerServer, distribution)
-        else
-          GR:SendCommMessage("ZUI_GameRoom_Reg", "Party Registered, " .. PlayerName, "WHISPER", Value)
-        end
+        GR:SendCommMessage("ZUI_GameRoom_Reg", "Party Registered, " .. PlayerName, distribution)
       end
       if (string.match(Action, "Register Guild")) then
         table.insert(GR.OnlyGuild, Value)
@@ -448,14 +436,12 @@ function GR:RegisterPlayers(...)
   GR:RegisterZone(text, PlayerName)
   GR:ZoneRegistered(text, PlayerName)
 
-  GR:RegisterParty(text, PlayerName, distribution)
+  GR:RegisterParty(text, PlayerName, PlayerServer, distribution)
   GR:PartyRegistered(text, PlayerName)
 end
 
--- who register works
 
 -- guild can send messages with whisper
--- raid and party need to send game-comm through raid and party channels
 
 -- make bnfriends work cross-server (whispers wont work, needs global channel)
 -- classic disable cross-server bnfriends (whispers wont work, no global channel)

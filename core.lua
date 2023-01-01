@@ -348,13 +348,31 @@ function GR:CreateAcceptDecline()
             GR.IsPlayerTurn = true
         end
         if (GR.IncGameType == "Tictactoe") then
-          GR:SendCommMessage("ZUI_GameRoom_Inv", "TicTacToe_Accept, " .. GR.PlayerPos .. ", " .. UnitName("Player"), "WHISPER", GR.Opponent)
+          if (GR.GroupType == nil) then
+            GR:SendCommMessage("ZUI_GameRoom_Inv", "TicTacToe_Accept, " .. GR.PlayerPos .. ", " .. UnitName("Player"), "WHISPER", GR.Opponent)
+          else
+            local ChatChannel
+            if (GR.GroupType == "PART") then ChatChannel = "PARTY" end
+            if (GR.GroupType == "RAID") then ChatChannel = "RAID" end
+            GR:SendCommMessage("ZUI_GameRoom_Inv", "TicTacToe_Accept, " .. GR.GroupType .. GR.PlayerPos .. ", " .. UnitName("Player"), ChatChannel)
+            GR.GroupType = ChatChannel
+            GR.UseGroupChat = true
+          end
           GR.GameType = "Tictactoe"
           GR.db.realm.tab = 1
           GR:TabSelect()
           end
         if (GR.IncGameType == "Battleships") then
-          GR:SendCommMessage("ZUI_GameRoom_Inv", "Battleships_Accept, " .. GR.PlayerPos .. ", " .. UnitName("Player"), "WHISPER", GR.Opponent)
+          if (GR.GroupType == nil) then
+            GR:SendCommMessage("ZUI_GameRoom_Inv", "Battleships_Accept, " .. GR.PlayerPos .. ", " .. UnitName("Player"), "WHISPER", GR.Opponent)
+          else
+            local ChatChannel
+            if (GR.GroupType == "PART") then ChatChannel = "PARTY" end
+            if (GR.GroupType == "RAID") then ChatChannel = "RAID" end
+            GR:SendCommMessage("ZUI_GameRoom_Inv", "Battleships_Accept, " .. GR.GroupType .. GR.PlayerPos .. ", " .. UnitName("Player"), ChatChannel)
+            GR.GroupType = ChatChannel
+            GR.UseGroupChat = true
+          end
           GR.GameType = "Battleships"
           GR.db.realm.tab = 1
           GR:TabSelect()
@@ -377,10 +395,24 @@ function GR:CreateAcceptDecline()
             GR_GUI.Main.Accept:Hide()
             GR_GUI.Accept:Hide()
             if (GR.GameType == "Tictactoe") then
+              if (GR.GroupType == nil) then
                 GR:SendCommMessage("ZUI_GameRoom_Inv", "TicTacToe_Decline, ", "WHISPER", GR.Opponent)
+              else
+                local ChatChannel
+                if (GR.GroupType == "PART") then ChatChannel = "PARTY" end
+                if (GR.GroupType == "RAID") then ChatChannel = "RAID" end
+                GR:SendCommMessage("ZUI_GameRoom_Inv", "TicTacToe_Decline, " .. GR.Opponent, ChatChannel)
+              end
             end 
             if (GR.GameType == "Battleships") then
+              if (GR.GroupType == nil) then
                 GR:SendCommMessage("ZUI_GameRoom_Inv", "Battleships_Decline, ", "WHISPER", GR.Opponent)
+              else
+                local ChatChannel
+                if (GR.GroupType == "PART") then ChatChannel = "PARTY" end
+                if (GR.GroupType == "RAID") then ChatChannel = "RAID" end
+                GR:SendCommMessage("ZUI_GameRoom_Inv", "Battleships_Decline, " .. GR.Opponent, ChatChannel)
+              end
             end 
             GR.Opponent = nil
         end 
@@ -902,6 +934,8 @@ function GR:HideGame()
   GR.CanSendInvite = true
   GR.IsChallenged = false
   GR.Opponent = nil
+  GR.GroupType = nil
+  GR.UseGroupChat = false
   GR_GUI.Main.HeaderInfo:Hide()
   GR_GUI.Main.ExitBtn:Hide()
   GR_GUI.Main.Register:Show()

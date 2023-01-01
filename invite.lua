@@ -14,6 +14,16 @@ function GR:IncomingInvite(text, Main, Accept)
   local BSChallenge = string.sub(text, 0, 21)
   local TicOpponent = string.sub(text, 22, 50)
   local BSOpponent = string.sub(text, 24, 50)
+  local distribution = nil
+  if (string.sub(text, 22, 25) == "PART" or string.sub(text, 22, 25) == "RAID") then
+    distribution = string.sub(text, 22, 25)
+    TicOpponent = string.sub(text, 26, 50)
+  end
+  if (string.sub(text, 24, 27) == "PART" or string.sub(text, 24, 27) == "RAID") then
+    distribution = string.sub(text, 24, 27)
+    BSOpponent = string.sub(text, 28, 50)
+  end
+
   if ((string.match(BSChallenge, "Battleships_Challenge") or string.match(TicChallenge, "TicTacToe_Challenge")) and GR.IsChallenged == false and GR.db.realm.disableChallenges == false) then
     local AcceptGameString = ""
     if (string.match(BSChallenge, "Battleships_Challenge")) then
@@ -79,11 +89,13 @@ function GR:IncomingInvite(text, Main, Accept)
         Main.Accept.FS2:SetText(BSOpponent .. " - " .. AcceptGameString)
         Accept.FS2:SetText(BSOpponent .. " - " .. AcceptGameString)
         GR.Opponent = BSOpponent
+        GR.GroupType = distribution
       end
       if (string.match(TicChallenge, "TicTacToe_Challenge")) then
         Main.Accept.FS2:SetText(TicOpponent .. " - " .. AcceptGameString)
         Accept.FS2:SetText(TicOpponent .. " - " .. AcceptGameString)
         GR.Opponent = TicOpponent
+        GR.GroupType = distribution
       end
       if (GR.InGame == false and Main.Battleships:IsVisible() == false and Main.Tictactoe:IsVisible() == false) then
         GR.IsChallenged = true
@@ -103,11 +115,13 @@ function GR:IncomingInvite(text, Main, Accept)
               C_Timer.After(15, function() 
                 Main.Accept:Hide()
                 Main.DeclineBtn:Hide()
+                GR.GroupType = nil
               end)
             else
               Accept:Show()
               C_Timer.After(15, function() 
                 Accept:Hide()
+                GR.GroupType = nil
               end)
             end
           else
@@ -119,6 +133,7 @@ function GR:IncomingInvite(text, Main, Accept)
               C_Timer.After(15, function() 
                 Main.Accept:Hide()
                 Main.DeclineBtn:Hide()
+                GR.GroupType = nil
               end)
             end
           end
@@ -137,10 +152,20 @@ function GR:ChallengeAccepted(text)
   local TicAccept = string.sub(text, 0, 16)
   local TicPlayerTurn = string.sub(text, 19, 19)
   local TicOpponent = string.sub(text, 22, 50)
+  local TicGroupType = string.sub(text, 19, 22)
+  if (TicGroupType == "PART" or TicGroupType == "RAID") then
+    TicPlayerTurn = string.sub(text, 23, 23)
+    TicOpponent = string.sub(text, 26, 50)
+    GR.GroupType = TicGroupType
+    GR.UseGroupChat = true
+  end
+
+
   if (string.match(TicAccept, "TicTacToe_Accept")) then
-    GR.GameType = "Tictactoe"
+    GR.GroupType = "Tictactoe"
     GR:TicTacToeHideContent()  
     GR.Opponent = TicOpponent
+    if (TicGroupType == "PART") then TicGroupType = "PARTY" end
     if (string.match(TicPlayerTurn, "2")) then
       GR.PlayerPos = 1
       GR.IsPlayerTurn = true
@@ -154,10 +179,19 @@ function GR:ChallengeAccepted(text)
   local BSAccept = string.sub(text, 0, 18)
   local BSPlayerTurn = string.sub(text, 21, 21)
   local BSOpponent = string.sub(text, 24, 50)
+  local BSGroupType = string.sub(text, 21, 24)
+  if (BSGroupType == "PART" or BSGroupType == "RAID") then
+    BSPlayerTurn = string.sub(text, 25, 25)
+    BSOpponent = string.sub(text, 28, 50)
+    GR.GroupType = BSGroupType
+    GR.UseGroupChat = true
+  end
+  
   if (string.match(BSAccept, "Battleships_Accept")) then
-    GR.GameType = "Battleships"
+    GR.GroupType = "Battleships"
     GR:BattleshipsHideContent()  
     GR.Opponent = BSOpponent
+    if (TicGroupType == "PART") then TicGroupType = "PARTY" end
     if (string.match(BSPlayerTurn, "2")) then
       GR.PlayerPos = 1
       GR.IsPlayerTurn = true
