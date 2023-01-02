@@ -1533,7 +1533,7 @@ function GR:BattleshipsComm(...)
     end
 
     -- if sender not appended run normally. if sender appended check that sender == target
-    if (Sender2 ~= nil or Sender2 == UnitName("player")) then
+    if (Sender2 == nil or Sender2 == UnitName("player")) then
       local Passed2, DesValue2 = GR:Deserialize(Value2)
 
       -- Battleships Move Received
