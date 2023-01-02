@@ -82,7 +82,6 @@ function GR:RegisterFriends()
       end
 
       if (IsInFriends == false and OGFriend.connected) then
-        print('register friend, normal friend')
         GR:SendCommMessage("ZUI_GameRoom_Reg", "Register Friend, " .. PlayerName, "WHISPER", OGFriend.name)
       end
     end
@@ -106,7 +105,6 @@ function GR:RegisterFriends()
           end
         end
         if (Client == "WoW" and type(Character) == "string" and IsInFriends == false) then
-          print('register friend, BN friend')
           GR:SendCommMessage("ZUI_GameRoom_Reg", "Register Friend, " .. PlayerName, "WHISPER", Character)
         end
       end
@@ -114,7 +112,6 @@ function GR:RegisterFriends()
   end 
   -- add rivals
   for i,v in ipairs(GR.db.realm.Rivals) do
-    print('register friend, rival')
     GR:SendCommMessage("ZUI_GameRoom_Reg", "Register Friend, " .. PlayerName, "WHISPER", v)
   end
 end
@@ -383,7 +380,6 @@ function GR:RegisterParty(text, PlayerName, PlayerServer, distribution)
       table.insert(GR.Party, Value)
       -- set party and guild arrays for whilelist option
       if (string.match(Action, "Register Party")) then
-        print(Value)
         table.insert(GR.OnlyParty, Value)
         GR:SendCommMessage("ZUI_GameRoom_Reg", "Party Registered, " .. PlayerName, distribution)
       end
@@ -441,7 +437,7 @@ function GR:RegisterPlayers(...)
 end
 
 
--- guild can send messages with whisper
+-- if GR.UseGroupChat then send all game comms through groupchat comms
 
 -- make bnfriends work cross-server (whispers wont work, needs global channel)
 -- classic disable cross-server bnfriends (whispers wont work, no global channel)

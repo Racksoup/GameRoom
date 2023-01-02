@@ -169,6 +169,7 @@ end
 function GR:TicTacToeHideContent()
     GR_GUI.Main.Tictactoe:Hide()
     GR.TicBoard = {0,0,0,0,0,0,0,0,0}
+    GR.UseGroupChat = false
     local Buttons = GR_GUI.Main.Tictactoe.Buttons
     for i,v in ipairs(Buttons) do 
         local BtnTex = v:GetRegions()

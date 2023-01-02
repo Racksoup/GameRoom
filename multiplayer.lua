@@ -121,12 +121,40 @@ function GR:CreateMultiInvite()
         if IsInRaid() then ChatChannel = "RAID" end
         local distribution = string.sub(ChatChannel, 1, 4)
 
+        -- settup player and target arrays
+        local Player = UnitName("Player")
+        local PlayerTable = {}
+        local Target = GR.Target
+        local TargetTable = {}
+        for i = 1, #Player do
+          table.insert(PlayerTable, Player:sub(i, i))
+        end
+        for i = 1, #Target do
+          table.insert(TargetTable, Target:sub(i, i))
+        end
+        for i = 1, 12, 1 do
+          if (PlayerTable[i] == nil) then PlayerTable[i] = "-" end 
+          if (TargetTable[i] == nil) then TargetTable[i] = "-" end 
+        end
+        
+        -- convert player and target arrays to strings
+        Player = ""
+        Target = ""
+        for i = 1, #PlayerTable do
+          Player = Player .. PlayerTable[i]
+        end
+        for i = 1, #TargetTable do
+          Target = Target .. TargetTable[i]
+        end
+
         -- send invite
+        -- when sending to groupchat, needs sender and target data
+        GR.UseGroupChat = true
         if (GR.GameType == "Battleships") then
-          GR:SendCommMessage("ZUI_GameRoom_Inv", "Battleships_Challenge, " .. distribution .. UnitName("Player"), ChatChannel)
+          GR:SendCommMessage("ZUI_GameRoom_Inv", "Battleships_Challenge, " .. distribution .. Player .. Target, ChatChannel)
         end
         if (GR.GameType == "Tictactoe") then
-          GR:SendCommMessage("ZUI_GameRoom_Inv", "TicTacToe_Challenge, " .. distribution .. UnitName("Player"), ChatChannel)
+          GR:SendCommMessage("ZUI_GameRoom_Inv", "TicTacToe_Challenge, " .. distribution .. Player .. Target, ChatChannel)
         end
       end
     end
