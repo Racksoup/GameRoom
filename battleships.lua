@@ -294,8 +294,10 @@ function GR:CreateBattleshipsButtons(Content, Buttons, User)
                         end
                       end
 
+                      print("battleships move send, cross-server")
                       GR:SendCommMessage("ZUI_GameRoom_BSG", "TicTacToe_Phase2_Move, " .. Target .. Serial, GR.GroupType)
                     else
+                        print("battleships move send, same-server")
                       GR:SendCommMessage("ZUI_GameRoom_BSG", "TicTacToe_Phase2_Move, " .. Serial, "WHISPER", GR.Opponent)
                     end
 
@@ -1492,19 +1494,17 @@ function GR:BattleshipsComm(...)
     -- Opponent Completed Phase 1
     local Action1 = string.sub(text, 0, 24)
     local Value1 = string.sub(text, 27, 1000)
-    local Sender1 = nil
+    local Target1 = nil
 
-    -- if raid/party channel get sender data
+    -- if raid/party channel get Target data
     if (distribution == "RAID" or distribution == "PARTY") then
-      Sender1 = string.sub(text, 27, 38)
-      Sender1 = Sender1:gsub("-", "")
+      Target1 = string.sub(text, 27, 38)
+      Target1 = Target1:gsub("-", "")
       Value1 = string.sub(39, 1000)
-      print("Battleships Phase 1 Action Received. Cross-server")
-      print(GR.Opponent, GR.Target)
     end
 
-    -- if sender not appended run normally. if sender appended check that sender == target
-    if (Sender1 == nil or Sender1 == UnitName("player")) then
+    -- if Target not appended run normally. if Target appended check that Target == player
+    if (Target1 == nil or Target1 == UnitName("player")) then
       local Passed1, DesValue1 = GR:Deserialize(Value1)
   
       -- Battleships Turn 1 Completed Received
@@ -1523,21 +1523,23 @@ function GR:BattleshipsComm(...)
     -- received opponent move/board
     local Action2 = string.sub(text, 0, 21)
     local Value2 = string.sub(text, 24, 1000)
-    local Sender2 = nil
+    local Target2 = nil
     
-    -- if raid/party channel get sender data
+    -- if raid/party channel get Target data
     if (distribution == "RAID" or distribution == "PARTY") then
-      Sender2 = string.sub(text, 24, 35)
-      Sender2 = Sender2:gsub("-", "")
-      Value2 = string.sub(36, 1000)
+      Target2 = string.sub(text, 24, 35)
+      Target2 = Target2:gsub("-", "")
+      Value2 = string.sub(text, 36, 1000)
+      print(Target2, Value2:sub(0,10))
     end
 
-    -- if sender not appended run normally. if sender appended check that sender == target
-    if (Sender2 == nil or Sender2 == UnitName("player")) then
+    -- if Target not appended run normally. if Target appended check that Target == player
+    if (Target2 == nil or Target2 == UnitName("player")) then
       local Passed2, DesValue2 = GR:Deserialize(Value2)
 
       -- Battleships Move Received
       if (string.match(Action2, "TicTacToe_Phase2_Move")) then
+        if (Target2 == UnitName("player")) then print("Battleships move received, cross-server") else print("Battleships move received, same-server") end
           GR.IsPlayerTurn = true
           GR:SetTurnString()
 
@@ -1658,3 +1660,4 @@ function GR:AABB(Rect1, Rect2)
 end
 
 -- rematch button
+-- need to look at the game board being sent from the player move. (or the gameboards sent on phase 1 complete)

@@ -205,7 +205,6 @@ function GR:ChallengeAccepted(text)
     if (BSGroupType == "PART" or BSGroupType == "RAID") then
       BSPlayerTurn = string.sub(text, 25, 25)
       BSOpponent = string.sub(text, 26, 50)
-      print(BSOpponent)
       GR.GroupType = BSGroupType
       GR.UseGroupChat = true
     else
