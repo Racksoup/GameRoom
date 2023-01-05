@@ -294,10 +294,8 @@ function GR:CreateBattleshipsButtons(Content, Buttons, User)
                         end
                       end
 
-                      print("battleships move send, cross-server")
                       GR:SendCommMessage("ZUI_GameRoom_BSG", "TicTacToe_Phase2_Move, " .. Target .. Serial, GR.GroupType)
                     else
-                        print("battleships move send, same-server")
                       GR:SendCommMessage("ZUI_GameRoom_BSG", "TicTacToe_Phase2_Move, " .. Serial, "WHISPER", GR.Opponent)
                     end
 
@@ -1500,7 +1498,7 @@ function GR:BattleshipsComm(...)
     if (distribution == "RAID" or distribution == "PARTY") then
       Target1 = string.sub(text, 27, 38)
       Target1 = Target1:gsub("-", "")
-      Value1 = string.sub(39, 1000)
+      Value1 = string.sub(text, 39, 1000)
     end
 
     -- if Target not appended run normally. if Target appended check that Target == player
@@ -1529,8 +1527,7 @@ function GR:BattleshipsComm(...)
     if (distribution == "RAID" or distribution == "PARTY") then
       Target2 = string.sub(text, 24, 35)
       Target2 = Target2:gsub("-", "")
-      Value2 = string.sub(text, 36, 1000)
-      print(Target2, Value2:sub(0,10))
+      Value2 = string.sub(text, 36, 1100)
     end
 
     -- if Target not appended run normally. if Target appended check that Target == player
@@ -1539,7 +1536,6 @@ function GR:BattleshipsComm(...)
 
       -- Battleships Move Received
       if (string.match(Action2, "TicTacToe_Phase2_Move")) then
-        if (Target2 == UnitName("player")) then print("Battleships move received, cross-server") else print("Battleships move received, same-server") end
           GR.IsPlayerTurn = true
           GR:SetTurnString()
 
