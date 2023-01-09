@@ -340,21 +340,22 @@ function GR:GroupRosterUpdate()
   GR:RefreshPartyList()
   -- resends Register Party messages
   local NumOfGroupMembers = GetNumGroupMembers()
-  local playerInRaid = IsInRaid()
+  local distribution = ""
   for i = 1, NumOfGroupMembers, 1 do
     local PartyMemberIndex
-    if (not playerInRaid) then 
-      PartyMemberIndex = "party" .. tostring(i)
-    end
-    if (playerInRaid) then
+    if (IsInRaid()) then
       PartyMemberIndex = "raid" .. tostring(i)
+      distribution = "INSTANCE_CHAT"
+    else
+      PartyMemberIndex = "party" .. tostring(i)
+      distribution = "PARTY"
     end
     local PartyMember = GetUnitName(PartyMemberIndex, true)
     local PartyMemberName, PartyMemberRealm = UnitName(PartyMemberIndex)
     local PlayerName, PlayerServer = UnitFullName("player")
     C_Timer.After(1, function() 
       if (type(PartyMember) == "string" and UnitIsConnected(PartyMemberIndex)) then
-        GR:SendCommMessage("ZUI_GameRoom_Reg", "Register Party, " .. PlayerName, "PARTY")
+        GR:SendCommMessage("ZUI_GameRoom_Reg", "Register Party, " .. PlayerName, distribution)
       end
     end)
   end
@@ -437,11 +438,5 @@ function GR:RegisterPlayers(...)
 end
 
 
--- if GR.UseGroupChat then send all game comms through groupchat comms
 
--- make bnfriends work cross-server (whispers wont work, needs global channel)
--- classic disable cross-server bnfriends (whispers wont work, no global channel)
 
--- build global channel for retail
-
--- register need to worry about cross-server (cant whisper) for raid and party

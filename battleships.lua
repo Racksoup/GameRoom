@@ -1576,7 +1576,7 @@ function GR:BattleshipsHideContent()
     GR:HideGame()
 end
 
-function GR:BattleshipsShowContent()
+function GR:BattleshipsShow()
     local Battleships = GR_GUI.Main.Battleships
     
     GR:ShowGame()
@@ -1656,4 +1656,3 @@ function GR:AABB(Rect1, Rect2)
 end
 
 -- rematch button
--- need to look at the game board being sent from the player move. (or the gameboards sent on phase 1 complete)

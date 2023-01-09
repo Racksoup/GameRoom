@@ -178,7 +178,7 @@ function GR:TicTacToeHideContent()
     GR:HideGame()
 end
 
-function GR:ShowTictactoe()
+function GR:TictactoeShow()
     GR_GUI.Main.Tictactoe:Show()
     GR_GUI.Main.H2:Hide()
     GR:ShowGame()            

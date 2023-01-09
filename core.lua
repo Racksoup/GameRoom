@@ -204,23 +204,7 @@ function GR:CreateMainWindow()
   ExitFS:SetText("Exit Game")
   ExitBtn:SetScript("OnClick", function(self, button, down)
     if (button == "LeftButton" and down == false) then 
-      if (GR.GameType == "Tictactoe") then
-        GR:SendCommMessage("ZUI_GameRoom_Inv", "TicTacToe_GameEnd", "WHISPER", GR.Opponent)
-        GR:TicTacToeHideContent()
-      end
-      if (GR.GameType == "Battleships") then
-        GR:SendCommMessage("ZUI_GameRoom_Inv", "Battleships_GameEnd", "WHISPER", GR.Opponent)
-        GR:BattleshipsHideContent()
-      end
-      if (GR.GameType == "Asteroids") then
-        GR:AsteroidsHide()    
-      end
-      if (GR.GameType == "Snake") then
-        GR:SnakeHide()    
-      end
-      GR.GameType = nil
-      GR.db.realm.tab = 2
-      GR:TabSelect()
+      GR:ExitGameClicked()
     end
   end)
   Main.ExitBtn:Hide()
@@ -337,47 +321,9 @@ function GR:CreateAcceptDecline()
     AcceptString2:SetPoint("BOTTOM", 0, 10)
     AcceptString2:SetTextScale(1.3)
     AcceptString2:SetTextColor(.8,1,0, 1)
-    Accept:SetScript("OnClick", function(self, button, down) 
-        -- send message to show other user board
-        GR_GUI.Main:Show()
-        GR.PlayerPos = random(1,2)
-        if (GR.PlayerPos == 2) then
-            GR.IsPlayerTurn = false
-        else
-            GR.IsPlayerTurn = true
-        end
-        GR.Target = GR.Opponent
-
-        if (GR.IncGameType == "Tictactoe") then
-          if (GR.GroupType == nil) then
-            GR:SendCommMessage("ZUI_GameRoom_Inv", "TicTacToe_Accept, " .. GR.PlayerPos .. ", " .. UnitName("Player"), "WHISPER", GR.Opponent)
-          else
-            local ChatChannel
-            if (GR.GroupType == "PART") then ChatChannel = "PARTY" end
-            if (GR.GroupType == "RAID") then ChatChannel = "RAID" end
-            GR:SendCommMessage("ZUI_GameRoom_Inv", "TicTacToe_Accept, " .. GR.GroupType .. GR.PlayerPos .. ", " .. UnitName("Player"), ChatChannel)
-            GR.GroupType = ChatChannel
-            GR.UseGroupChat = true
-          end
-          GR.GameType = "Tictactoe"
-          GR.db.realm.tab = 1
-          GR:TabSelect()
-          end
-        if (GR.IncGameType == "Battleships") then
-          if (GR.GroupType == nil) then
-            GR:SendCommMessage("ZUI_GameRoom_Inv", "Battleships_Accept, " .. GR.PlayerPos .. ", " .. UnitName("Player"), "WHISPER", GR.Opponent)
-          else
-            local ChatChannel
-            if (GR.GroupType == "PART") then ChatChannel = "PARTY" end
-            if (GR.GroupType == "RAID") then ChatChannel = "RAID" end
-            GR:SendCommMessage("ZUI_GameRoom_Inv", "Battleships_Accept, " .. GR.GroupType .. GR.PlayerPos  .. UnitName("Player"), ChatChannel)
-            GR.GroupType = ChatChannel
-            GR.UseGroupChat = true
-          end
-          GR.GameType = "Battleships"
-          GR.db.realm.tab = 1
-          GR:TabSelect()
-        end
+    Accept:SetScript("OnClick", function(self, button, down)
+      GR_GUI.Main:Show() 
+      GR:AcceptGameClicked()
     end)
 
     -- Decline Button while GameRoom is closed
@@ -392,30 +338,9 @@ function GR:CreateAcceptDecline()
     DeclineFS:SetText("Decline")
     DeclineBtn:SetScript("OnClick", function(self, button, down)
         if (button == "LeftButton" and down == false) then 
-            GR.IsChallenged = false
-            GR_GUI.Main.Accept:Hide()
-            GR_GUI.Accept:Hide()
-            if (GR.GameType == "Tictactoe") then
-              if (GR.GroupType == nil) then
-                GR:SendCommMessage("ZUI_GameRoom_Inv", "TicTacToe_Decline, ", "WHISPER", GR.Opponent)
-              else
-                local ChatChannel
-                if (GR.GroupType == "PART") then ChatChannel = "PARTY" end
-                if (GR.GroupType == "RAID") then ChatChannel = "RAID" end
-                GR:SendCommMessage("ZUI_GameRoom_Inv", "TicTacToe_Decline, " .. GR.Opponent, ChatChannel)
-              end
-            end 
-            if (GR.GameType == "Battleships") then
-              if (GR.GroupType == nil) then
-                GR:SendCommMessage("ZUI_GameRoom_Inv", "Battleships_Decline, ", "WHISPER", GR.Opponent)
-              else
-                local ChatChannel
-                if (GR.GroupType == "PART") then ChatChannel = "PARTY" end
-                if (GR.GroupType == "RAID") then ChatChannel = "RAID" end
-                GR:SendCommMessage("ZUI_GameRoom_Inv", "Battleships_Decline, " .. GR.Opponent, ChatChannel)
-              end
-            end 
-            GR.Opponent = nil
+          GR_GUI.Main.Accept:Hide()
+          GR_GUI.Accept:Hide()
+          GR:DeclineGameClicked()
         end 
     end)
 
@@ -458,47 +383,9 @@ function GR:CreateAcceptDecline()
     local AcceptFS2 = Accept.FS2
     AcceptFS2:SetTextColor(.8,1,0, 1)
     Accept:SetScript("OnClick", function(self, button, down) 
-      -- send message to show other user board
       GR_GUI.Main.Accept:Hide()
       GR_GUI.Main.DeclineBtn:Hide()
-      GR.PlayerPos = random(1,2)
-      if (GR.PlayerPos == 2) then
-        GR.IsPlayerTurn = false
-      else
-        GR.IsPlayerTurn = true
-      end
-      GR.Target = GR.Opponent
-      
-      if (GR.IncGameType == "Tictactoe") then
-        if (GR.GroupType == nil) then
-          GR:SendCommMessage("ZUI_GameRoom_Inv", "TicTacToe_Accept, " .. GR.PlayerPos .. ", " .. UnitName("Player"), "WHISPER", GR.Opponent)
-        else
-          local ChatChannel
-          if (GR.GroupType == "PART") then ChatChannel = "PARTY" end
-          if (GR.GroupType == "RAID") then ChatChannel = "RAID" end
-          GR:SendCommMessage("ZUI_GameRoom_Inv", "TicTacToe_Accept, " .. GR.GroupType .. GR.PlayerPos .. ", " .. UnitName("Player"), ChatChannel)
-          GR.GroupType = ChatChannel
-          GR.UseGroupChat = true
-        end
-        GR.GameType = "Tictactoe"
-        GR.db.realm.tab = 1
-        GR:TabSelect()
-        end
-      if (GR.IncGameType == "Battleships") then
-        if (GR.GroupType == nil) then
-          GR:SendCommMessage("ZUI_GameRoom_Inv", "Battleships_Accept, " .. GR.PlayerPos .. ", " .. UnitName("Player"), "WHISPER", GR.Opponent)
-        else
-          local ChatChannel
-          if (GR.GroupType == "PART") then ChatChannel = "PARTY" end
-          if (GR.GroupType == "RAID") then ChatChannel = "RAID" end
-          GR:SendCommMessage("ZUI_GameRoom_Inv", "Battleships_Accept, " .. GR.GroupType .. GR.PlayerPos .. ", " .. UnitName("Player"), ChatChannel)
-          GR.GroupType = ChatChannel
-          GR.UseGroupChat = true
-        end
-        GR.GameType = "Battleships"
-        GR.db.realm.tab = 1
-        GR:TabSelect()
-      end
+      GR:AcceptGameClicked()
     end)
 
     -- Decline Button
@@ -510,31 +397,10 @@ function GR:CreateAcceptDecline()
     DeclineFS:SetText("Decline")
     DeclineBtn:SetScript("OnClick", function(self, button, down)
         if (button == "LeftButton" and down == false) then 
-            GR.IsChallenged = false
-            GR.Opponent = nil
-            GR_GUI.Main.Accept:Hide()
-            GR_GUI.Main.DeclineBtn:Hide()
-            GR_GUI.Accept:Hide()
-            if (GR.GameType == "Tictactoe") then
-              if (GR.GroupType == nil) then
-                GR:SendCommMessage("ZUI_GameRoom_Inv", "TicTacToe_Decline, ", "WHISPER", GR.Opponent)
-              else
-                local ChatChannel
-                if (GR.GroupType == "PART") then ChatChannel = "PARTY" end
-                if (GR.GroupType == "RAID") then ChatChannel = "RAID" end
-                GR:SendCommMessage("ZUI_GameRoom_Inv", "TicTacToe_Decline, " .. GR.Opponent, ChatChannel)
-              end
-            end 
-            if (GR.GameType == "Battleships") then
-              if (GR.GroupType == nil) then
-                GR:SendCommMessage("ZUI_GameRoom_Inv", "Battleships_Decline, ", "WHISPER", GR.Opponent)
-              else
-                local ChatChannel
-                if (GR.GroupType == "PART") then ChatChannel = "PARTY" end
-                if (GR.GroupType == "RAID") then ChatChannel = "RAID" end
-                GR:SendCommMessage("ZUI_GameRoom_Inv", "Battleships_Decline, " .. GR.Opponent, ChatChannel)
-              end
-            end 
+          GR_GUI.Main.Accept:Hide()
+          GR_GUI.Main.DeclineBtn:Hide()
+          GR_GUI.Accept:Hide()
+          GR:DeclineGameClicked()
         end
     end)
     
@@ -785,6 +651,7 @@ end
 function GR:TabSelect()
   local Main = GR_GUI.Main
   local tab = GR.db.realm.tab
+  local point, relativeTo, relativePoint, xOfs, yOfs = Main:GetPoint()
   
   Main.Tab2:Hide()
   Main.Tab3:Hide()
@@ -819,7 +686,6 @@ function GR:TabSelect()
   -- In Game
   if (tab == 1) then
     local Width, Height, Change = CheckWidthHeight(GR.Win.Const.Tab1Width * Main.XRatio, GR.Win.Const.Tab1Height * Main.YRatio)
-    local point, relativeTo, relativePoint, xOfs, yOfs = Main:GetPoint()
 
     Main:SetSize(Width, Height)
     Main:SetPoint(point, relativeTo, relativePoint, xOfs, yOfs)
@@ -838,16 +704,15 @@ function GR:TabSelect()
       GR:SnakeShow()
     end
     if (GR.GameType == "Tictactoe") then
-      GR:ShowTictactoe()
+      GR:TictactoeShow()
     end
     if (GR.GameType == "Battleships") then
-      GR:BattleshipsShowContent()
+      GR:BattleshipsShow()
     end
   end
   -- Solo Games
   if (tab == 2) then
     local Width, Height, Change = CheckWidthHeight(GR.Win.Const.Tab2Width * Main.XRatio, GR.Win.Const.Tab2Height * Main.YRatio)
-    local point, relativeTo, relativePoint, xOfs, yOfs = Main:GetPoint()
 
     Main:SetSize(Width, Height)
     if (point == nil) then
@@ -867,7 +732,6 @@ function GR:TabSelect()
   -- Multiplayer Games
   if (tab == 3) then
     local Width, Height, Change = CheckWidthHeight(GR.Win.Const.Tab3Width * Main.XRatio, GR.Win.Const.Tab3Height * Main.YRatio)
-    local point, relativeTo, relativePoint, xOfs, yOfs = Main:GetPoint()
 
     Main:SetSize(Width, Height)
     Main:SetPoint(point, relativeTo, relativePoint, xOfs, yOfs)
@@ -887,7 +751,6 @@ function GR:TabSelect()
   -- Settings
   if (tab == 4) then
     local Width, Height, Change = CheckWidthHeight(GR.Win.Const.Tab4Width * Main.XRatio, GR.Win.Const.Tab4Height * Main.YRatio)
-    local point, relativeTo, relativePoint, xOfs, yOfs = Main:GetPoint()
 
     Main:SetSize(Width, Height)
     Main:SetPoint(point, relativeTo, relativePoint, xOfs, yOfs)
@@ -926,6 +789,99 @@ function GR:ShowRivalsBtn()
     if (InRivals == false) then
         GR_GUI.Main.HeaderInfo.Rival:Show()
     end
+end
+
+function GR:ExitGameClicked()
+  if (GR.GameType == "Tictactoe") then
+    if (GR.UseGroupChat) then 
+      GR:SendCommMessage("ZUI_GameRoom_Inv", "TicTacToe_GameEnd", "WHISPER", GR.Opponent)
+    else
+      GR:SendCommMessage("ZUI_GameRoom_Inv", "TicTacToe_GameEnd", "WHISPER", GR.Opponent)
+    end
+    GR:TicTacToeHideContent()
+  end
+  if (GR.GameType == "Battleships") then
+    if (GR.UseGroupChat) then 
+      GR:SendCommMessage("ZUI_GameRoom_Inv", "Battleships_GameEnd", "WHISPER", GR.Opponent)
+    else
+      GR:SendCommMessage("ZUI_GameRoom_Inv", "Battleships_GameEnd", "WHISPER", GR.Opponent)
+    end
+    GR:BattleshipsHideContent()
+  end
+  if (GR.GameType == "Asteroids") then
+    GR:AsteroidsHide()    
+  end
+  if (GR.GameType == "Snake") then
+    GR:SnakeHide()    
+  end
+  GR.GameType = nil
+  GR.db.realm.tab = 2
+  GR:TabSelect()
+end
+
+function GR:AcceptGameClicked()
+  local ChatChannel
+  if (GR.GroupType == "PART") then ChatChannel = "PARTY" end
+  if (GR.GroupType == "RAID") then ChatChannel = "RAID" end
+
+  GR.PlayerPos = random(1,2)
+  if (GR.PlayerPos == 2) then
+    GR.IsPlayerTurn = false
+  else
+    GR.IsPlayerTurn = true
+  end
+  GR.Target = GR.Opponent
+  
+  -- send message to show other user board
+  if (GR.IncGameType == "Tictactoe") then
+    if (GR.GroupType == nil) then
+      GR:SendCommMessage("ZUI_GameRoom_Inv", "TicTacToe_Accept, " .. GR.PlayerPos .. ", " .. UnitName("Player"), "WHISPER", GR.Opponent)
+    else
+      GR:SendCommMessage("ZUI_GameRoom_Inv", "TicTacToe_Accept, " .. GR.GroupType .. GR.PlayerPos .. ", " .. UnitName("Player"), ChatChannel)
+      GR.GroupType = ChatChannel
+      GR.UseGroupChat = true
+    end
+    GR.GameType = "Tictactoe"
+    GR.db.realm.tab = 1
+    GR:TabSelect()
+    end
+  if (GR.IncGameType == "Battleships") then
+    if (GR.GroupType == nil) then
+      GR:SendCommMessage("ZUI_GameRoom_Inv", "Battleships_Accept, " .. GR.PlayerPos .. ", " .. UnitName("Player"), "WHISPER", GR.Opponent)
+    else
+      GR:SendCommMessage("ZUI_GameRoom_Inv", "Battleships_Accept, " .. GR.GroupType .. GR.PlayerPos  .. UnitName("Player"), ChatChannel)
+      GR.GroupType = ChatChannel
+      GR.UseGroupChat = true
+    end
+    GR.GameType = "Battleships"
+    GR.db.realm.tab = 1
+    GR:TabSelect()
+  end
+end
+
+function GR:DeclineGameClicked()
+  local ChatChannel
+  if (GR.GroupType == "PART") then ChatChannel = "PARTY" end
+  if (GR.GroupType == "RAID") then ChatChannel = "RAID" end
+
+  GR.IsChallenged = false
+  
+  -- send decline game message
+  if (GR.GameType == "Tictactoe") then
+    if (GR.GroupType == nil) then
+      GR:SendCommMessage("ZUI_GameRoom_Inv", "TicTacToe_Decline, ", "WHISPER", GR.Opponent)
+    else
+      GR:SendCommMessage("ZUI_GameRoom_Inv", "TicTacToe_Decline, " .. GR.Opponent, ChatChannel)
+    end
+  end 
+  if (GR.GameType == "Battleships") then
+    if (GR.GroupType == nil) then
+      GR:SendCommMessage("ZUI_GameRoom_Inv", "Battleships_Decline, ", "WHISPER", GR.Opponent)
+    else
+      GR:SendCommMessage("ZUI_GameRoom_Inv", "Battleships_Decline, " .. GR.Opponent, ChatChannel)
+    end
+  end 
+  GR.Opponent = nil
 end
 
 -- Show/Hide Game
@@ -1037,6 +993,26 @@ function ScrollFrame_OnMouseWheel(self, delta)
   self:SetVerticalScroll(newValue);
 end
 
+-- BUGS
+-- exit game needs to close game
+-- tictactoe needs to do cross-server
+-- fix cross-server battlenet registers
+-- refresh raid/party needs to fix
+-- fix asteroids show
+-- fix show / hide game funcitons
+-- fix show / hide main fucntions
+
+-- Testing
+
+-- Re-Release
+
+-- GAMES
 -- chess
 -- flappy bird
 -- pin-ball macheine
+
+-- FUNCTIONS
+-- rematch button
+-- look into retail custom chat channel addon comms
+
+-- highlight selected opponent on multiplayer invite scroll
