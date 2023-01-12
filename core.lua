@@ -1001,6 +1001,7 @@ end
 -- fix asteroids show
 -- fix show / hide game funcitons
 -- fix show / hide main fucntions
+-- invite scrollwindow needs to resize
 
 -- Testing
 
