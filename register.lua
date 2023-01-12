@@ -30,7 +30,6 @@ function GR:CreateRegister()
 
     if (event == "FRIENDLIST_UPDATE" or event == "BN_FRIEND_LIST_SIZE_CHANGED") then
       GR:FriendslistUpdate()
-      
     end
 
     if (event == "WHO_LIST_UPDATE" and GR_GUI.Main:IsVisible()) then

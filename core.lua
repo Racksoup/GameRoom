@@ -8,7 +8,6 @@ local GR_LDB = LibStub("LibDataBroker-1.1"):NewDataObject("GR", {
   icon = "interface/icons/inv_misc_ticket_tarot_maelstrom_01.blp",
   OnClick = function()
     if (GR_GUI.Main:IsVisible()) then 
-      --GR:HideMain()
       GR_GUI.Main:Hide()
     else 
       if (GR.FirstOpen) then
@@ -183,7 +182,6 @@ function GR:CreateMainWindow()
   Main.xButton:SetScript("OnClick", function(self, button, down) 
       if(button == "LeftButton" and down == true) then Main.xButton.tex:SetTexture("Interface\\AddOns\\ZUI_GameRoom\\images\\XButtonDown.blp") end
       if(button == "LeftButton" and down == false) then 
-          --GR:HideMain() 
           Main:Hide()
       end
   end)
@@ -791,34 +789,6 @@ function GR:ShowRivalsBtn()
     end
 end
 
-function GR:ExitGameClicked()
-  if (GR.GameType == "Tictactoe") then
-    if (GR.UseGroupChat) then 
-      GR:SendCommMessage("ZUI_GameRoom_Inv", "TicTacToe_GameEnd", "WHISPER", GR.Opponent)
-    else
-      GR:SendCommMessage("ZUI_GameRoom_Inv", "TicTacToe_GameEnd", "WHISPER", GR.Opponent)
-    end
-    GR:TicTacToeHideContent()
-  end
-  if (GR.GameType == "Battleships") then
-    if (GR.UseGroupChat) then 
-      GR:SendCommMessage("ZUI_GameRoom_Inv", "Battleships_GameEnd", "WHISPER", GR.Opponent)
-    else
-      GR:SendCommMessage("ZUI_GameRoom_Inv", "Battleships_GameEnd", "WHISPER", GR.Opponent)
-    end
-    GR:BattleshipsHideContent()
-  end
-  if (GR.GameType == "Asteroids") then
-    GR:AsteroidsHide()    
-  end
-  if (GR.GameType == "Snake") then
-    GR:SnakeHide()    
-  end
-  GR.GameType = nil
-  GR.db.realm.tab = 2
-  GR:TabSelect()
-end
-
 function GR:AcceptGameClicked()
   local ChatChannel
   if (GR.GroupType == "PART") then ChatChannel = "PARTY" end
@@ -935,24 +905,10 @@ end
 -- Show/Hide Main
 function GR:OpenClose(input)
   if (GR_GUI.Main:IsVisible()) then 
-      --GR:HideMain()
       GR_GUI.Main:Hide()
   else
       GR:ShowMain()
   end
-end
-
-function GR:HideMain()
-  if (GR.GameType == "Tictactoe" and GR.InGame) then
-      GR:SendCommMessage("ZUI_GameRoom_Inv", "TicTacToe_GameEnd", "WHISPER", GR.Opponent)
-      GR:TicTacToeHideContent()
-  end
-  if (GR.GameType == "Battleships" and GR.InGame) then
-      GR:SendCommMessage("ZUI_GameRoom_Inv", "Battleships_GameEnd", "WHISPER", GR.Opponent)
-      GR:BattleshipsHideContent()
-  end
-  GR_GUI.Main:Hide() 
-  GR.GameType = nil
 end
 
 function GR:ShowMain()

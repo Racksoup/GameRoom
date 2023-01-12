@@ -268,4 +268,107 @@ function GR:ShowChalOnInvite()
   end
 end
 
+function GR:SendGameInvite(self, button, down)
+  if (button == "LeftButton" and down == false) then
+    -- needs to comm through party or raid if cross-server
+    local PlayerName, PlayerServer = UnitFullName("player")
+    local PartyMemberName, PartyMemberRealm = UnitName(GR.Target)
+    local IsCrossServer = false
+    local GroupType = "party"
+    if IsInRaid() then GroupType = "raid" end
+    local IsInParty = false
 
+    -- unitname works if target is in party/raid. go through party/raid to find if target is in group. then check if they are cross-server. 
+    for i = 1, GetNumGroupMembers() -1, 1 do
+      local PlayerIndex = GroupType .. tostring(i)
+      local PartyMember = UnitName(PlayerIndex)
+      if (PartyMember == GR.Target) then 
+        if (PartyMemberRealm ~= PlayerServer) then
+          IsCrossServer = true
+        end
+      end
+    end
+
+    if (not IsCrossServer) then
+
+      -- send invite
+      if (GR.GameType == "Battleships") then
+        GR:SendCommMessage("ZUI_GameRoom_Inv", "Battleships_Challenge, " .. UnitName("Player"), "WHISPER", GR.Target)
+      end
+      if (GR.GameType == "Tictactoe") then
+        GR:SendCommMessage("ZUI_GameRoom_Inv", "TicTacToe_Challenge, " .. UnitName("Player"), "WHISPER", GR.Target)
+      end
+      
+    else
+      -- if target is cross-server they are in a party or raid
+      -- check for party or raid for chat channel
+      local ChatChannel = "PARTY"
+      if IsInRaid() then ChatChannel = "RAID" end
+      local distribution = string.sub(ChatChannel, 1, 4)
+
+      -- settup player and target arrays
+      local Player = UnitName("Player")
+      local PlayerTable = {}
+      local Target = GR.Target
+      local TargetTable = {}
+      for i = 1, #Player do
+        table.insert(PlayerTable, Player:sub(i, i))
+      end
+      for i = 1, #Target do
+        table.insert(TargetTable, Target:sub(i, i))
+      end
+      for i = 1, 12, 1 do
+        if (PlayerTable[i] == nil) then PlayerTable[i] = "-" end 
+        if (TargetTable[i] == nil) then TargetTable[i] = "-" end 
+      end
+      
+      -- convert player and target arrays to strings
+      Player = ""
+      Target = ""
+      for i = 1, #PlayerTable do
+        Player = Player .. PlayerTable[i]
+      end
+      for i = 1, #TargetTable do
+        Target = Target .. TargetTable[i]
+      end
+
+      -- send invite
+      -- when sending to groupchat, needs sender and target data
+      GR.UseGroupChat = true
+      if (GR.GameType == "Battleships") then
+        GR:SendCommMessage("ZUI_GameRoom_Inv", "Battleships_Challenge, " .. distribution .. Player .. Target, ChatChannel)
+      end
+      if (GR.GameType == "Tictactoe") then
+        GR:SendCommMessage("ZUI_GameRoom_Inv", "TicTacToe_Challenge, " .. distribution .. Player .. Target, ChatChannel)
+      end
+    end
+  end
+end
+
+function GR:ExitGameClicked()
+  if (GR.GameType == "Tictactoe") then
+    if (GR.UseGroupChat) then 
+      GR:SendCommMessage("ZUI_GameRoom_Inv", "TicTacToe_GameEnd", "WHISPER", GR.Opponent)
+    else
+      GR:SendCommMessage("ZUI_GameRoom_Inv", "TicTacToe_GameEnd", "WHISPER", GR.Opponent)
+    end
+    GR:TicTacToeHideContent()
+  end
+  if (GR.GameType == "Battleships") then
+    if (GR.UseGroupChat) then 
+      GR:SendCommMessage("ZUI_GameRoom_Inv", "Battleships_GameEnd", "WHISPER", GR.Opponent)
+    else
+      GR:SendCommMessage("ZUI_GameRoom_Inv", "Battleships_GameEnd", "WHISPER", GR.Opponent)
+    end
+    GR:BattleshipsHideContent()
+  end
+  if (GR.GameType == "Asteroids") then
+    GR:AsteroidsHide()    
+  end
+  if (GR.GameType == "Snake") then
+    GR:SnakeHide()    
+  end
+  GR.GameType = nil
+  GR.db.realm.tab = 2
+  GR:TabSelect()
+end
