@@ -276,6 +276,7 @@ function GR:CreateShips()
     Ship:EnableMouse(true)
     Ship:RegisterForDrag("LeftButton")
     Ship:SetPropagateKeyboardInput(true)
+    -- Rotate Ship on X Button
     Ship:SetScript("OnKeyDown", function(self, key) 
       if (key == "X" and self:IsDragging()) then
         -- rotate 90deg
@@ -314,6 +315,7 @@ function GR:CreateShips()
         end
       end
       RenderTilesOnMovement()
+
       self:StartMoving() 
       self:EnableKeyboard(true)
     end)
@@ -325,7 +327,7 @@ function GR:CreateShips()
       GR:ShadeTilesOnShipMovement()
       self:EnableKeyboard(false)
     end)
-    return Ship
+    return Ship                                                    
   end
 
   Battleships.Ship1 = BuildShip(1)
@@ -342,31 +344,6 @@ function GR:CreateLegend()
     local Legend = Battleships.Legend
     Legend:SetPoint("TOPRIGHT", 200, 0)
     Legend:SetSize(200, 200)
-    -- Legend.Exit = CreateFrame("Button", Exit, Legend)
-    -- local Exit = Legend.Exit
-    -- Exit:SetPoint("TOPRIGHT", -13, -13)
-    -- Exit:SetSize(25,25)
-    -- Exit.Tex = Exit:CreateTexture()
-    -- Exit.Tex:SetAllPoints(Exit)
-    -- Exit.Tex:SetTexture("Interface\\AddOns\\ZUI_GameRoom\\images\\XButton.blp")
-    -- Exit.Tex:SetTexCoord(0, 1, 0, 1)
-    -- Exit.Tint = Exit:CreateTexture()
-    -- Exit.Tint:SetPoint("TOPLEFT", Exit, "TOPLEFT", 2, -2)
-    -- Exit.Tint:SetPoint("BOTTOMRIGHT", Exit, "BOTTOMRIGHT", -2, 2)
-    -- Exit.Tint:SetColorTexture(0,0,0,0);
-    -- Exit:SetScript("OnClick", function(self, button, down) 
-    --     if(button == "LeftButton" and down == true) then Exit.Tex:SetTexture("Interface\\AddOns\\ZUI_GameRoom\\images\\XButtonDown.blp") end
-    --     if(button == "LeftButton" and down == false) then 
-    --         Legend:Hide()
-    --     end
-    -- end)
-    -- Exit:SetScript("OnEnter", function(self, motion)
-    --     Exit.Tint:SetColorTexture(0,0,0,.3);
-    -- end)
-    -- Exit:SetScript("OnLeave", function(self, motion)
-    --     Exit.Tint:SetColorTexture(0,0,0,0);
-    --     Exit.Tex:SetTexture("Interface\\AddOns\\ZUI_GameRoom\\images\\XButton.blp")
-    -- end)
 
     -- Player Text
     Legend.PlayerString = Legend:CreateFontString(nil, "ARTWORK", "GameTooltipText")
@@ -702,7 +679,8 @@ function GR:SetShipPosOnPlacement(Ship)
         y = BtnY,
       }
     }
-    local Overlapping = GR:AABB(ShipCords, BtnCords)
+    local Overlapping = GR:OverlapingSquares(ShipCords, BtnCords)
+    -- first tile will always be top left
     if Overlapping then
       if FirstTile then
         FirstTile = false
@@ -805,11 +783,11 @@ function GR:ShadeTilesOnShipMovement()
     -- 10 ship5 place
     -- 11 ship5 hit
     
-    local IsOverlapping1 = GR:AABB(Ship1Cords, BtnCords)
-    local IsOverlapping2 = GR:AABB(Ship2Cords, BtnCords)
-    local IsOverlapping3 = GR:AABB(Ship3Cords, BtnCords)
-    local IsOverlapping4 = GR:AABB(Ship4Cords, BtnCords)
-    local IsOverlapping5 = GR:AABB(Ship5Cords, BtnCords)
+    local IsOverlapping1 = GR:OverlapingSquares(Ship1Cords, BtnCords)
+    local IsOverlapping2 = GR:OverlapingSquares(Ship2Cords, BtnCords)
+    local IsOverlapping3 = GR:OverlapingSquares(Ship3Cords, BtnCords)
+    local IsOverlapping4 = GR:OverlapingSquares(Ship4Cords, BtnCords)
+    local IsOverlapping5 = GR:OverlapingSquares(Ship5Cords, BtnCords)
     local tex = v:GetRegions()
         
     -- find which board is players
@@ -895,38 +873,31 @@ end
 
 function GR:BattleshipsPhase1CompleteBtn(self, button, down) 
   local Battleships = GR_GUI.Main.Battleships
-
+  local Message = {
+    Tag = "Battleships_Phase1Complete",
+    Data = "",
+    Target = ""
+  }
+  
   if (button == "LeftButton" and down == false) then
     -- prep gameboard to send
-    local Serial = nil
     GR.SentBoard = true
     if (GR.PlayerPos == 1) then 
-      Serial = GR:Serialize(GR.BattleshipsBoardP1)
+      Message.Data = GR.BattleshipsBoardP1
     end
     if (GR.PlayerPos == 2) then 
-      Serial = GR:Serialize(GR.BattleshipsBoardP2)
+      Message.Data = GR.BattleshipsBoardP2
     end
-    
     
     -- Send phase 1 gameboard
     -- if using group chat channel, send target data with game board
     if (GR.UseGroupChat) then 
-      -- prep target to be 12 characters long
-      local Target = ""
-      for i = 1, 12, 1 do
-        if (GR.Target:sub(i,i) == "") then
-          Target = Target .. "-"
-        else
-          Target = Target .. GR.Target:sub(i,i)
-        end
-      end
+      Message.Target = GR.Target
       if (GR.GroupType == "PART") then GR.GroupType = "PARTY" end
-
-      GR:SendCommMessage("ZUI_GameRoom_BSG", "TicTacToe_Phase1Complete, " .. Target .. Serial, GR.GroupType)
+      GR:SendCommMessage("ZUI_GameRoom_BSG", GR:Serialize(Message), GR.GroupType)
     else
-      GR:SendCommMessage("ZUI_GameRoom_BSG", "TicTacToe_Phase1Complete, " .. Serial, "WHISPER", GR.Opponent)
+      GR:SendCommMessage("ZUI_GameRoom_BSG", GR:Serialize(Message), "WHISPER", GR.Opponent)
     end
-
 
     -- make ships unmovable
     Battleships.Ship1:SetMovable(false)
@@ -1203,6 +1174,11 @@ end
 
 function GR:BattleshipsGridButton(self, button, down, i)
   local Tex, LastHitTex = self:GetRegions()
+  local Message = {
+    Tag = "Battleships_Phase2_Move",
+    Data = "",
+    Target = ""
+  }
 
   if (button == "LeftButton" and down == false and GR.IsPlayerTurn and Tex:IsVisible() == false) then
     -- check which board is player. 
@@ -1247,23 +1223,15 @@ function GR:BattleshipsGridButton(self, button, down, i)
     end
     
     -- send new game board to opponent
-    local Serial = GR:Serialize(Board)
+    Message.Data = Board
 
     -- if using group chat channel, send target data with game board
     if (GR.UseGroupChat) then 
-      -- prep target to be 12 characters long
-      local Target = ""
-      for i = 1, 12, 1 do
-        if (GR.Target:sub(i,i) == "") then
-          Target = Target .. "-"
-        else
-          Target = Target .. GR.Target:sub(i,i)
-        end
-      end
+      Message.Target = GR.Target
 
-      GR:SendCommMessage("ZUI_GameRoom_BSG", "TicTacToe_Phase2_Move, " .. Target .. Serial, GR.GroupType)
+      GR:SendCommMessage("ZUI_GameRoom_BSG", GR:Serialize(Message), GR.GroupType)
     else
-      GR:SendCommMessage("ZUI_GameRoom_BSG", "TicTacToe_Phase2_Move, " .. Serial, "WHISPER", GR.Opponent)
+      GR:SendCommMessage("ZUI_GameRoom_BSG", GR:Serialize(Message), "WHISPER", GR.Opponent)
     end
 
     -- change turn string
@@ -1305,169 +1273,148 @@ function GR:BattleshipsComm(...)
 end
 
 function GR:BattleshipsTurn1Received(text, distribution)
-  -- Opponent Completed Phase 1
-  local Action1 = string.sub(text, 0, 24)
-  local Value1 = string.sub(text, 27, 1000)
-  local Target1 = nil
-
-  -- if raid/party channel get Target data
-  if (distribution == "RAID" or distribution == "PARTY") then
-    Target1 = string.sub(text, 27, 38)
-    Target1 = Target1:gsub("-", "")
-    Value1 = string.sub(text, 39, 1000)
-  end
+  local P, V = GR:Deserialize(text)
 
   -- if Target not appended run normally. if Target appended check that Target == player
-  if (Target1 == nil or Target1 == UnitName("player")) then
-    local Passed1, DesValue1 = GR:Deserialize(Value1)
+  if (V.Target == "" or V.Target == UnitName("player")) then
 
     -- Battleships Turn 1 Completed Received
-    if (string.match(Action1, "TicTacToe_Phase1Complete")) then
-        GR.HasOpponentBoard = true
-        if (GR.PlayerPos == 1) then
-            GR.BattleshipsBoardP2 = DesValue1
-        end
-        if (GR.PlayerPos == 2) then
-            GR.BattleshipsBoardP1 = DesValue1
-        end
-        GR:CheckToStartPhase2()
+    if (string.match(V.Tag, "Battleships_Phase1Complete")) then
+      GR.HasOpponentBoard = true
+      if (GR.PlayerPos == 1) then
+        GR.BattleshipsBoardP2 = V.Data
+      end
+      if (GR.PlayerPos == 2) then
+        GR.BattleshipsBoardP1 = V.Data
+      end
+      GR:CheckToStartPhase2()
     end
   end
 end
 
 function GR:BattleshipsMoveReceived(text, distribution)
   -- received opponent move/board
-  local Action2 = string.sub(text, 0, 21)
-  local Value2 = string.sub(text, 24, 1000)
-  local Target2 = nil
-  
-  -- if raid/party channel get Target data
-  if (distribution == "RAID" or distribution == "PARTY") then
-    Target2 = string.sub(text, 24, 35)
-    Target2 = Target2:gsub("-", "")
-    Value2 = string.sub(text, 36, 1100)
-  end
+  local P, V = GR:Deserialize(text)
 
   -- if Target not appended run normally. if Target appended check that Target == player
-  if (Target2 == nil or Target2 == UnitName("player")) then
-    local Passed2, DesValue2 = GR:Deserialize(Value2)
-
+  if (V.Target == "" or V.Target == UnitName("player")) then
+    
     -- Battleships Move Received
-    if (string.match(Action2, "TicTacToe_Phase2_Move")) then
-        GR.IsPlayerTurn = true
-        GR:SetTurnString()
+    if (string.match(V.Tag, "Battleships_Phase2_Move")) then
+      GR.IsPlayerTurn = true
+      GR:SetTurnString()
 
-        if (GR.PlayerPos == 1) then
-            GR.BattleshipsBoardP1Old = GR.BattleshipsBoardP1
-            GR.BattleshipsBoardP1 = DesValue2
-            GR:ShowOpponentMoves(GR.BattleshipsBoardP1, GR.BattleshipsBoardP1Old)
-        end
-        if (GR.PlayerPos == 2) then
-            GR.BattleshipsBoardP2Old = GR.BattleshipsBoardP2
-            GR.BattleshipsBoardP2 = DesValue2
-            GR:ShowOpponentMoves(GR.BattleshipsBoardP2, GR.BattleshipsBoardP2Old)
-        end
-        GR:BattleshipsCountRemainingSpaces()
-        GR:UpdateLegend()
+      if (GR.PlayerPos == 1) then
+        GR.BattleshipsBoardP1Old = GR.BattleshipsBoardP1
+        GR.BattleshipsBoardP1 = V.Data
+        GR:ShowOpponentMoves(GR.BattleshipsBoardP1, GR.BattleshipsBoardP1Old)
+      end
+      if (GR.PlayerPos == 2) then
+        GR.BattleshipsBoardP2Old = GR.BattleshipsBoardP2
+        GR.BattleshipsBoardP2 = V.Data
+        GR:ShowOpponentMoves(GR.BattleshipsBoardP2, GR.BattleshipsBoardP2Old)
+      end
+      GR:BattleshipsCountRemainingSpaces()
+      GR:UpdateLegend()
     end
   end
 end
 
 -- show and hide
 function GR:BattleshipsHideContent()
-    GR_GUI.Main.Battleships:Hide()
-    GR_GUI.Main.Battleships.Legend:Hide()
-    GR.BattleshipsBoardP1 = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
-    GR.BattleshipsBoardP2 = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
-    local Buttons = GR_GUI.Main.Battleships.Buttons
-    for i,v in ipairs(Buttons) do 
-        local BtnTex, x = v:GetRegions()
-        BtnTex:Hide()
-        x:Hide()
-    end
-    for i,v in ipairs(GR_GUI.Main.Battleships.OppButtons) do 
-        local BtnTex, x = v:GetRegions()
-        BtnTex:Hide()
-        x:Hide()
-    end
-    GR:HideGame()
+  GR_GUI.Main.Battleships:Hide()
+  GR_GUI.Main.Battleships.Legend:Hide()
+  GR.BattleshipsBoardP1 = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
+  GR.BattleshipsBoardP2 = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
+  local Buttons = GR_GUI.Main.Battleships.Buttons
+  for i,v in ipairs(Buttons) do 
+    local BtnTex, x = v:GetRegions()
+    BtnTex:Hide()
+    x:Hide()
+  end
+  for i,v in ipairs(GR_GUI.Main.Battleships.OppButtons) do 
+    local BtnTex, x = v:GetRegions()
+    BtnTex:Hide()
+    x:Hide()
+  end
+  GR:HideGame()
 end
 
 function GR:BattleshipsShow()
-    local Battleships = GR_GUI.Main.Battleships
-    
-    GR:ShowGame()
-    
-    GR.BattleshipsBoardP1 = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
-    GR.BattleshipsBoardP2 = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
-    GR.Phase = 1
-    GR.HasOpponentBoard = false
-    GR.SentBoard = false
-    GR.P1SpacesLeft = 25
-    GR.P2SpacesLeft = 25
-    GR.P1Ship1 = 6
-    GR.P1Ship2 = 3
-    GR.P1Ship3 = 8
-    GR.P1Ship4 = 4
-    GR.P1Ship5 = 4
-    GR.P2Ship1 = 6
-    GR.P2Ship2 = 3
-    GR.P2Ship3 = 8
-    GR.P2Ship4 = 4
-    GR.P2Ship5 = 4
-    GR.GameType = "Battleships"
-    
-    GR_GUI.Main.H2:SetText("Battleships")
-    Battleships.CurrPhase:SetText("Place your Battleships")
-    GR_GUI.Main.HeaderInfo.TurnString:Hide()
-    GR_GUI.Main.Battleships.ShowLegend:Hide()
-    GR_GUI.Main.HeaderInfo.OpponentString:Show()
-    GR_GUI.Main.Battleships.Legend:Hide()
-    GR_GUI.Main.HeaderInfo.TurnString:SetPoint("TOP", 0, -67 * (GR_GUI.Main:GetHeight() / 750))
-    
-    GR:RedrawBattleshipLinesAndButtons(Battleships.Board, Battleships.VLines, Battleships.HLines, Battleships.Buttons, 570, 450)
-    for i,v in ipairs(GR_GUI.Main.Battleships.OppButtons) do
-        v:EnableMouse(true)
-        local Tex = v:GetRegions()
-        Tex:Hide()
-    end
-    for i,v in ipairs(GR_GUI.Main.Battleships.Buttons) do
-        local Tex = v:GetRegions()
-        Tex:Hide()
-    end
-    
-    Battleships:Show()
-    Battleships.Board:Show()
-    Battleships.OppBoard:Hide()
-    Battleships.CurrPhase:Show()
-    Battleships.ExtraInfo:Show()
-    Battleships.ExtraInfo:SetText("Press X to rotate ships")
-    Battleships.Board.FS:Hide()
-    Battleships.OppBoard.FS:Hide()
-    Battleships.Ship1:Show()
-    Battleships.Ship1:SetMovable(true)
-    Battleships.Ship1:EnableMouse(true)
-    Battleships.Ship2:Show()
-    Battleships.Ship2:SetMovable(true)
-    Battleships.Ship2:EnableMouse(true)
-    Battleships.Ship3:Show()
-    Battleships.Ship3:SetMovable(true)
-    Battleships.Ship3:EnableMouse(true)
-    Battleships.Ship4:Show()
-    Battleships.Ship4:SetMovable(true)
-    Battleships.Ship4:EnableMouse(true)
-    Battleships.Ship5:Show()
-    Battleships.Ship5:SetMovable(true)
-    Battleships.Ship5:EnableMouse(true)
-    GR:ResizeShips(Battleships.Board)
-    GR:ResizeBattleships(Battleships.Board)
+  local Battleships = GR_GUI.Main.Battleships
+  
+  GR:ShowGame()
+  
+  GR.BattleshipsBoardP1 = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
+  GR.BattleshipsBoardP2 = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
+  GR.Phase = 1
+  GR.HasOpponentBoard = false
+  GR.SentBoard = false
+  GR.P1SpacesLeft = 25
+  GR.P2SpacesLeft = 25
+  GR.P1Ship1 = 6
+  GR.P1Ship2 = 3
+  GR.P1Ship3 = 8
+  GR.P1Ship4 = 4
+  GR.P1Ship5 = 4
+  GR.P2Ship1 = 6
+  GR.P2Ship2 = 3
+  GR.P2Ship3 = 8
+  GR.P2Ship4 = 4
+  GR.P2Ship5 = 4
+  GR.GameType = "Battleships"
+  
+  GR_GUI.Main.H2:SetText("Battleships")
+  Battleships.CurrPhase:SetText("Place your Battleships")
+  GR_GUI.Main.HeaderInfo.TurnString:Hide()
+  GR_GUI.Main.Battleships.ShowLegend:Hide()
+  GR_GUI.Main.HeaderInfo.OpponentString:Show()
+  GR_GUI.Main.Battleships.Legend:Hide()
+  GR_GUI.Main.HeaderInfo.TurnString:SetPoint("TOP", 0, -67 * (GR_GUI.Main:GetHeight() / 750))
+  
+  GR:RedrawBattleshipLinesAndButtons(Battleships.Board, Battleships.VLines, Battleships.HLines, Battleships.Buttons, 570, 450)
+  for i,v in ipairs(GR_GUI.Main.Battleships.OppButtons) do
+    v:EnableMouse(true)
+    local Tex = v:GetRegions()
+    Tex:Hide()
+  end
+  for i,v in ipairs(GR_GUI.Main.Battleships.Buttons) do
+    local Tex = v:GetRegions()
+    Tex:Hide()
+  end
+  
+  Battleships:Show()
+  Battleships.Board:Show()
+  Battleships.OppBoard:Hide()
+  Battleships.CurrPhase:Show()
+  Battleships.ExtraInfo:Show()
+  Battleships.ExtraInfo:SetText("Press X to rotate ships")
+  Battleships.Board.FS:Hide()
+  Battleships.OppBoard.FS:Hide()
+  Battleships.Ship1:Show()
+  Battleships.Ship1:SetMovable(true)
+  Battleships.Ship1:EnableMouse(true)
+  Battleships.Ship2:Show()
+  Battleships.Ship2:SetMovable(true)
+  Battleships.Ship2:EnableMouse(true)
+  Battleships.Ship3:Show()
+  Battleships.Ship3:SetMovable(true)
+  Battleships.Ship3:EnableMouse(true)
+  Battleships.Ship4:Show()
+  Battleships.Ship4:SetMovable(true)
+  Battleships.Ship4:EnableMouse(true)
+  Battleships.Ship5:Show()
+  Battleships.Ship5:SetMovable(true)
+  Battleships.Ship5:EnableMouse(true)
+  GR:ResizeShips(Battleships.Board)
+  GR:ResizeBattleships(Battleships.Board)
 end
 
-function GR:AABB(Rect1, Rect2)
+function GR:OverlapingSquares(Rect1, Rect2)
   local MarginX = 9 * (GR_GUI.Main:GetWidth() / 800)
   local MarginY = 9 * (GR_GUI.Main:GetHeight() / 640)
   if (Rect1.tl.x + MarginX > Rect2.br.x - MarginX or Rect1.tl.y - MarginY < Rect2.br.y + MarginY or Rect1.br.x - MarginX < Rect2.tl.x + MarginX or Rect1.br.y + MarginY > Rect2.tl.y - MarginY) then
-      return false
+    return false
   end
   return true
 end
