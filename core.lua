@@ -789,71 +789,6 @@ function GR:ShowRivalsBtn()
     end
 end
 
-function GR:AcceptGameClicked()
-  local ChatChannel
-  if (GR.GroupType == "PART") then ChatChannel = "PARTY" end
-  if (GR.GroupType == "RAID") then ChatChannel = "RAID" end
-
-  GR.PlayerPos = random(1,2)
-  if (GR.PlayerPos == 2) then
-    GR.IsPlayerTurn = false
-  else
-    GR.IsPlayerTurn = true
-  end
-  GR.Target = GR.Opponent
-  
-  -- send message to show other user board
-  if (GR.IncGameType == "Tictactoe") then
-    if (GR.GroupType == nil) then
-      GR:SendCommMessage("ZUI_GameRoom_Inv", "TicTacToe_Accept, " .. GR.PlayerPos .. ", " .. UnitName("Player"), "WHISPER", GR.Opponent)
-    else
-      GR:SendCommMessage("ZUI_GameRoom_Inv", "TicTacToe_Accept, " .. GR.GroupType .. GR.PlayerPos .. ", " .. UnitName("Player"), ChatChannel)
-      GR.GroupType = ChatChannel
-      GR.UseGroupChat = true
-    end
-    GR.GameType = "Tictactoe"
-    GR.db.realm.tab = 1
-    GR:TabSelect()
-    end
-  if (GR.IncGameType == "Battleships") then
-    if (GR.GroupType == nil) then
-      GR:SendCommMessage("ZUI_GameRoom_Inv", "Battleships_Accept, " .. GR.PlayerPos .. ", " .. UnitName("Player"), "WHISPER", GR.Opponent)
-    else
-      GR:SendCommMessage("ZUI_GameRoom_Inv", "Battleships_Accept, " .. GR.GroupType .. GR.PlayerPos  .. UnitName("Player"), ChatChannel)
-      GR.GroupType = ChatChannel
-      GR.UseGroupChat = true
-    end
-    GR.GameType = "Battleships"
-    GR.db.realm.tab = 1
-    GR:TabSelect()
-  end
-end
-
-function GR:DeclineGameClicked()
-  local ChatChannel
-  if (GR.GroupType == "PART") then ChatChannel = "PARTY" end
-  if (GR.GroupType == "RAID") then ChatChannel = "RAID" end
-
-  GR.IsChallenged = false
-  
-  -- send decline game message
-  if (GR.GameType == "Tictactoe") then
-    if (GR.GroupType == nil) then
-      GR:SendCommMessage("ZUI_GameRoom_Inv", "TicTacToe_Decline, ", "WHISPER", GR.Opponent)
-    else
-      GR:SendCommMessage("ZUI_GameRoom_Inv", "TicTacToe_Decline, " .. GR.Opponent, ChatChannel)
-    end
-  end 
-  if (GR.GameType == "Battleships") then
-    if (GR.GroupType == nil) then
-      GR:SendCommMessage("ZUI_GameRoom_Inv", "Battleships_Decline, ", "WHISPER", GR.Opponent)
-    else
-      GR:SendCommMessage("ZUI_GameRoom_Inv", "Battleships_Decline, " .. GR.Opponent, ChatChannel)
-    end
-  end 
-  GR.Opponent = nil
-end
-
 -- Show/Hide Game
 function GR:ShowGame()
   GR.InGame = true
@@ -890,16 +825,14 @@ function GR:HideGame()
   GR.PlayerPos = nil
   GR.IsPlayerTurn = nil
   GR.InGame = false
+  GR.UseGroupChat = false
   GR.GameOver = false
-  GR.db.realm.tab = 2
   GR.CanSendInvite = true
   GR.IsChallenged = false
   GR.Opponent = nil
   GR_GUI.Main.HeaderInfo:Hide()
   GR_GUI.Main.ExitBtn:Hide()
   GR_GUI.Main.Register:Show()
-
-  GR:TabSelect()
 end
 
 -- Show/Hide Main
@@ -955,7 +888,6 @@ end
 -- fix cross-server battlenet registers
 -- refresh raid/party needs to fix
 -- fix asteroids show
--- fix show / hide game funcitons
 -- fix show / hide main fucntions
 -- invite scrollwindow needs to resize
 

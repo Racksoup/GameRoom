@@ -1337,7 +1337,26 @@ function GR:BattleshipsHideContent()
     BtnTex:Hide()
     x:Hide()
   end
-  GR:HideGame()
+
+  GR_GUI.Main.HeaderInfo:Hide()
+  GR_GUI.Main.ExitBtn:Hide()
+  GR_GUI.Main.Register:Show()
+end
+
+function GR:BattleshipsEndGame()
+  GR:BattleshipsHideContent()
+  
+  GR.PlayerPos = nil
+  GR.IsPlayerTurn = nil
+  GR.InGame = false
+  GR.UseGroupChat = false
+  GR.GameOver = false
+  GR.CanSendInvite = true
+  GR.IsChallenged = false
+  GR.Opponent = nil
+
+  GR.db.realm.tab = 2
+  GR:TabSelect()
 end
 
 function GR:BattleshipsShow()
@@ -1419,4 +1438,3 @@ function GR:OverlapingSquares(Rect1, Rect2)
   return true
 end
 
--- rematch button

@@ -1,282 +1,33 @@
 function GR:Invite(...)
   local prefix, text, distribution, target = ...
-  local Main = GR_GUI.Main
-  local Accept = GR_GUI.Accept
 
-  GR:IncomingInvite(text, Main, Accept)
-  GR:ChallengeAccepted(text)
+  GR:IncomingInvite(text, distribution)
+  GR:AcceptGameInvite(text, distribution)
   GR:OpponentEndedGame(text)
-  GR:GameDeclined(text)
+  GR:GameDeclined(text, distribution)
 end
 
-function GR:IncomingInvite(text, Main, Accept)
-  local TicChallenge = string.sub(text, 0, 19)
-  local BSChallenge = string.sub(text, 0, 21)
-  local TicOpponent = string.sub(text, 22, 50)
-  local BSOpponent = string.sub(text, 24, 50)
-
-  -- if raid/party setup different variables
-  local distribution = nil
-  local Receiver = nil
-  if (string.sub(text, 22, 25) == "PART" or string.sub(text, 22, 25) == "RAID") then
-    distribution = string.sub(text, 22, 25)
-    TicOpponent = string.sub(text, 26, 37)
-    TicOpponent = TicOpponent.gsub("-", "")
-    Receiver = string.sub(text, 38, 49)
-    Receiver = Receiver:gsub("-", "")
-  end
-  if (string.sub(text, 24, 27) == "PART" or string.sub(text, 24, 27) == "RAID") then
-    distribution = string.sub(text, 24, 27)
-    BSOpponent = string.sub(text, 28, 39)
-    BSOpponent = BSOpponent:gsub("-", "")
-    Receiver = string.sub(text, 38, 49)
-    Receiver = Receiver:gsub("-", "")
-  end
-
-  -- if raid/party we need to check that we are the reciver
-  if (Receiver == nil or Receiver == UnitName("player")) then
-
-    -- if challenge recieved
-    if ((string.match(BSChallenge, "Battleships_Challenge") or string.match(TicChallenge, "TicTacToe_Challenge")) and GR.IsChallenged == false and GR.db.realm.disableChallenges == false) then
-      local AcceptGameString = ""
-
-      if (string.match(BSChallenge, "Battleships_Challenge")) then
-        GR.GameType = "Battleships"
-        GR.IncGameType = "Battleships"
-        AcceptGameString = "Battleships"
-      end
-      if (string.match(TicChallenge, "TicTacToe_Challenge")) then
-        GR.GameType = "Tictactoe"
-        GR.IncGameType = "Tictactoe"
-        AcceptGameString = "Tic-Tac-Toe"
-      end
-
-      -- Check if challenger is allowed to invite player
-      local function ChalAllowedInvite()
-        local AcceptChal = true
-        if (GR.db.realm.onlyWhitelist) then 
-          AcceptChal = false
-          -- go through whitelist and see if challenger is on list
-          for i,v in ipairs(GR.db.realm.Whitelist) do
-            if (string.match(v, TicOpponent) or string.match(v, BSOpponent)) then
-              AcceptChal = true
-            end
-          end
-          -- if whitelist Friends, go through Friends and AcceptChal true if they match the opponent
-          if (GR.db.realm.WhitelistFriends) then
-            for i,v in ipairs(GR.Friends) do
-              if (string.match(v, TicOpponent) or string.match(v, BSOpponent)) then
-                AcceptChal = true
-              end
-            end
-          end
-          -- if whitelist Guild, go through Guild and AcceptChal true if they match the opponent
-          if (GR.db.realm.WhitelistGuild) then
-            for i,v in ipairs(GR.OnlyGuild) do
-              if (string.match(v, TicOpponent) or string.match(v, BSOpponent)) then
-                AcceptChal = true
-              end
-            end
-          end
-          -- if whitelist Party, go through Party and AcceptChal true if they match the opponent
-          if (GR.db.realm.WhitelistParty) then
-            for i,v in ipairs(GR.OnlyParty) do
-              if (string.match(v, TicOpponent) or string.match(v, BSOpponent)) then
-                AcceptChal = true
-              end
-            end
-          end
-        end
-        -- go through Blacklist and see if challenger is on list
-        for i,v in ipairs(GR.db.realm.Blacklist) do
-          if (string.match(v, TicOpponent) or string.match(v, BSOpponent)) then
-            AcceptChal = false
-          end
-        end
-        return AcceptChal
-      end
-      local AcceptChallenger = ChalAllowedInvite()
-
-      -- if challenger is allowed to invite player to game
-      if (AcceptChallenger) then
-        
-        if (string.match(BSChallenge, "Battleships_Challenge")) then
-          Main.Accept.FS2:SetText(BSOpponent .. " - " .. AcceptGameString)
-          Accept.FS2:SetText(BSOpponent .. " - " .. AcceptGameString)
-          GR.Opponent = BSOpponent
-        end
-        if (string.match(TicChallenge, "TicTacToe_Challenge")) then
-          Main.Accept.FS2:SetText(TicOpponent .. " - " .. AcceptGameString)
-          Accept.FS2:SetText(TicOpponent .. " - " .. AcceptGameString)
-          GR.Opponent = TicOpponent
-        end
-        if (GR.InGame == false and Main.Battleships:IsVisible() == false and Main.Tictactoe:IsVisible() == false) then
-          GR.GroupType = distribution
-          GR.IsChallenged = true
-          C_Timer.After(15, function()
-            GR.IsChallenged = false
-            GR:ShowChalOnInvite()
-          end)
-          local Hide = false
-          if (GR.db.realm.HideInCombat and InCombatLockdown()) then
-            Hide = true
-          end
-          if (not Hide) then
-            if (GR.db.realm.showChallengeAsMsg == false) then
-              if (Main:IsVisible() == true) then
-                Main.Accept:Show()
-                Main.DeclineBtn:Show()
-                C_Timer.After(15, function() 
-                  Main.Accept:Hide()
-                  Main.DeclineBtn:Hide()
-                end)
-              else
-                Accept:Show()
-                C_Timer.After(15, function() 
-                  Accept:Hide()
-                end)
-              end
-            else
-              GR:Print(GR.Opponent .. " has challenged you to play " .. AcceptGameString .. "!")
-              Accept.FS2:SetText(GR.Opponent .. " - " .. AcceptGameString)
-              if (Main:IsVisible() == true) then
-                Main.Accept:Show()
-                Main.DeclineBtn:Show()
-                C_Timer.After(15, function() 
-                  Main.Accept:Hide()
-                  Main.DeclineBtn:Hide()
-                end)
-              end
-            end
-          end
-        else
-          -- show accept button if not in game
-          Main.HeaderInfo.ReInvite:Hide()
-          Main.HeaderInfo.ReMatch:Show()
-        end
-      end
-    end
-  end
-end
-
-function GR:ChallengeAccepted(text)
-  -- registers challenge accepted, shows game board. sender shows board on accept click
-  -- TicTacToe Challenge Accepted
-  local TicAccept = string.sub(text, 0, 16)
-  local TicPlayerTurn = string.sub(text, 19, 19)
-  local TicOpponent = string.sub(text, 22, 50)
-  local TicGroupType = string.sub(text, 19, 22)
-
-  if (string.match(TicAccept, "TicTacToe_Accept")) then
-    if (TicGroupType == "PART" or TicGroupType == "RAID") then
-      TicPlayerTurn = string.sub(text, 23, 23)
-      TicOpponent = string.sub(text, 24, 50)
-      GR.GroupType = TicGroupType
-      GR.UseGroupChat = true
-    else 
-      GR.UseGroupChat = false
-      GR.GroupType = nil
-    end
-
-    if (TicOpponent ~= UnitName("player")) then
-      GR.GameType = "Tictactoe"
-      GR:TicTacToeHideContent()  
-      GR.Opponent = TicOpponent
-      if (TicGroupType == "PART") then TicGroupType = "PARTY" end
-      if (string.match(TicPlayerTurn, "2")) then
-        GR.PlayerPos = 1
-        GR.IsPlayerTurn = true
-      else
-        GR.PlayerPos = 2
-        GR.IsPlayerTurn = false
-      end
-      GR.db.realm.tab = 1
-      GR:TabSelect()
-    end
-  end
-
-  -- Battleships Challenge Accepted
-  local BSAccept = string.sub(text, 0, 18)
-  local BSPlayerTurn = string.sub(text, 21, 21)
-  local BSOpponent = string.sub(text, 24, 50)
-  local BSGroupType = string.sub(text, 21, 24)
-  
-  if (string.match(BSAccept, "Battleships_Accept")) then
-    if (BSGroupType == "PART" or BSGroupType == "RAID") then
-      BSPlayerTurn = string.sub(text, 25, 25)
-      BSOpponent = string.sub(text, 26, 50)
-      GR.GroupType = BSGroupType
-      GR.UseGroupChat = true
-    else
-      GR.UseGroupChat = false
-      GR.GroupType = nil
-    end
-
-    if (BSOpponent ~= UnitName("player")) then
-      GR.GameType = "Battleships"
-      GR:BattleshipsHideContent()  
-      GR.Opponent = BSOpponent
-      if (TicGroupType == "PART") then TicGroupType = "PARTY" end
-      if (string.match(BSPlayerTurn, "2")) then
-        GR.PlayerPos = 1
-        GR.IsPlayerTurn = true
-      else
-        GR.PlayerPos = 2
-        GR.IsPlayerTurn = false
-      end
-      GR.db.realm.tab = 1
-      GR:TabSelect()
-    end
-  end
-end
-
-function GR:OpponentEndedGame(text)
-  -- ends game if opponent ends game
-  local TicEndGame = string.sub(text, 0, 17)
-  if (string.match(TicEndGame, "TicTacToe_GameEnd")) then
-    GR.GameType = nil
-    GR:TicTacToeHideContent()
-  end
-  local BSEndGame = string.sub(text, 0, 19)
-  if (string.match(BSEndGame, "Battleships_GameEnd")) then
-    GR.GameType = nil
-    GR:BattleshipsHideContent()
-  end
-end
-
-function GR:GameDeclined(text)
-  -- game declined
-  local TicDecline = string.sub(text, 0, 17)
-  if (string.match(TicDecline, "TicTacToe_Decline")) then
-    GR.CanSendInvite = true
-    GR.Opponent = nil
-  end
-  local BSDecline = string.sub(text, 0, 19)
-  if (string.match(BSDecline, "Battleships_Decline")) then
-    GR.CanSendInvite = true
-    GR.Opponent = nil
-  end
-end
-
-function GR:ShowChalOnInvite()
-  if (GR.IsChallenged and GR_GUI.Main.Tictactoe:IsVisible() == false and GR_GUI.Main.Battleships:IsVisible() == false) then 
-    GR_GUI.Main.Accept:Show()
-    GR_GUI.Main.DeclineBtn:Show()
-  else
-    GR_GUI.Main.Accept:Hide()
-    GR_GUI.Main.DeclineBtn:Hide()
-  end
-end
-
+---
+-- Game Invite
+-- step 1: Btn Click, Send Invite
 function GR:SendGameInvite(self, button, down)
   if (button == "LeftButton" and down == false) then
-    -- needs to comm through party or raid if cross-server
+    -- needs to comm through party/raid chat if cross-server
     local PlayerName, PlayerServer = UnitFullName("player")
     local PartyMemberName, PartyMemberRealm = UnitName(GR.Target)
     local IsCrossServer = false
     local GroupType = "party"
     if IsInRaid() then GroupType = "raid" end
     local IsInParty = false
+    local Message = {
+      Tag = "",
+      Target = GR.Target,
+      Sender = UnitName("Player"),
+    }
+
+    -- set message tag
+    if (GR.GameType == "Battleships") then Message.Tag = "Battleships_Challenge" end
+    if (GR.GameType == "Tictactoe") then Message.Tag = "TicTacToe_Challenge" end
 
     -- unitname works if target is in party/raid. go through party/raid to find if target is in group. then check if they are cross-server. 
     for i = 1, GetNumGroupMembers() -1, 1 do
@@ -290,85 +41,355 @@ function GR:SendGameInvite(self, button, down)
     end
 
     if (not IsCrossServer) then
-
       -- send invite
       if (GR.GameType == "Battleships") then
-        GR:SendCommMessage("ZUI_GameRoom_Inv", "Battleships_Challenge, " .. UnitName("Player"), "WHISPER", GR.Target)
+        GR:SendCommMessage("ZUI_GameRoom_Inv", GR:Serialize(Message), "WHISPER", GR.Target)
       end
       if (GR.GameType == "Tictactoe") then
-        GR:SendCommMessage("ZUI_GameRoom_Inv", "TicTacToe_Challenge, " .. UnitName("Player"), "WHISPER", GR.Target)
+        GR:SendCommMessage("ZUI_GameRoom_Inv", GR:Serialize(Message), "WHISPER", GR.Target)
       end
-      
     else
       -- if target is cross-server they are in a party or raid
       -- check for party or raid for chat channel
       local ChatChannel = "PARTY"
       if IsInRaid() then ChatChannel = "RAID" end
-      local distribution = string.sub(ChatChannel, 1, 4)
-
-      -- settup player and target arrays
-      local Player = UnitName("Player")
-      local PlayerTable = {}
-      local Target = GR.Target
-      local TargetTable = {}
-      for i = 1, #Player do
-        table.insert(PlayerTable, Player:sub(i, i))
-      end
-      for i = 1, #Target do
-        table.insert(TargetTable, Target:sub(i, i))
-      end
-      for i = 1, 12, 1 do
-        if (PlayerTable[i] == nil) then PlayerTable[i] = "-" end 
-        if (TargetTable[i] == nil) then TargetTable[i] = "-" end 
-      end
       
-      -- convert player and target arrays to strings
-      Player = ""
-      Target = ""
-      for i = 1, #PlayerTable do
-        Player = Player .. PlayerTable[i]
-      end
-      for i = 1, #TargetTable do
-        Target = Target .. TargetTable[i]
-      end
-
       -- send invite
-      -- when sending to groupchat, needs sender and target data
       GR.UseGroupChat = true
       if (GR.GameType == "Battleships") then
-        GR:SendCommMessage("ZUI_GameRoom_Inv", "Battleships_Challenge, " .. distribution .. Player .. Target, ChatChannel)
+        GR:SendCommMessage("ZUI_GameRoom_Inv", GR:Serialize(Message), ChatChannel)
       end
       if (GR.GameType == "Tictactoe") then
-        GR:SendCommMessage("ZUI_GameRoom_Inv", "TicTacToe_Challenge, " .. distribution .. Player .. Target, ChatChannel)
+        GR:SendCommMessage("ZUI_GameRoom_Inv", GR:Serialize(Message), ChatChannel)
       end
     end
   end
 end
 
-function GR:ExitGameClicked()
-  if (GR.GameType == "Tictactoe") then
-    if (GR.UseGroupChat) then 
-      GR:SendCommMessage("ZUI_GameRoom_Inv", "TicTacToe_GameEnd", "WHISPER", GR.Opponent)
+-- step 2: Message, Incoming Invite
+function GR:IncomingInvite(text, distribution)
+  local Main = GR_GUI.Main
+  local Accept = GR_GUI.Accept
+  local P, V = GR:Deserialize(text)
+
+  -- if raid/party we need to check that we are the receiver
+  if (V.Target == "" or V.Target == UnitName("player")) then
+    -- if challenge recieved, all challenges not disabled, not in a game
+    if ((string.match(V.Tag, "Battleships_Challenge") or string.match(V.Tag, "TicTacToe_Challenge")) and GR.IsChallenged == false and GR.db.realm.disableChallenges == false and GR.InGame == false and Main.Battleships:IsVisible() == false and Main.Tictactoe:IsVisible() == false) then
+      -- Check if challenger is allowed to invite player
+      local function ChalAllowedInvite()
+        local AcceptChal = true
+        if (GR.db.realm.onlyWhitelist) then 
+          AcceptChal = false
+          -- go through whitelist and see if challenger is on list
+          for i,v in ipairs(GR.db.realm.Whitelist) do
+            if (string.match(v, V.Sender) or string.match(v, V.Sender)) then
+              AcceptChal = true
+            end
+          end
+          -- if whitelist Friends, go through Friends and AcceptChal true if they match the opponent
+          if (GR.db.realm.WhitelistFriends) then
+            for i,v in ipairs(GR.Friends) do
+              if (string.match(v, V.Sender) or string.match(v, V.Sender)) then
+                AcceptChal = true
+              end
+            end
+          end
+          -- if whitelist Guild, go through Guild and AcceptChal true if they match the opponent
+          if (GR.db.realm.WhitelistGuild) then
+            for i,v in ipairs(GR.OnlyGuild) do
+              if (string.match(v, V.Sender) or string.match(v, V.Sender)) then
+                AcceptChal = true
+              end
+            end
+          end
+          -- if whitelist Party, go through Party and AcceptChal true if they match the opponent
+          if (GR.db.realm.WhitelistParty) then
+            for i,v in ipairs(GR.OnlyParty) do
+              if (string.match(v, V.Sender) or string.match(v, V.Sender)) then
+                AcceptChal = true
+              end
+            end
+          end
+        end
+        -- go through Blacklist and see if challenger is on list
+        for i,v in ipairs(GR.db.realm.Blacklist) do
+          if (string.match(v, V.Sender) or string.match(v, V.Sender)) then
+            AcceptChal = false
+          end
+        end
+        return AcceptChal
+      end
+
+      -- if challenger is allowed to invite player to game
+      if (ChalAllowedInvite()) then
+        GR.IsChallenged = true
+        if (distribution == "PARTY" or distribution == "RAID") then GR.GroupType = distribution end
+        
+        -- set game variables, strings, opponent
+        local GameDisplayName = ""
+        if (string.match(V.Tag, "Battleships_Challenge")) then
+          GR.GameType = "Battleships"
+          GR.IncGameType = "Battleships"
+          GameDisplayName = "Battleships"
+          Main.Accept.FS2:SetText(V.Sender .. " - " .. GameDisplayName)
+          Accept.FS2:SetText(V.Sender .. " - " .. GameDisplayName)
+          GR.Opponent = V.Sender
+        end
+        if (string.match(V.Tag, "TicTacToe_Challenge")) then
+          GR.GameType = "Tictactoe"
+          GR.IncGameType = "Tictactoe"
+          GameDisplayName = "Tic-Tac-Toe"
+          Main.Accept.FS2:SetText(V.Sender .. " - " .. GameDisplayName)
+          Accept.FS2:SetText(V.Sender .. " - " .. GameDisplayName)
+          GR.Opponent = V.Sender
+        end
+
+        -- hides invite (open and closed) after 15 seconds
+        C_Timer.After(15, function()
+          GR.IsChallenged = false
+          Main.Accept:Hide()
+          Main.DeclineBtn:Hide()
+          Accept:Hide()
+        end)
+      
+        -- if hideincombat selected and in combat, dont show invite
+        if (not (GR.db.realm.HideInCombat and InCombatLockdown())) then
+          if (GR.db.realm.showChallengeAsMsg == false) then
+            -- show main open accept
+            if (Main:IsVisible() == true) then
+              Main.Accept:Show()
+              Main.DeclineBtn:Show()
+              -- show main closed accept
+            else
+              Accept:Show()
+            end
+          else
+            -- print invite message
+            GR:Print(GR.Opponent .. " has challenged you to play " .. GameDisplayName .. "!")
+            -- show main open accept
+            if (Main:IsVisible() == true) then
+              Main.Accept:Show()
+              Main.DeclineBtn:Show()
+            end
+          end
+        end
+      end
+    end
+  end
+end
+
+-- step 3: Btn Click, Accept Invite or Decline Invite
+function GR:AcceptGameClicked()
+  local ChatChannel = "PARTY"
+  if (IsInRaid()) then ChatChannel = "RAID" end
+  GR.Target = GR.Opponent
+
+  -- randomize player 1 and player 2, set player turn
+  GR.PlayerPos = math.random(1,2)
+  if (GR.PlayerPos == 1) then
+    GR.IsPlayerTurn = true
+  else
+    GR.IsPlayerTurn = false
+  end
+  
+  local Message = {
+    Tag = "",
+    Sender = UnitName("Player"),
+    Target = GR.Opponent,
+    OpponentPos = GR.PlayerPos
+  }
+
+  -- send game accept message
+  if (GR.IncGameType == "Tictactoe") then
+    GR.GameType = "Tictactoe"
+    Message.Tag = "TicTacToe_Accept"
+    
+    if (GR.GroupType == nil) then
+      GR:SendCommMessage("ZUI_GameRoom_Inv", GR:Serialize(Message), "WHISPER", GR.Opponent)
     else
-      GR:SendCommMessage("ZUI_GameRoom_Inv", "TicTacToe_GameEnd", "WHISPER", GR.Opponent)
+      GR:SendCommMessage("ZUI_GameRoom_Inv", GR:Serialize(Message), ChatChannel)
+      GR.UseGroupChat = true
+    end
+    -- hide and reshowin GR:TabSelect()
+    GR:TicTacToeHideContent()
+  end
+  if (GR.IncGameType == "Battleships") then
+    GR.GameType = "Battleships"
+    Message.Tag = "Battleships_Accept"
+    
+    if (GR.GroupType == nil) then
+      GR:SendCommMessage("ZUI_GameRoom_Inv", GR:Serialize(Message), "WHISPER", GR.Opponent)
+    else
+      GR:SendCommMessage("ZUI_GameRoom_Inv", GR:Serialize(Message), ChatChannel)
+      GR.UseGroupChat = true
+    end
+    -- hide and reshow in GR:TabSelect()
+    GR:BattleshipsHideContent() 
+  end
+
+  -- show game
+  GR.db.realm.tab = 1
+  GR:TabSelect()
+end
+
+function GR:DeclineGameClicked()
+  GR.IsChallenged = false
+  local ChatChannel = "PARTY"
+  if (IsInRaid()) then ChatChannel = "RAID" end
+  local Message = {
+    Tag = "",
+    Target = GR.Opponent,
+    Sender = UnitName("Player")
+  }
+  
+  -- send decline game message
+  if (GR.GameType == "Tictactoe") then
+    Message.Tag = "TicTacToe_Decline"
+    if (GR.GroupType == nil) then
+      GR:SendCommMessage("ZUI_GameRoom_Inv", GR:Serialize(Message), "WHISPER", GR.Opponent)
+    else
+      GR:SendCommMessage("ZUI_GameRoom_Inv", GR:Serialize(Message), ChatChannel)
+    end
+  end 
+  if (GR.GameType == "Battleships") then
+    Message.Tag = "Battleships_Decline"
+    if (GR.GroupType == nil) then
+      GR:SendCommMessage("ZUI_GameRoom_Inv", GR:Serialize(Message), "WHISPER", GR.Opponent)
+    else
+      GR:SendCommMessage("ZUI_GameRoom_Inv", GR:Serialize(Message), ChatChannel)
+    end
+  end 
+
+  -- clear variables
+  GR.Opponent = nil
+end
+
+-- step 4: Message, Game Accepted or Game Declined
+function GR:AcceptGameInvite(text, distribution)  
+  local P, V = GR:Deserialize(text)
+
+  if (string.match(V.Tag, "TicTacToe_Accept") or string.match(V.Tag, "Battleships_Accept")) then
+    -- if sender isn't player and sender is target we sent invite
+    if (V.Sender ~= UnitName("player") and V.Target == UnitName("player")) then
+      GR.Opponent = V.Sender
+      -- set variables if using party/raid chat
+      if (distribution == "PARTY" or distribution == "RAID") then
+        GR.GroupType = distribution
+        GR.UseGroupChat = true
+      else 
+        GR.GroupType = nil
+        GR.UseGroupChat = false
+      end
+
+      -- set playerpos
+      if (V.OpponentPos == 2) then
+        GR.PlayerPos = 1
+        GR.IsPlayerTurn = true
+      else
+        GR.PlayerPos = 2
+        GR.IsPlayerTurn = false
+      end
+
+      -- hide game, set variable to show game in GR:TabSelect()
+      if (string.match(V.Tag, "TicTacToe_Accept")) then
+        GR.GameType = "Tictactoe"
+        GR:TicTacToeHideContent()  
+      end
+      if (string.match(V.Tag, "Battleships_Accept")) then
+        GR.GameType = "Battleships"
+        GR:BattleshipsHideContent()  
+      end
+    end
+
+    -- show game
+    GR.db.realm.tab = 1
+    GR:TabSelect()
+  end
+
+end
+
+function GR:GameDeclined(text, distribution)
+  local P, V = GR:Deserialize(text)
+  local Declined = false
+
+  if (string.match(V.Tag, "TicTacToe_Decline") or string.match(V.Tag, "Battleships_Decline")) then
+    -- if distribution is not raid/party, register decline
+    if (distribution ~= "RAID" and distribution ~= "PARTY") then Declined = true end
+    -- if distribution is raid/party and player is the message target, register decline
+    if (V.Target == UnitName("Player") and (distribution == "RAID" or distribution == "PARTY")) then
+      Declined = true
+    end
+
+    -- set variables
+    if Decline then
+      GR.CanSendInvite = true
+      GR.Opponent = nil
+    end
+  end
+end
+---
+
+
+-- Game ended
+function GR:ExitGameClicked()
+  local Message = {
+    Tag = "",
+    Target = ""
+  }
+  local ChatChannel = "PARTY"
+  if IsInRaid() then ChatChannel = "RAID" end
+
+  -- Tictactoe
+  if (GR.GameType == "Tictactoe") then
+    Message.Tag = "TicTacToe_GameEnd"
+    if (GR.UseGroupChat) then 
+      Message.Target = GR.Opponent
+      GR:SendCommMessage("ZUI_GameRoom_Inv", GR:Serialize(Message), ChatChannel)
+    else
+      GR:SendCommMessage("ZUI_GameRoom_Inv", GR:Serialize(Message), "WHISPER", GR.Opponent)
     end
     GR:TicTacToeHideContent()
   end
+
+  -- Battleship
   if (GR.GameType == "Battleships") then
+    Message.Tag = "Battleships_GameEnd"
     if (GR.UseGroupChat) then 
-      GR:SendCommMessage("ZUI_GameRoom_Inv", "Battleships_GameEnd", "WHISPER", GR.Opponent)
+      Message.Target = GR.Opponent
+      GR:SendCommMessage("ZUI_GameRoom_Inv", GR:Serialize(Message), ChatChannel)
     else
-      GR:SendCommMessage("ZUI_GameRoom_Inv", "Battleships_GameEnd", "WHISPER", GR.Opponent)
+      GR:SendCommMessage("ZUI_GameRoom_Inv", GR:Serialize(Message), "WHISPER", GR.Opponent)
     end
-    GR:BattleshipsHideContent()
+    GR:BattleshipsEndGame()
   end
+
+  -- Asteroids
   if (GR.GameType == "Asteroids") then
     GR:AsteroidsHide()    
   end
+
+  -- Snake
   if (GR.GameType == "Snake") then
     GR:SnakeHide()    
   end
+
   GR.GameType = nil
   GR.db.realm.tab = 2
   GR:TabSelect()
+end
+
+function GR:OpponentEndedGame(text)
+  local P, V = GR:Deserialize(text)
+  -- ends game if opponent ends game
+  if P then 
+    if (string.match(V.Tag, "TicTacToe_GameEnd") and (V.Target == "" or V.Target == UnitName("Player"))) then
+      GR.GameType = nil
+      GR:TicTacToeHideContent()
+    end
+    if (string.match(V.Tag, "Battleships_GameEnd") and (V.Target == "" or V.Target == UnitName("Player"))) then
+      GR.GameType = nil
+      GR:BattleshipsEndGame()
+    end
+  end 
 end
