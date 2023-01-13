@@ -290,7 +290,6 @@ function GR:AcceptGameInvite(text, distribution)
         GR.PlayerPos = 2
         GR.IsPlayerTurn = false
       end
-      print(V.OpponentPos, GR.PlayerPos)
 
       -- hide game, set variable to show game in GR:TabSelect()
       if (string.match(V.Tag, "TicTacToe_Accept")) then
