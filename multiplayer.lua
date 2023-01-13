@@ -117,11 +117,6 @@ function GR:CreateInviteFriends()
     Btn.FS:SetPoint("TOPLEFT")
     table.insert(Invite.Friends.Btns, Btn)
   end
-
-  C_Timer.After(5, function() 
-    -- sends Register Friend message on login
-    GR:RegisterFriends()
-  end)
 end
 
 function GR:CreateInviteParty()
@@ -320,7 +315,7 @@ function GR:SizeMultiInvite()
   Invite.Header:SetTextScale(1.1 * Main.ScreenRatio)
 
   Invite.SendBtn:SetPoint("BOTTOM")
-  Invite.SendBtn:SetSize(200 * Main.XRatio, 50 * Main.YRatio)
+  Invite.SendBtn:SetSize(268 * Main.XRatio, 50 * Main.YRatio)
   Invite.SendBtn.FS:SetTextScale(2 * Main.ScreenRatio)
 end
 

@@ -17,7 +17,7 @@ function GR:CreateRegister()
   GR_GUI.Main.Register = CreateFrame("Frame", Register, GR_GUI.Main)
   local Register = GR_GUI.Main.Register
 
-  -- listen for party changes
+  -- listen for party, guild, who changes
   Register:RegisterEvent("GROUP_ROSTER_UPDATE")
   Register:RegisterEvent("BN_FRIEND_LIST_SIZE_CHANGED")
   Register:RegisterEvent("FRIENDLIST_UPDATE")
@@ -26,10 +26,6 @@ function GR:CreateRegister()
   Register:SetScript("OnEvent", function(self, event, ...)
     if (event == "GROUP_ROSTER_UPDATE") then
      GR:GroupRosterUpdate()
-    end
-
-    if (event == "FRIENDLIST_UPDATE" or event == "BN_FRIEND_LIST_SIZE_CHANGED") then
-      GR:FriendslistUpdate()
     end
 
     if (event == "WHO_LIST_UPDATE" and GR_GUI.Main:IsVisible()) then
@@ -58,129 +54,7 @@ function GR:WhoListUpdate()
 end
 
 -- Friends
-function GR:RegisterFriends()
-  local PlayerName = UnitName("player")
-  local NumFriends = C_FriendList.GetNumFriends()
-  if (type(NumFriends) == "number") then
-    for i = 1, NumFriends, 1 do
-      local IsInFriends = false
-      local OGFriend = C_FriendList.GetFriendInfoByIndex(i)
-      
-      if (GR.Friends == nil) then
-        GR.Friends = {}
-      end
-
-      for j,v in ipairs(GR.Friends) do
-        if (v == OGFriend.name and OGFriend.connected) then
-          IsInFriends = true
-        end
-        if (v == OGFriend.name and not OGFriend.connected) then
-          IsInFriends = true
-          GR:RemoveFromFriendsList()
-        end
-      end
-
-      if (IsInFriends == false and OGFriend.connected) then
-        GR:SendCommMessage("ZUI_GameRoom_Reg", "Register Friend, " .. PlayerName, "WHISPER", OGFriend.name)
-      end
-    end
-  end
-  -- add battle.net account friends
-  if (BNConnected() and GR.db.realm.showBN) then
-    local NumBNFriends = BNGetNumFriends()
-    if (type(NumBNFriends) == "number") then
-      for i = 1, NumBNFriends, 1 do
-        local IsInFriends = false
-        if (GR.Retail) then 
-          local Character = select(5, C_BattleNet.GetFriendAccountInfo(i))
-          local Client = select(7, C_BattleNet.GetFriendAccountInfo(i))
-        else
-          local Character = select(5, BNGetFriendInfo(i))
-          local Client = select(7, BNGetFriendInfo(i))
-        end
-        for j,v in ipairs(GR.Friends) do
-          if (v == Character) then
-            IsInFriends = true
-          end
-        end
-        if (Client == "WoW" and type(Character) == "string" and IsInFriends == false) then
-          GR:SendCommMessage("ZUI_GameRoom_Reg", "Register Friend, " .. PlayerName, "WHISPER", Character)
-        end
-      end
-    end
-  end 
-  -- add rivals
-  for i,v in ipairs(GR.db.realm.Rivals) do
-    GR:SendCommMessage("ZUI_GameRoom_Reg", "Register Friend, " .. PlayerName, "WHISPER", v)
-  end
-end
-
-function GR:AddToFriendsList(Value)
-  local IsInTable = false
-  for i,v in ipairs(GR.Friends) do
-    if (string.match(v, Value)) then
-      IsInTable = true
-    end
-  end
-  if (IsInTable == false) then
-    table.insert(GR.Friends, Value)
-  end
-end
-
-function GR:RemoveFromFriendsList()
-  -- remove old friends
-  local NumBNFriends = BNGetNumFriends()
-  local NumFriends = C_FriendList.GetNumFriends()
-  for i,v in ipairs(GR.Friends) do
-    local IsInFriendList = false
-    if (GR.db.realm.showBN) then
-      for j = 1, NumBNFriends, 1 do
-        if (GR.Retail) then 
-          local Friend = select(5, C_BattleNet.GetFriendAccountInfo(j))
-        else
-          local Friend = select(5,BNGetFriendInfo(j))
-        end
-        if (type(Friend) == "string") then
-          if (string.match(v, Friend)) then
-            IsInFriendList = true
-          end
-        end
-      end
-    end
-    -- remove all BNFriends
-    if (GR.db.realm.showBN == false) then
-      for j = 1, NumBNFriends, 1 do
-        if (GR.Retail) then 
-          local Friend = select(5, C_BattleNet.GetFriendAccountInfo(j))
-        else
-          local Friend = select(5,BNGetFriendInfo(j))
-        end
-        if (type(Friend) == "string") then
-          if (string.match(v, Friend)) then
-            IsInFriendList = false
-          end
-        end
-      end
-    end
-    -- add from normal friends list after BNFriends dealt with
-    for j = 1, NumFriends, 1 do
-      local Friend = C_FriendList.GetFriendInfoByIndex(j)
-      if (string.match(v, Friend.name) and Friend.connected) then
-        IsInFriendList = true
-      end
-    end
-    for j,k in ipairs(GR.db.realm.Rivals) do
-      if (string.match(v, k)) then
-        IsInFriendList = true
-      end
-    end
-    if (IsInFriendList == false) then
-      table.remove(GR.Friends, i)
-    end
-  end
-end
-
-function GR:RefreshFriendsList()
+function GR:RefreshFriendsListUI()
   local Btns = GR_GUI.Main.Tab3.Invite.Friends.Btns
   for i = 1, 100, 1 do
     Btns[i]:Hide()
@@ -200,34 +74,125 @@ function GR:RefreshFriendsList()
 
 end
 
-function GR:FriendslistUpdate()
-  C_Timer.After(.5, function()
-    GR:RemoveFromFriendsList()
-    GR:RefreshFriendsList()
-  end)
-end
-
-function GR:RegisterFriend(text, PlayerName)
-  -- Register Friend
-  local Action = string.sub(text, 0, 15)
-  local Value = string.sub(text, 18, 50)
-  if (string.match(Action, "Register Friend")) then
-    GR:AddToFriendsList(Value)
-    GR:RemoveFromFriendsList()
-    GR:RefreshFriendsList()
-    GR:SendCommMessage("ZUI_GameRoom_Reg", "Friend Registered, " .. PlayerName, "WHISPER", Value)
+function GR:UpdateFriends5Seconds()
+  -- update friends every 5 seconds
+  GR:UpdateFriendsList()
+  if (GR_GUI.Main:IsVisible()) then
+    C_Timer.After(5, function()
+      GR:UpdateFriends5Seconds()
+    end)
   end
 end
 
-function GR:FriendRegistered(text)
-  -- Friend Registered
-  local Action = string.sub(text, 0, 17)
-  local Value = string.sub(text, 20, 50)
-  if (string.match(Action, "Friend Registered")) then
-    GR:AddToFriendsList(Value)
-    GR:RemoveFromFriendsList()
-    GR:RefreshFriendsList()
-  end 
+function GR:UpdateFriendsList()
+  GR:RemoveFromFriendsListx()
+  GR:AddToFriendsListx()
+  GR:RefreshFriendsListUI()
+end
+
+function GR:RemoveFromFriendsListx()
+  -- go through all players in friend list
+  for i,v in ipairs(GR.Friends) do
+    local IsConnected = false
+
+    -- check target against friendslist
+    for j = 1, C_FriendList.GetNumFriends(), 1 do
+      local Friend = C_FriendList.GetFriendInfoByIndex(j)
+      if (string.match(v, Friend.name) and Friend.connected) then
+        IsConnected = True
+      end
+    end
+
+    -- check target against bnfriendslist
+    for j = 1, select(1, BNGetNumFriends()), 1 do
+      if (GR.Retail) then 
+        local Friend = C_BattleNet.GetFriendAccountInfo(j)
+
+        -- same realm, faction, target matches bnfriend
+        if (Friend.gameAccountInfo.characterName ~= nil) then
+          if (string.match(v, Friend.gameAccountInfo.characterName) and Friend.gameAccountInfo.realmName == select(2, UnitFullName("Player")) and Friend.gameAccountInfo.factionName == select(1, UnitFactionGroup("Player"))) then
+            IsConnected = True
+          end
+        end
+      else
+        local Friend = BNGetFriendInfo(j)
+      end
+    end
+    
+    -- no way to check random player is online. needs message/response to check if online. will do one day
+    -- if in rivals pass
+    for j,k in ipairs(GR.db.realm.Rivals) do
+      if (string.match(v, k)) then
+        IsConnected = true
+      end
+    end
+
+    -- if target not connected, remove target
+    if (not IsConnected) then
+      table.remove(GR.Friends, i)
+    end
+  end
+end
+
+function GR:AddToFriendsListx()
+  -- if target from friendslist is not in friends, add to friends
+  for i = 1, C_FriendList.GetNumFriends(), 1 do
+    local InFriends = false
+    local Friend = C_FriendList.GetFriendInfoByIndex(i)
+    for j,v in ipairs(GR.Friends) do
+      if (string.match(v, Friend.name)) then
+        InFriends = true
+        return 
+      end
+    end
+
+    -- Friendlist target not found in GR.Friends
+    if (not InFriends) then
+      table.insert(GR.Friends, Friend.name)
+    end
+  end
+  
+  -- if target from bnfriendslist is not in friends, add to friends
+  for i = 1, select(1, BNGetNumFriends()), 1 do
+    local InFriends = false
+    local Friend = C_BattleNet.GetFriendAccountInfo(i)
+    for j,v in ipairs(GR.Friends) do
+      if (Friend.gameAccountInfo.characterName ~= nil) then
+        if (string.match(v, Friend.gameAccountInfo.characterName)) then
+          InFriends = true
+          return
+        end
+      end
+    end
+    
+    -- BNFriendlist target not found in GR.Friends
+    if (not InFriends) then
+      -- if connected same realm same faction
+
+      if (Friend.gameAccountInfo.clientProgram == "WoW" and Friend.gameAccountInfo.realmName == select(2, UnitFullName("Player")) and Friend.gameAccountInfo.factionName == select(1, UnitFactionGroup("Player"))) then
+        table.insert(GR.Friends, Friend.gameAccountInfo.characterName)
+      end
+    end
+  end
+  
+  -- if target from rivals is not in friends, add to friends
+  if (GR.Rivals ~= nil) then
+    for i = 1, #GR.Rivals, 1 do
+      local InFriends = false
+      for j,v in ipairs(GR.Friends) do
+        if (GR.Rivals[i] == v) then
+          InFriends = true
+          return
+        end
+      end
+
+      -- if rival not found in GR.Friends
+      if (not InFriends) then
+        table.insert(GR.Friends, GR.Rivals[i])
+      end
+    end
+  end
+
 end
 
 -- Zone
@@ -426,9 +391,6 @@ function GR:RegisterPlayers(...)
   local prefix, text, distribution, target = ...
   local PlayerName, PlayerServer = UnitFullName("player")
 
-  GR:RegisterFriend(text, PlayerName)
-  GR:FriendRegistered(text)
-
   GR:RegisterZone(text, PlayerName)
   GR:ZoneRegistered(text, PlayerName)
 
@@ -439,3 +401,6 @@ end
 
 
 
+-- can get event from friends list login/out, cant get one from bnfriendslist login/out
+-- will not run on event
+-- will check friends and bnfriends every five seconds to see if add or delete required

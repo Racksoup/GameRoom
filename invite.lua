@@ -3,7 +3,7 @@ function GR:Invite(...)
 
   GR:IncomingInvite(text, distribution)
   GR:AcceptGameInvite(text, distribution)
-  GR:OpponentEndedGame(text)
+  GR:OpponentEndedGame(text, distribution)
   GR:GameDeclined(text, distribution)
 end
 
@@ -300,11 +300,11 @@ function GR:AcceptGameInvite(text, distribution)
         GR.GameType = "Battleships"
         GR:BattleshipsHideContent()  
       end
+      
+      -- show game
+      GR.db.realm.tab = 1
+      GR:TabSelect()
     end
-
-    -- show game
-    GR.db.realm.tab = 1
-    GR:TabSelect()
   end
 
 end
@@ -379,15 +379,15 @@ function GR:ExitGameClicked()
   GR:TabSelect()
 end
 
-function GR:OpponentEndedGame(text)
+function GR:OpponentEndedGame(text, distribution)
   local P, V = GR:Deserialize(text)
   -- ends game if opponent ends game
   if P then 
-    if (string.match(V.Tag, "TicTacToe_GameEnd") and (V.Target == "" or V.Target == UnitName("Player"))) then
+    if (string.match(V.Tag, "TicTacToe_GameEnd") and ((V.Target == "" or V.Target == UnitName("Player")) or (distribution ~= "RAID" and distribution ~= "PARTY"))) then
       GR.GameType = nil
       GR:TicTacToeEndGame()
     end
-    if (string.match(V.Tag, "Battleships_GameEnd") and (V.Target == "" or V.Target == UnitName("Player"))) then
+    if (string.match(V.Tag, "Battleships_GameEnd") and ((V.Target == "" or V.Target == UnitName("Player")) or (distribution ~= "RAID" and distribution ~= "PARTY"))) then
       GR.GameType = nil
       GR:BattleshipsEndGame()
     end

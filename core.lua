@@ -98,6 +98,8 @@ function GR:OnInitialize()
   GR:RegisterComm("ZUI_GameRoom_TiG", function(...) GR:TicTacToeComm(...) end)
   GR:RegisterComm("ZUI_GameRoom_BSG", function(...) GR:BattleshipsComm(...) end)
 
+  C_Timer.After(5, function() GR:UpdateFriends5Seconds() end)
+  
   GR_GUI.Main:Hide()
 end
 
@@ -834,15 +836,17 @@ function GR:ShowMain()
   GR_GUI.Main:Show() 
 
   if (GR:CheckOutOfBoundsRects(GR_GUI.Main, UIParent)) then
-    Main:SetPoint("TOPLEFT", UIParent, "TOPLEFT", UIParent:GetWidth() / 2 - GR.Win.Const.Tab2Width / 2, -130)
+    GR_GUI.Main:SetPoint("TOPLEFT", UIParent, "TOPLEFT", UIParent:GetWidth() / 2 - GR.Win.Const.Tab2Width / 2, -130)
   end
 
   -- if main is bigger than screen, reset main size
   if (GR_GUI.Main:GetHeight() > UIParent:GetHeight() or GR_GUI.Main:GetWidth() > UIParent:GetWidth()) then
       GR_GUI.Main:SetSize(GR.Tab2Width, GR.Tab2Width)
   end
+  
+
+  GR:UpdateFriends5Seconds()
   GR:ResizeMain()
-  GR:ShowChalOnInvite() 
 end
 
 -- Extra
@@ -869,13 +873,11 @@ function ScrollFrame_OnMouseWheel(self, delta)
 end
 
 -- BUGS
--- fix cross-server battlenet registers (stop sending messages cross-server)
--- refresh raid/party needs to fix (small)
 -- invite scrollwindow names needs to resize
+-- party and guild needs to load on reload
 
 -- Testing
 -- check in bg's
--- check battlenet friends register
 
 -- Re-Release
 
@@ -887,5 +889,6 @@ end
 -- FUNCTIONS
 -- rematch button
 -- look into retail custom chat channel addon comms
+-- rival message/response to register/unregister online/offline rivals
 
 -- highlight selected opponent on multiplayer invite scroll
