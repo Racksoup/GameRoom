@@ -60,6 +60,7 @@ function GR:RefreshFriendsListUI()
     Btns[i]:Hide()
   end
 
+  -- change script and text on button 
   for i,v in ipairs(GR.Friends) do
     Btns[i].FS:SetText(v)
     Btns[i]:Show()
@@ -71,7 +72,6 @@ function GR:RefreshFriendsListUI()
       end
     end)
   end
-
 end
 
 function GR:UpdateFriends5Seconds()
@@ -85,12 +85,12 @@ function GR:UpdateFriends5Seconds()
 end
 
 function GR:UpdateFriendsList()
-  GR:RemoveFromFriendsListx()
-  GR:AddToFriendsListx()
+  GR:RemoveFromFriendsList()
+  GR:AddToFriendsList()
   GR:RefreshFriendsListUI()
 end
 
-function GR:RemoveFromFriendsListx()
+function GR:RemoveFromFriendsList()
   -- go through all players in friend list
   for i,v in ipairs(GR.Friends) do
     local IsConnected = false
@@ -99,7 +99,7 @@ function GR:RemoveFromFriendsListx()
     for j = 1, C_FriendList.GetNumFriends(), 1 do
       local Friend = C_FriendList.GetFriendInfoByIndex(j)
       if (string.match(v, Friend.name) and Friend.connected) then
-        IsConnected = True
+        IsConnected = true
       end
     end
 
@@ -111,7 +111,7 @@ function GR:RemoveFromFriendsListx()
         -- same realm, faction, target matches bnfriend
         if (Friend.gameAccountInfo.characterName ~= nil) then
           if (string.match(v, Friend.gameAccountInfo.characterName) and Friend.gameAccountInfo.realmName == select(2, UnitFullName("Player")) and Friend.gameAccountInfo.factionName == select(1, UnitFactionGroup("Player"))) then
-            IsConnected = True
+            IsConnected = true
           end
         end
       else
@@ -134,7 +134,7 @@ function GR:RemoveFromFriendsListx()
   end
 end
 
-function GR:AddToFriendsListx()
+function GR:AddToFriendsList()
   -- if target from friendslist is not in friends, add to friends
   for i = 1, C_FriendList.GetNumFriends(), 1 do
     local InFriends = false
@@ -147,7 +147,7 @@ function GR:AddToFriendsListx()
     end
 
     -- Friendlist target not found in GR.Friends
-    if (not InFriends) then
+    if (not InFriends and Friend.connected) then
       table.insert(GR.Friends, Friend.name)
     end
   end
@@ -176,11 +176,11 @@ function GR:AddToFriendsListx()
   end
   
   -- if target from rivals is not in friends, add to friends
-  if (GR.Rivals ~= nil) then
-    for i = 1, #GR.Rivals, 1 do
+  if (GR.db.realm.Rivals ~= nil) then
+    for i = 1, #GR.db.realm.Rivals, 1 do
       local InFriends = false
       for j,v in ipairs(GR.Friends) do
-        if (GR.Rivals[i] == v) then
+        if (GR.db.realm.Rivals[i] == v) then
           InFriends = true
           return
         end
@@ -188,7 +188,7 @@ function GR:AddToFriendsListx()
 
       -- if rival not found in GR.Friends
       if (not InFriends) then
-        table.insert(GR.Friends, GR.Rivals[i])
+        table.insert(GR.Friends, GR.db.realm.Rivals[i])
       end
     end
   end
@@ -397,10 +397,3 @@ function GR:RegisterPlayers(...)
   GR:RegisterParty(text, PlayerName, PlayerServer, distribution)
   GR:PartyRegistered(text, PlayerName)
 end
-
-
-
-
--- can get event from friends list login/out, cant get one from bnfriendslist login/out
--- will not run on event
--- will check friends and bnfriends every five seconds to see if add or delete required

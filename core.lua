@@ -1,3 +1,6 @@
+-- Author: Connor Rack
+-- Git: https://github.com/Racksoup/ZUI_GameRoom
+
 GR = LibStub("AceAddon-3.0"):NewAddon("ZUI_GameRoom", "AceConsole-3.0", "AceComm-3.0", "AceSerializer-3.0" )
 L = LibStub("AceLocale-3.0"):GetLocale("ZUI_GameRoomLocale")
 GR_GUI = {}
@@ -98,7 +101,8 @@ function GR:OnInitialize()
   GR:RegisterComm("ZUI_GameRoom_TiG", function(...) GR:TicTacToeComm(...) end)
   GR:RegisterComm("ZUI_GameRoom_BSG", function(...) GR:BattleshipsComm(...) end)
 
-  C_Timer.After(5, function() GR:UpdateFriends5Seconds() end)
+  -- on load update friends and group multiplayer invites
+  C_Timer.After(5, function() GR:UpdateFriends5Seconds() GR:GroupRosterUpdate() end)
   
   GR_GUI.Main:Hide()
 end
@@ -873,8 +877,6 @@ function ScrollFrame_OnMouseWheel(self, delta)
 end
 
 -- BUGS
--- invite scrollwindow names needs to resize
--- party and guild needs to load on reload
 
 -- Testing
 -- check in bg's
@@ -890,5 +892,6 @@ end
 -- rematch button
 -- look into retail custom chat channel addon comms
 -- rival message/response to register/unregister online/offline rivals
+-- maybe maybe... comms through bnet for cross-server games with bnet friends (while out of party/raid)
 
 -- highlight selected opponent on multiplayer invite scroll

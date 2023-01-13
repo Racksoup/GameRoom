@@ -331,6 +331,7 @@ function GR:SizeInviteFriends()
   for i = 1, #Invite.Friends.Btns, 1 do
     Invite.Friends.Btns[i]:SetPoint("TOPLEFT", 0, (i*-14) * Main.YRatio)
     Invite.Friends.Btns[i]:SetSize(200 * Main.XRatio, 14 * Main.YRatio)
+    Invite.Friends.Btns[i].FS:SetTextScale(1 * ((Main.XRatio + Main.YRatio) / 2))
   end
 end
 
@@ -346,6 +347,7 @@ function GR:SizeInviteParty()
   for i = 1, #Invite.Party.Btns, 1 do
     Invite.Party.Btns[i]:SetPoint("TOPLEFT", 0, (i*-14) * Main.YRatio)
     Invite.Party.Btns[i]:SetSize(200 * Main.XRatio, 14 * Main.YRatio)
+    Invite.Party.Btns[i].FS:SetTextScale(1 * ((Main.XRatio + Main.YRatio) / 2))
   end
 end
 
@@ -361,6 +363,7 @@ function GR:SizeInviteZone()
   for i = 1, #Invite.Zone.Btns, 1 do
     Invite.Zone.Btns[i]:SetPoint("TOP", 0, (i*-14) * Main.YRatio)
     Invite.Zone.Btns[i]:SetSize(200 * Main.XRatio, 14 * Main.YRatio)
+    Invite.Zone.Btns[i].FS:SetTextScale(1 * ((Main.XRatio + Main.YRatio) / 2))
   end
 end
 
