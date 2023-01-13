@@ -821,20 +821,6 @@ function GR:ShowSoloGame()
   GR:TabSelect()
 end
 
-function GR:HideGame()
-  GR.PlayerPos = nil
-  GR.IsPlayerTurn = nil
-  GR.InGame = false
-  GR.UseGroupChat = false
-  GR.GameOver = false
-  GR.CanSendInvite = true
-  GR.IsChallenged = false
-  GR.Opponent = nil
-  GR_GUI.Main.HeaderInfo:Hide()
-  GR_GUI.Main.ExitBtn:Hide()
-  GR_GUI.Main.Register:Show()
-end
-
 -- Show/Hide Main
 function GR:OpenClose(input)
   if (GR_GUI.Main:IsVisible()) then 
@@ -883,17 +869,13 @@ function ScrollFrame_OnMouseWheel(self, delta)
 end
 
 -- BUGS
--- exit game needs to close game
--- tictactoe needs to do cross-server
--- fix cross-server battlenet registers
--- refresh raid/party needs to fix
--- fix asteroids show
--- fix show / hide main fucntions
--- invite scrollwindow needs to resize
+-- fix cross-server battlenet registers (stop sending messages cross-server)
+-- refresh raid/party needs to fix (small)
+-- invite scrollwindow names needs to resize
 
 -- Testing
-
--- Commenting
+-- check in bg's
+-- check battlenet friends register
 
 -- Re-Release
 

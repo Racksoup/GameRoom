@@ -432,8 +432,18 @@ function GR:AsteroidsHide()
   local Main = GR_GUI.Main
   local Asteroids = GR_GUI.Main.Asteroids
   
+  GR.PlayerPos = nil
+  GR.IsPlayerTurn = nil
+  GR.InGame = false
+  GR.UseGroupChat = false
+  GR.GameOver = false
+  GR.CanSendInvite = true
+  GR.IsChallenged = false
+  GR.Opponent = nil
+  GR_GUI.Main.HeaderInfo:Hide()
+  GR_GUI.Main.ExitBtn:Hide()
+  GR_GUI.Main.Register:Show()
   Asteroids:Hide()
-  GR:HideGame()
 end
 
 function GR:AsteroidsShow()

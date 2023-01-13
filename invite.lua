@@ -290,6 +290,7 @@ function GR:AcceptGameInvite(text, distribution)
         GR.PlayerPos = 2
         GR.IsPlayerTurn = false
       end
+      print(V.OpponentPos, GR.PlayerPos)
 
       -- hide game, set variable to show game in GR:TabSelect()
       if (string.match(V.Tag, "TicTacToe_Accept")) then
@@ -349,7 +350,7 @@ function GR:ExitGameClicked()
     else
       GR:SendCommMessage("ZUI_GameRoom_Inv", GR:Serialize(Message), "WHISPER", GR.Opponent)
     end
-    GR:TicTacToeHideContent()
+    GR:TicTacToeEndGame()
   end
 
   -- Battleship
@@ -385,7 +386,7 @@ function GR:OpponentEndedGame(text)
   if P then 
     if (string.match(V.Tag, "TicTacToe_GameEnd") and (V.Target == "" or V.Target == UnitName("Player"))) then
       GR.GameType = nil
-      GR:TicTacToeHideContent()
+      GR:TicTacToeEndGame()
     end
     if (string.match(V.Tag, "Battleships_GameEnd") and (V.Target == "" or V.Target == UnitName("Player"))) then
       GR.GameType = nil
