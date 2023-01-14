@@ -1340,7 +1340,6 @@ function GR:BattleshipsHideContent()
 
   GR_GUI.Main.HeaderInfo:Hide()
   GR_GUI.Main.ExitBtn:Hide()
-  GR_GUI.Main.Register:Show()
 end
 
 function GR:BattleshipsEndGame()

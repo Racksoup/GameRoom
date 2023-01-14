@@ -15,6 +15,7 @@ local GR_LDB = LibStub("LibDataBroker-1.1"):NewDataObject("GR", {
     else 
       if (GR.FirstOpen) then
         GR.FirstOpen = false
+        GR:UpdateFriendsList() 
         GR_GUI.Main:Show()
       else
         GR:ShowMain()
@@ -100,9 +101,6 @@ function GR:OnInitialize()
   GR:RegisterComm("ZUI_GameRoom_Inv", function(...) GR:Invite(...) end)
   GR:RegisterComm("ZUI_GameRoom_TiG", function(...) GR:TicTacToeComm(...) end)
   GR:RegisterComm("ZUI_GameRoom_BSG", function(...) GR:BattleshipsComm(...) end)
-
-  -- on load update friends and group multiplayer invites
-  C_Timer.After(5, function() GR:UpdateFriends5Seconds() GR:GroupRosterUpdate() end)
   
   GR_GUI.Main:Hide()
 end
@@ -808,7 +806,6 @@ function GR:ShowGame()
   GR_GUI.Main.HeaderInfo.ReInvite:Hide()
   GR_GUI.Main.HeaderInfo.ReMatch:Hide()
   GR_GUI.Main.HeaderInfo.Rival:Hide()
-  GR_GUI.Main.Register:Hide()
   
   if (GR.Opponent) then 
     GR_GUI.Main.HeaderInfo.OpponentString:SetText("Opponent: " .. GR.Opponent)
@@ -848,8 +845,8 @@ function GR:ShowMain()
       GR_GUI.Main:SetSize(GR.Tab2Width, GR.Tab2Width)
   end
   
+  GR:UpdateFriendsList()
 
-  GR:UpdateFriends5Seconds()
   GR:ResizeMain()
 end
 

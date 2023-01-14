@@ -142,7 +142,6 @@ function GR:TicTacToeEndGame()
 
   GR_GUI.Main.HeaderInfo:Hide()
   GR_GUI.Main.ExitBtn:Hide()
-  GR_GUI.Main.Register:Show()
 
   GR.db.realm.tab = 2
   GR:TabSelect()
@@ -259,5 +258,3 @@ function GR:TicCheckForWin()
       end
   end
 end
-
--- rematch button

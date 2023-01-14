@@ -14,15 +14,14 @@ function GR:CreateRegister()
   GR.GroupType = nil
   GR.UseGroupChat = false
 
-  GR_GUI.Main.Register = CreateFrame("Frame", Register, GR_GUI.Main)
-  local Register = GR_GUI.Main.Register
-
+  Register = CreateFrame("Frame", Register)
+  
   -- listen for party, guild, who changes
   Register:RegisterEvent("GROUP_ROSTER_UPDATE")
-  Register:RegisterEvent("BN_FRIEND_LIST_SIZE_CHANGED")
-  Register:RegisterEvent("FRIENDLIST_UPDATE")
   Register:RegisterEvent("WHO_LIST_UPDATE")
   Register:RegisterEvent("GUILD_ROSTER_UPDATE")
+  Register:RegisterEvent("PLAYER_ENTERING_WORLD")
+
   Register:SetScript("OnEvent", function(self, event, ...)
     if (event == "GROUP_ROSTER_UPDATE") then
      GR:GroupRosterUpdate()
@@ -34,6 +33,13 @@ function GR:CreateRegister()
 
     if (event == "GUILD_ROSTER_UPDATE") then
       GR:SendCommMessage("ZUI_GameRoom_Reg", "Register Guild, " .. UnitName("player"), "GUILD")
+    end
+
+    -- on login/reload
+    if (event == "PLAYER_ENTERING_WORLD") then
+      -- on load update friends and group multiplayer invites
+      GR:UpdateFriendsList() 
+      GR:GroupRosterUpdate() 
     end
   end)
 end
@@ -85,12 +91,12 @@ function GR:UpdateFriends5Seconds()
 end
 
 function GR:UpdateFriendsList()
-  GR:RemoveFromFriendsList()
+  GR:RemoveDisconnectedFromFriendsList()
   GR:AddToFriendsList()
   GR:RefreshFriendsListUI()
 end
 
-function GR:RemoveFromFriendsList()
+function GR:RemoveDisconnectedFromFriendsList()
   -- go through all players in friend list
   for i,v in ipairs(GR.Friends) do
     local IsConnected = false
@@ -134,8 +140,27 @@ function GR:RemoveFromFriendsList()
   end
 end
 
+function GR:RemoveDuplicatesFromFriendsList()
+  for i = 1, #GR.Friends, 1 do
+    for j = 1, #GR.Friends, 1 do
+      if (GR.Friends[j] ~= nil and GR.Friends[i] ~= nil) then
+        if (string.match(GR.Friends[i], GR.Friends[j]) and i ~= j) then
+          table.remove(GR.Friends, j)
+          j = j - 1
+        end
+      end
+    end
+  end
+end 
+
 function GR:AddToFriendsList()
-  -- if target from friendslist is not in friends, add to friends
+  local Message = {
+    Tag = "Register Friend Invite",
+    Sender = UnitName("Player")
+  }
+  local SerialMessage = GR:Serialize(Message) 
+
+  -- if target from friendslist is not in friends, send add to friends comms
   for i = 1, C_FriendList.GetNumFriends(), 1 do
     local InFriends = false
     local Friend = C_FriendList.GetFriendInfoByIndex(i)
@@ -148,11 +173,11 @@ function GR:AddToFriendsList()
 
     -- Friendlist target not found in GR.Friends
     if (not InFriends and Friend.connected) then
-      table.insert(GR.Friends, Friend.name)
+        GR:SendCommMessage("ZUI_GameRoom_Reg", SerialMessage, "WHISPER", Friend.name)
     end
   end
   
-  -- if target from bnfriendslist is not in friends, add to friends
+  -- if target from bnfriendslist is not in friends, send add to friends comms
   for i = 1, select(1, BNGetNumFriends()), 1 do
     local InFriends = false
     local Friend = C_BattleNet.GetFriendAccountInfo(i)
@@ -170,12 +195,12 @@ function GR:AddToFriendsList()
       -- if connected same realm same faction
 
       if (Friend.gameAccountInfo.clientProgram == "WoW" and Friend.gameAccountInfo.realmName == select(2, UnitFullName("Player")) and Friend.gameAccountInfo.factionName == select(1, UnitFactionGroup("Player"))) then
-        table.insert(GR.Friends, Friend.gameAccountInfo.characterName)
+        GR:SendCommMessage("ZUI_GameRoom_Reg", SerialMessage, "WHISPER", Friend.gameAccountInfo.characterName)
       end
     end
   end
   
-  -- if target from rivals is not in friends, add to friends
+  -- if target from rivals is not in friends, send add to friends comms
   if (GR.db.realm.Rivals ~= nil) then
     for i = 1, #GR.db.realm.Rivals, 1 do
       local InFriends = false
@@ -188,11 +213,40 @@ function GR:AddToFriendsList()
 
       -- if rival not found in GR.Friends
       if (not InFriends) then
-        table.insert(GR.Friends, GR.db.realm.Rivals[i])
+        GR:SendCommMessage("ZUI_GameRoom_Reg", SerialMessage, "WHISPER", GR.db.realm.Rivals[i])
       end
     end
   end
 
+end
+
+function GR:RegisterFriendInviteReceived(text)
+  local P,V = GR:Deserialize(text)
+  
+  if P and string.match(V.Tag, "Register Friend Invite") then
+    -- add to list
+    table.insert(GR.Friends, V.Sender)
+    GR:RemoveDuplicatesFromFriendsList()
+    GR:RefreshFriendsListUI()
+    
+    -- respond
+    local Message = {
+      Tag = "Register Friend Response",
+      Sender = UnitName("Player")
+    }
+    local SerialMessage = GR:Serialize(Message) 
+    GR:SendCommMessage("ZUI_GameRoom_Reg", SerialMessage, "WHISPER", V.Sender)
+  end
+end
+
+function GR:RegisterFriendResponseReceived(text)
+  local P,V = GR:Deserialize(text)
+  
+  if P and string.match(V.Tag, "Register Friend Response") then
+    table.insert(GR.Friends, V.Sender)
+    GR:RemoveDuplicatesFromFriendsList()
+    GR:RefreshFriendsListUI()
+  end
 end
 
 -- Zone
@@ -309,7 +363,7 @@ function GR:GroupRosterUpdate()
     local PartyMemberIndex
     if (IsInRaid()) then
       PartyMemberIndex = "raid" .. tostring(i)
-      distribution = "INSTANCE_CHAT"
+      distribution = "RAID"
     else
       PartyMemberIndex = "party" .. tostring(i)
       distribution = "PARTY"
@@ -396,4 +450,7 @@ function GR:RegisterPlayers(...)
 
   GR:RegisterParty(text, PlayerName, PlayerServer, distribution)
   GR:PartyRegistered(text, PlayerName)
+
+  GR:RegisterFriendInviteReceived(text)
+  GR:RegisterFriendResponseReceived(text)
 end

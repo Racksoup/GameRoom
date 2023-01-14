@@ -442,7 +442,6 @@ function GR:AsteroidsHide()
   GR.Opponent = nil
   GR_GUI.Main.HeaderInfo:Hide()
   GR_GUI.Main.ExitBtn:Hide()
-  GR_GUI.Main.Register:Show()
   Asteroids:Hide()
 end
 
