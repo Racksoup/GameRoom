@@ -57,10 +57,9 @@ function GR:CreateMainSettings()
     if (button == "LeftButton" and down == false) then
       GR.db.realm.showBN = not GR.db.realm.showBN
       if (GR.db.realm.showBN == false) then
-        GR:RemoveFromFriendsList()
-        GR:RefreshFriendsList()
+        GR:RemoveDisconnectedFromFriendsList()
+        GR:RefreshFriendsListUI()
       end
-      GR:RegisterFriends()
     end
   end)
 

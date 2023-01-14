@@ -32,7 +32,7 @@ local defaults = {
     minimap = { hide = false },
     HideInCombat = false,
     tab = 1,
-    showBN = true,
+    showBN = false,
     disableChallenges = false,
     showChallengeAsMsg = false,
     Xpos = 200,

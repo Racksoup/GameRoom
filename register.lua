@@ -111,17 +111,30 @@ function GR:RemoveDisconnectedFromFriendsList()
 
     -- check target against bnfriendslist
     for j = 1, select(1, BNGetNumFriends()), 1 do
+      local Friend
+      local RealmName
+      local FactionName
       if (GR.Retail) then 
-        local Friend = C_BattleNet.GetFriendAccountInfo(j)
+        local x = C_BattleNet.GetFriendAccountInfo(i)
+        Friend = x.GetFriendAccountInfo.characterName
+        RealmName = x.GetFriendAccountInfo.realmName
+        FactionName = x.GetFriendAccountInfo.factionName
+      else
+        Friend = select(5, BNGetFriendInfo(i))
+      end
 
-        -- same realm, faction, target matches bnfriend
-        if (Friend.gameAccountInfo.characterName ~= nil) then
-          if (string.match(v, Friend.gameAccountInfo.characterName) and Friend.gameAccountInfo.realmName == select(2, UnitFullName("Player")) and Friend.gameAccountInfo.factionName == select(1, UnitFactionGroup("Player"))) then
+      if (Friend ~= nil) then
+        if (GR.Retail) then
+          -- same realm, faction, target matches bnfriend
+          if (string.match(v, Friend) and RealmName == select(2, UnitFullName("Player")) and FactionName == select(1, UnitFactionGroup("Player"))) then
+            IsConnected = true
+          end
+        else
+          -- target match bnfriend
+          if (string.match(v, Friend)) then
             IsConnected = true
           end
         end
-      else
-        local Friend = BNGetFriendInfo(j)
       end
     end
     
@@ -178,24 +191,45 @@ function GR:AddToFriendsList()
   end
   
   -- if target from bnfriendslist is not in friends, send add to friends comms
-  for i = 1, select(1, BNGetNumFriends()), 1 do
-    local InFriends = false
-    local Friend = C_BattleNet.GetFriendAccountInfo(i)
-    for j,v in ipairs(GR.Friends) do
-      if (Friend.gameAccountInfo.characterName ~= nil) then
-        if (string.match(v, Friend.gameAccountInfo.characterName)) then
-          InFriends = true
-          return
+  if (GR.db.realm.showBN) then 
+    for i = 1, select(1, BNGetNumFriends()), 1 do
+      local InFriends = false
+      local Friend
+      local ClientProgram
+      local RealmName
+      local FactionName
+      if (GR.Retail) then 
+        local x = C_BattleNet.GetFriendAccountInfo(i)
+        Friend = x.GetFriendAccountInfo.characterName
+        ClientProgram = x.GetFriendAccountInfo.x.GetFriendAccountInfo.clientProgram
+        RealmName = x.GetFriendAccountInfo.realmName
+        FactionName = x.GetFriendAccountInfo.factionName
+      else
+        Friend = select(5, BNGetFriendInfo(i))
+        ClientProgram = select(7, BNGetFriendInfo(i))
+      end
+      for j,v in ipairs(GR.Friends) do
+        if (Friend ~= nil) then
+          if (string.match(v, Friend)) then
+            InFriends = true
+            return
+          end
         end
       end
-    end
-    
-    -- BNFriendlist target not found in GR.Friends
-    if (not InFriends) then
-      -- if connected same realm same faction
+      
+      -- BNFriendlist target not found in GR.Friends
+      if (not InFriends) then
+        -- if connected same realm same faction
 
-      if (Friend.gameAccountInfo.clientProgram == "WoW" and Friend.gameAccountInfo.realmName == select(2, UnitFullName("Player")) and Friend.gameAccountInfo.factionName == select(1, UnitFactionGroup("Player"))) then
-        GR:SendCommMessage("ZUI_GameRoom_Reg", SerialMessage, "WHISPER", Friend.gameAccountInfo.characterName)
+        if (GR.Retail) then
+          if (ClientProgram == "WoW" and RealmName == select(2, UnitFullName("Player")) and FactionName == select(1, UnitFactionGroup("Player"))) then
+            GR:SendCommMessage("ZUI_GameRoom_Reg", SerialMessage, "WHISPER", Friend)
+          end
+        else
+          if (ClientProgram == "WoW") then
+            GR:SendCommMessage("ZUI_GameRoom_Reg", SerialMessage, "WHISPER", Friend)
+          end
+        end
       end
     end
   end
