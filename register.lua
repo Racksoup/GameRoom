@@ -126,13 +126,17 @@ function GR:RemoveDisconnectedFromFriendsList()
       if (Friend ~= nil) then
         if (GR.Retail) then
           -- same realm, faction, target matches bnfriend
-          if (string.match(v, Friend) and string.match(RealmName, select(2, UnitFullName("Player"))) and string.match(FactionName, select(2, UnitFactionGroup("Player")))) then
-            IsConnected = true
+          if (FactionName ~= nil) then
+            if (string.match(v, Friend) and string.match(RealmName, select(2, UnitFullName("Player"))) and string.match(FactionName, select(2, UnitFactionGroup("Player")))) then
+              IsConnected = true
+            end
           end
         else
           -- target match bnfriend
-          if (string.match(v, Friend)) then
-            IsConnected = true
+          if (Friend ~= nil) then
+            if (string.match(v, Friend)) then
+              IsConnected = true
+            end
           end
         end
       end
@@ -228,8 +232,10 @@ function GR:AddToFriendsList()
             end
           end
         else
-          if (string.match(ClientProgram, "WoW")) then
-            GR:SendCommMessage("ZUI_GameRoom_Reg", SerialMessage, "WHISPER", Friend)
+          if (ClientProgram ~= nil) then
+            if (string.match(ClientProgram, "WoW")) then
+              GR:SendCommMessage("ZUI_GameRoom_Reg", SerialMessage, "WHISPER", Friend)
+            end
           end
         end
       end
