@@ -116,17 +116,17 @@ function GR:RemoveDisconnectedFromFriendsList()
       local FactionName
       if (GR.Retail) then 
         local x = C_BattleNet.GetFriendAccountInfo(i)
-        Friend = x.GetFriendAccountInfo.characterName
-        RealmName = x.GetFriendAccountInfo.realmName
-        FactionName = x.GetFriendAccountInfo.factionName
+        Friend = x.gameAccountInfo.characterName
+        RealmName = x.gameAccountInfo.realmName
+        FactionName = x.gameAccountInfo.factionName
       else
         Friend = select(5, BNGetFriendInfo(i))
       end
-
+      
       if (Friend ~= nil) then
         if (GR.Retail) then
           -- same realm, faction, target matches bnfriend
-          if (string.match(v, Friend) and RealmName == select(2, UnitFullName("Player")) and FactionName == select(1, UnitFactionGroup("Player"))) then
+          if (string.match(v, Friend) and string.match(RealmName, select(2, UnitFullName("Player"))) and string.match(FactionName, select(2, UnitFactionGroup("Player")))) then
             IsConnected = true
           end
         else
@@ -200,10 +200,10 @@ function GR:AddToFriendsList()
       local FactionName
       if (GR.Retail) then 
         local x = C_BattleNet.GetFriendAccountInfo(i)
-        Friend = x.GetFriendAccountInfo.characterName
-        ClientProgram = x.GetFriendAccountInfo.x.GetFriendAccountInfo.clientProgram
-        RealmName = x.GetFriendAccountInfo.realmName
-        FactionName = x.GetFriendAccountInfo.factionName
+        Friend = x.gameAccountInfo.characterName
+        ClientProgram = x.gameAccountInfo.clientProgram
+        RealmName = x.gameAccountInfo.realmName
+        FactionName = x.gameAccountInfo.factionName
       else
         Friend = select(5, BNGetFriendInfo(i))
         ClientProgram = select(7, BNGetFriendInfo(i))
@@ -222,11 +222,13 @@ function GR:AddToFriendsList()
         -- if connected same realm same faction
 
         if (GR.Retail) then
-          if (ClientProgram == "WoW" and RealmName == select(2, UnitFullName("Player")) and FactionName == select(1, UnitFactionGroup("Player"))) then
-            GR:SendCommMessage("ZUI_GameRoom_Reg", SerialMessage, "WHISPER", Friend)
+          if (FactionName ~= nil) then
+            if (string.match(ClientProgram, "WoW") and string.match(RealmName, select(2, UnitFullName("Player"))) and string.match(FactionName, select(2, UnitFactionGroup("Player")))) then
+              GR:SendCommMessage("ZUI_GameRoom_Reg", SerialMessage, "WHISPER", Friend)
+            end
           end
         else
-          if (ClientProgram == "WoW") then
+          if (string.match(ClientProgram, "WoW")) then
             GR:SendCommMessage("ZUI_GameRoom_Reg", SerialMessage, "WHISPER", Friend)
           end
         end
