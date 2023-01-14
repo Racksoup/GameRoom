@@ -874,11 +874,7 @@ function ScrollFrame_OnMouseWheel(self, delta)
 end
 
 -- BUGS
-
--- Testing
--- check in bg's
-
--- Re-Release
+-- use instance chat for battlegrounds
 
 -- GAMES
 -- chess

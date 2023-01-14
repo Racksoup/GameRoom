@@ -1,4 +1,4 @@
-## Interface: 30400
+## Interface: 100002
 ## Title: ZUI Game Room
 ## Author: ZUI
 ## DefaultState: enabled
