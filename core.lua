@@ -874,9 +874,6 @@ function ScrollFrame_OnMouseWheel(self, delta)
 end
 
 -- BUGS
--- guild register comms need testing
--- make sure it runs on classic
--- get settings sorted out
 
 -- GAMES
 -- chess

@@ -87,11 +87,9 @@ function GR:CreateRegister()
       -- register group send invite
       local GroupDist
       if (IsInInstance()) then
-        print("INSTANCE")
         GroupDist = "INSTANCE_CHAT"
       else
         if (IsInRaid()) then
-          print("RAID")
           GroupDist = "RAID"
         else
           GroupDist = "PARTY"
@@ -155,7 +153,6 @@ function GR:UpdateFriends5Seconds()
 end
 
 function GR:UpdateFriendsList()
-  print("UpdateFriendsList")
   GR:RemoveDisconnectedFromFriendsList()
   GR:AddToFriendsList()
   GR:RefreshFriendsListUI()

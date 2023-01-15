@@ -83,30 +83,30 @@ function GR:IncomingInvite(text, distribution)
           AcceptChal = false
           -- go through whitelist and see if challenger is on list
           for i,v in ipairs(GR.db.realm.Whitelist) do
-            if (string.match(v, V.Sender) or string.match(v, V.Sender)) then
+            if (string.match(v, V.Sender)) then
               AcceptChal = true
             end
           end
           -- if whitelist Friends, go through Friends and AcceptChal true if they match the opponent
           if (GR.db.realm.WhitelistFriends) then
             for i,v in ipairs(GR.Friends) do
-              if (string.match(v, V.Sender) or string.match(v, V.Sender)) then
+              if (string.match(v, V.Sender)) then
                 AcceptChal = true
               end
             end
           end
           -- if whitelist Guild, go through Guild and AcceptChal true if they match the opponent
           if (GR.db.realm.WhitelistGuild) then
-            for i,v in ipairs(GR.OnlyGuild) do
-              if (string.match(v, V.Sender) or string.match(v, V.Sender)) then
+            for i,v in ipairs(GR.Guild) do
+              if (string.match(v, V.Sender)) then
                 AcceptChal = true
               end
             end
           end
           -- if whitelist Party, go through Party and AcceptChal true if they match the opponent
           if (GR.db.realm.WhitelistParty) then
-            for i,v in ipairs(GR.OnlyParty) do
-              if (string.match(v, V.Sender) or string.match(v, V.Sender)) then
+            for i,v in ipairs(GR.Group) do
+              if (string.match(v, V.Sender)) then
                 AcceptChal = true
               end
             end
@@ -114,7 +114,7 @@ function GR:IncomingInvite(text, distribution)
         end
         -- go through Blacklist and see if challenger is on list
         for i,v in ipairs(GR.db.realm.Blacklist) do
-          if (string.match(v, V.Sender) or string.match(v, V.Sender)) then
+          if (string.match(v, V.Sender)) then
             AcceptChal = false
           end
         end
