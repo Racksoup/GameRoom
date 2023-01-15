@@ -874,7 +874,9 @@ function ScrollFrame_OnMouseWheel(self, delta)
 end
 
 -- BUGS
--- use instance chat for battlegrounds
+-- guild register comms need testing
+-- make sure it runs on classic
+-- get settings sorted out
 
 -- GAMES
 -- chess

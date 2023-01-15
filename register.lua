@@ -1,9 +1,8 @@
 function GR:CreateRegister()
   GR.Friends = {}
   GR.Zone = {}
-  GR.Party = {}
-  GR.OnlyParty = {}
-  GR.OnlyGuild = {}
+  GR.Group = {}
+  GR.Guild = {}
   GR.Target = nil
   GR.Opponent = nil
   GR.CanSendInvite = true
@@ -17,31 +16,96 @@ function GR:CreateRegister()
   Register = CreateFrame("Frame", Register)
   
   -- listen for party, guild, who changes
+  Register:RegisterEvent("GROUP_LEFT")
+  Register:RegisterEvent("FRIENDLIST_UPDATE")
+  Register:RegisterEvent("BN_FRIEND_INFO_CHANGED")
+  Register:RegisterEvent("GROUP_JOINED")
+  Register:RegisterEvent("GROUP_FORMED")
+  Register:RegisterEvent("INSTANCE_GROUP_SIZE_CHANGED")
   Register:RegisterEvent("GROUP_ROSTER_UPDATE")
   Register:RegisterEvent("WHO_LIST_UPDATE")
   Register:RegisterEvent("GUILD_ROSTER_UPDATE")
   Register:RegisterEvent("PLAYER_ENTERING_WORLD")
 
   Register:SetScript("OnEvent", function(self, event, ...)
-    if (event == "GROUP_ROSTER_UPDATE") then
-     GR:GroupRosterUpdate()
-    end
-
     if (event == "WHO_LIST_UPDATE" and GR_GUI.Main:IsVisible()) then
       GR:WhoListUpdate()
     end
-
+    
+    if (event == "GROUP_LEFT") then
+      GR.Group = {}
+      GR:RefreshGuildGroupListUI()
+    end
+    
+    -- removes offline friends
+    if (event == "FRIENDLIST_UPDATE" or event == "BN_FRIEND_INFO_CHANGED") then
+      GR:RemoveDisconnectedFromFriendsList()
+      GR:RefreshFriendsListUI()
+    end
+      
+    -- register group send invite
+    if (event == "GROUP_JOINED" or event == "GROUP_FORMED") then
+      local GroupDist
+      if (IsInInstance()) then
+        GroupDist = "INSTANCE_CHAT"
+      else
+        if (IsInRaid()) then
+          GroupDist = "RAID"
+        else
+          GroupDist = "PARTY"
+        end
+      end
+      local GroupMessage = {
+        Tag = "Register Group Invite",
+        Sender = UnitName("Player")
+      }
+      GR:SendCommMessage("ZUI_GameRoom_Reg", GR:Serialize(GroupMessage), GroupDist) 
+    end
+      
     if (event == "GUILD_ROSTER_UPDATE") then
-      GR:SendCommMessage("ZUI_GameRoom_Reg", "Register Guild, " .. UnitName("player"), "GUILD")
+      GR:CheckRemoveGuild()
+    end
+    
+    if (event == "GROUP_ROSTER_UPDATE" or "GROUP_ROSTER_UPDATE") then
+      GR:CheckRemoveGroup()
     end
 
     -- on login/reload
     if (event == "PLAYER_ENTERING_WORLD") then
-      -- on load update friends and group multiplayer invites
+      -- register friends
       GR:UpdateFriendsList() 
-      GR:GroupRosterUpdate() 
+
+      -- register guild send invite
+      if IsInGuild() then
+        local GuildMessage = {
+          Tag = "Register Guild Invite",
+          Sender = UnitName("Player")
+        }
+        GR:SendCommMessage("ZUI_GameRoom_Reg", GR:Serialize(GuildMessage), "GUILD") 
+      end
+
+      -- register group send invite
+      local GroupDist
+      if (IsInInstance()) then
+        print("INSTANCE")
+        GroupDist = "INSTANCE_CHAT"
+      else
+        if (IsInRaid()) then
+          print("RAID")
+          GroupDist = "RAID"
+        else
+          GroupDist = "PARTY"
+        end
+      end
+      local GroupMessage = {
+        Tag = "Register Group Invite",
+        Sender = UnitName("Player")
+      }
+      GR:SendCommMessage("ZUI_GameRoom_Reg", GR:Serialize(GroupMessage), GroupDist) 
     end
   end)
+
+
 end
 
 function GR:WhoListUpdate()
@@ -91,6 +155,7 @@ function GR:UpdateFriends5Seconds()
 end
 
 function GR:UpdateFriendsList()
+  print("UpdateFriendsList")
   GR:RemoveDisconnectedFromFriendsList()
   GR:AddToFriendsList()
   GR:RefreshFriendsListUI()
@@ -375,19 +440,124 @@ function GR:ZoneRegistered(text, PlayerName)
   end 
 end
 
--- Party
-function GR:RefreshPartyList()
+-- Group
+function GR:RegisterGroupInviteReceived(text)
+  local P,V = GR:Deserialize(text)
+
+  if P then 
+    local Message = {
+      Tag = "Register Group Response",
+      Sender = UnitName("Player"),
+      Target = V.Sender
+    }
+    local Dist
+    if (IsInInstance()) then
+      Dist = "INSTANCE_CHAT"
+    else
+      if (IsInRaid()) then
+        Dist = "RAID"
+      else
+        Dist = "PARTY"
+      end
+    end
+  
+    if (string.match(V.Tag, "Register Group Invite") and not string.match(V.Sender, UnitName("Player"))) then
+      table.insert(GR.Group, V.Sender)
+      GR:RemoveDuplicates(GR.Group)
+      GR:RefreshGuildGroupListUI()
+      GR:SendCommMessage("ZUI_GameRoom_Reg", GR:Serialize(Message), Dist)
+    end
+  end
+end
+
+function GR:RegisterGroupResponseReceived(text)
+  local P,V = GR:Deserialize(text)
+  
+  if P then 
+    if (string.match(V.Tag, "Register Group Response") and string.match(V.Target, UnitName("Player")) and not string.match(V.Sender, UnitName("Player"))) then
+      table.insert(GR.Group, V.Sender)
+      GR:RemoveDuplicates(GR.Group)
+      GR:RefreshGuildGroupListUI()
+    end
+  end
+end
+
+function GR:CheckRemoveGroup()
+  for i = 1, #GR.Group, 1 do
+    if (UnitName(GR.Group[i]) == nil) then
+      table.remove(GR.Group, i)
+      GR:RefreshGuildGroupListUI()
+    end
+  end
+end
+
+
+-- Guild
+function GR:RegisterGuildInviteReceived(text)
+  local P,V = GR:Deserialize(text)
+  local Message = {
+    Tag = "Register Guild Response",
+    Sender = UnitName("Player")
+  }
+
+  if P then 
+    if (string.match(V.Tag, "Register Guild Invite") and not string.match(V.Sender, UnitName("Player"))) then
+      table.insert(GR.Guild, V.Sender)
+      GR:RemoveDuplicates(GR.Guild)
+      GR:RefreshGuildGroupListUI()
+      GR:SendCommMessage("ZUI_GameRoom_Reg", GR:Serialize(Message), "WHISPER", V.Sender)
+    end
+  end
+end
+
+function GR:RegisterGuildResponseReceived(text)
+  local P,V = GR:Deserialize(text)
+  
+  if P then 
+    if (string.match(V.Tag, "Register Guild Response") and not string.match(V.Sender, UnitName("Player"))) then
+      table.insert(GR.Guild, V.Sender)
+      GR:RemoveDuplicates(GR.Guild)
+      GR:RefreshGuildGroupListUI()
+    end
+  end
+end
+
+function GR:CheckRemoveGuild()
+  for i = 1, GetNumGuildMembers(), 1 do
+    local Name = select(1, GetGuildRosterInfo(i))
+    local Online = select(1, GetGuildRosterInfo(i))
+
+    if (Name ~= nil) then
+      Name = string.match(Name, "(.*)\\-")
+
+      for j = 1, #GR.Guild, 1 do
+        if (string.match(Name, GR.Guild[j]) and not Online) then
+          table.remove(GR.Guild, j)
+        end
+      end
+    end
+  end
+end
+
+-- Guild + Group
+function GR:RefreshGuildGroupListUI()
   local Btns = GR_GUI.Main.Tab3.Invite.Party.Btns
   for i = 1, 100, 1 do
     Btns[i]:Hide()
   end
   
-  for i,v in ipairs(GR.Party) do
-    Btns[i].FS:SetText(v)
+  for i = 1, #GR.Group + #GR.Guild, 1 do
+    local List = GR.Guild
+    if (#GR.Guild < i) then
+      List = GR.Group
+    end
+
+    
+    Btns[i].FS:SetText(List[i])
     Btns[i]:Show()
     Btns[i]:SetScript("OnClick", function(self, button, down)
       if (button == "LeftButton" and down == false) then
-        GR.Target = v
+        GR.Target = List[i]
         GR_GUI.Main.Tab3.Invite.SendBtn.FS:SetText("Invite " .. GR.Target)
         GR_GUI.Main.Tab3.Invite.SendBtn:Show()
       end
@@ -395,91 +565,17 @@ function GR:RefreshPartyList()
   end
 end
 
-function GR:GroupRosterUpdate()
-  GR.Party = {}
-  GR:RefreshPartyList()
-  -- resends Register Party messages
-  local NumOfGroupMembers = GetNumGroupMembers()
-  local distribution = ""
-  for i = 1, NumOfGroupMembers, 1 do
-    local PartyMemberIndex
-    if (IsInRaid()) then
-      PartyMemberIndex = "raid" .. tostring(i)
-      distribution = "RAID"
-    else
-      PartyMemberIndex = "party" .. tostring(i)
-      distribution = "PARTY"
-    end
-    local PartyMember = GetUnitName(PartyMemberIndex, true)
-    local PartyMemberName, PartyMemberRealm = UnitName(PartyMemberIndex)
-    local PlayerName, PlayerServer = UnitFullName("player")
-    C_Timer.After(1, function() 
-      if (type(PartyMember) == "string" and UnitIsConnected(PartyMemberIndex)) then
-        GR:SendCommMessage("ZUI_GameRoom_Reg", "Register Party, " .. PlayerName, distribution)
+function GR:RemoveDuplicates(list)
+  for i = 1, #list, 1 do
+    for j = 1, #list, 1 do
+      if (list[i] ~= nil and list[j] ~= nil) then
+        if (string.match(list[i], list[j]) and i ~= j) then
+          table.remove(list, j)
+          j = j - 1
+        end
       end
-    end)
+    end
   end
-end
-
-function GR:RegisterParty(text, PlayerName, PlayerServer, distribution)
-  -- Register Party
-  local Action = string.sub(text, 0, 14)
-  local Value = string.sub(text, 17, 50)
-  if (string.match(Action, "Register Party") or string.match(Action, "Register Guild")) then
-    local IsInTable = false
-    if (string.match(Value, PlayerName)) then
-      IsInTable = true
-    end
-
-    for i,v in ipairs(GR.Party) do
-      if (string.match(v, Value)) then
-        IsInTable = true
-      end
-    end
-    if (IsInTable == false) then
-
-      table.insert(GR.Party, Value)
-      -- set party and guild arrays for whilelist option
-      if (string.match(Action, "Register Party")) then
-        table.insert(GR.OnlyParty, Value)
-        GR:SendCommMessage("ZUI_GameRoom_Reg", "Party Registered, " .. PlayerName, distribution)
-      end
-      if (string.match(Action, "Register Guild")) then
-        table.insert(GR.OnlyGuild, Value)
-        GR:SendCommMessage("ZUI_GameRoom_Reg", "Guild Registered, " .. PlayerName, "WHISPER", Value)
-      end
-    end
-    GR:RefreshPartyList()
-  end
-end
-
-function GR:PartyRegistered(text, PlayerName)
-  -- Party Registered
-  local Action = string.sub(text, 0, 16)
-  local Value = string.sub(text, 19, 50)
-  if (string.match(Action, "Party Registered") or string.match(Action, "Guild Registered")) then
-    local IsInTable = false
-    if (string.match(Value, PlayerName)) then
-      IsInTable = true
-    end
-
-    for i,v in ipairs(GR.Party) do
-      if (string.match(v, Value)) then
-        IsInTable = true
-      end
-    end
-    if (IsInTable == false) then
-      table.insert(GR.Party, Value)
-      -- set party and guild arrays for whilelist option
-      if (string.match(Action, "Party Registered")) then
-        table.insert(GR.OnlyParty, Value)
-      end
-      if (string.match(Action, "Guild Registered")) then
-        table.insert(GR.OnlyGuild, Value)
-      end
-    end
-    GR:RefreshPartyList()
-  end 
 end
 
 -- Comms handler
@@ -490,8 +586,11 @@ function GR:RegisterPlayers(...)
   GR:RegisterZone(text, PlayerName)
   GR:ZoneRegistered(text, PlayerName)
 
-  GR:RegisterParty(text, PlayerName, PlayerServer, distribution)
-  GR:PartyRegistered(text, PlayerName)
+  GR:RegisterGuildInviteReceived(text)
+  GR:RegisterGuildResponseReceived(text)
+
+  GR:RegisterGroupInviteReceived(text)
+  GR:RegisterGroupResponseReceived(text)
 
   GR:RegisterFriendInviteReceived(text)
   GR:RegisterFriendResponseReceived(text)
