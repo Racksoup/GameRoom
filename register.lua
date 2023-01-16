@@ -288,7 +288,7 @@ function GR:AddToFriendsList()
         -- if connected same realm same faction
 
         if (GR.Retail) then
-          if (FactionName ~= nil) then
+          if (FactionName ~= nil and ClientProgram ~= nil and RealmName ~= nil) then
             if (string.match(ClientProgram, "WoW") and string.match(RealmName, select(2, UnitFullName("Player"))) and string.match(FactionName, select(2, UnitFactionGroup("Player")))) then
               GR:SendCommMessage("ZUI_GameRoom_Reg", SerialMessage, "WHISPER", Friend)
             end
@@ -545,16 +545,17 @@ function GR:RefreshGuildGroupListUI()
   
   for i = 1, #GR.Group + #GR.Guild, 1 do
     local List = GR.Guild
+    local RestartIndexForList2 = 0
     if (#GR.Guild < i) then
       List = GR.Group
+      RestartIndexForList2 = #GR.Guild
     end
-
     
-    Btns[i].FS:SetText(List[i])
+    Btns[i].FS:SetText(List[i - RestartIndexForList2])
     Btns[i]:Show()
     Btns[i]:SetScript("OnClick", function(self, button, down)
       if (button == "LeftButton" and down == false) then
-        GR.Target = List[i]
+        GR.Target = List[i - RestartIndexForList2]
         GR_GUI.Main.Tab3.Invite.SendBtn.FS:SetText("Invite " .. GR.Target)
         GR_GUI.Main.Tab3.Invite.SendBtn:Show()
       end
