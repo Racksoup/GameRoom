@@ -327,6 +327,7 @@ function GR:SizeInviteFriends()
   Invite.FriendsScrollFrame:SetSize(200 * Main.XRatio, 100 * Main.YRatio)
   Invite.Friends:SetSize(200 * Main.XRatio, 700 * Main.YRatio)
   Invite.FriendsScrollFrame.FS:SetPoint("TOP", 0, 15 * Main.YRatio)
+  Invite.FriendsScrollFrame.FS:SetTextScale(1 * Main.ScreenRatio)
 
   for i = 1, #Invite.Friends.Btns, 1 do
     Invite.Friends.Btns[i]:SetPoint("TOPLEFT", 0, (i*-14) * Main.YRatio)
@@ -343,6 +344,7 @@ function GR:SizeInviteParty()
   Invite.PartyScrollFrame:SetSize(200 * Main.XRatio, 100 * Main.YRatio)
   Invite.Party:SetSize(200 * Main.XRatio, 700 * Main.YRatio)
   Invite.PartyScrollFrame.FS:SetPoint("TOP", 0, 15 * Main.YRatio)
+  Invite.PartyScrollFrame.FS:SetTextScale(1 * Main.ScreenRatio)
   
   for i = 1, #Invite.Party.Btns, 1 do
     Invite.Party.Btns[i]:SetPoint("TOPLEFT", 0, (i*-14) * Main.YRatio)
@@ -359,6 +361,7 @@ function GR:SizeInviteZone()
   Invite.ZoneScrollFrame:SetSize(200 * Main.XRatio, 100 * Main.YRatio)
   Invite.Zone:SetSize(200 * Main.XRatio, 700 * Main.YRatio)
   Invite.ZoneScrollFrame.FS:SetPoint("TOP", 0, 15 * Main.YRatio)
+  Invite.ZoneScrollFrame.FS:SetTextScale(1 * Main.ScreenRatio)
 
   for i = 1, #Invite.Zone.Btns, 1 do
     Invite.Zone.Btns[i]:SetPoint("TOP", 0, (i*-14) * Main.YRatio)
