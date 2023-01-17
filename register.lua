@@ -266,10 +266,12 @@ function GR:AddToFriendsList()
       local FactionName
       if (GR.Retail) then 
         local x = C_BattleNet.GetFriendAccountInfo(i)
-        Friend = x.gameAccountInfo.characterName
-        ClientProgram = x.gameAccountInfo.clientProgram
-        RealmName = x.gameAccountInfo.realmName
-        FactionName = x.gameAccountInfo.factionName
+        if (x ~= nil) then
+          Friend = x.gameAccountInfo.characterName
+          ClientProgram = x.gameAccountInfo.clientProgram
+          RealmName = x.gameAccountInfo.realmName
+          FactionName = x.gameAccountInfo.factionName
+        end
       else
         Friend = select(5, BNGetFriendInfo(i))
         ClientProgram = select(7, BNGetFriendInfo(i))
@@ -539,23 +541,35 @@ end
 -- Guild + Group
 function GR:RefreshGuildGroupListUI()
   local Btns = GR_GUI.Main.Tab3.Invite.Party.Btns
+  -- reset buttons
   for i = 1, 100, 1 do
     Btns[i]:Hide()
   end
   
+  local JoinedList = {}
+  -- go through both group and guild lists
   for i = 1, #GR.Group + #GR.Guild, 1 do
     local List = GR.Guild
     local RestartIndexForList2 = 0
+    -- if done with first list grab second list
     if (#GR.Guild < i) then
       List = GR.Group
       RestartIndexForList2 = #GR.Guild
     end
-    
-    Btns[i].FS:SetText(List[i - RestartIndexForList2])
+
+    -- add to list item to JoinedList 
+    table.insert(JoinedList, List[i - RestartIndexForList2])  
+  end
+  
+  GR:RemoveDuplicates(JoinedList)
+
+  -- set text and set buttons
+  for i = 1, #JoinedList, 1 do 
+    Btns[i].FS:SetText(JoinedList[i])
     Btns[i]:Show()
     Btns[i]:SetScript("OnClick", function(self, button, down)
       if (button == "LeftButton" and down == false) then
-        GR.Target = List[i - RestartIndexForList2]
+        GR.Target = JoinedList[i]
         GR_GUI.Main.Tab3.Invite.SendBtn.FS:SetText("Invite " .. GR.Target)
         GR_GUI.Main.Tab3.Invite.SendBtn:Show()
       end
