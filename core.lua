@@ -110,7 +110,6 @@ function GR:CreateMainWindow()
   GR_GUI.Main = CreateFrame("Frame", GameRoom, UIParent, "TranslucentFrameTemplate")
   local Main = GR_GUI.Main
   Main:SetSize(GR.Win.Const.Tab2Width, GR.Win.Const.Tab2Height)
-  print(select(4,GetBuildInfo()))
   if (select(4,GetBuildInfo()) > 30400) then 
     Main:SetResizeBounds(100,120)
   else
