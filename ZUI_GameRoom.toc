@@ -1,4 +1,4 @@
-## Interface: 100002
+## Interface: 100005
 ## Title: ZUI Game Room
 ## Author: ZUI
 ## DefaultState: enabled
@@ -17,4 +17,5 @@ tictactoe.lua
 battleships.lua
 asteroids.lua
 snake.lua
+bouncyChicken.lua
 multiplayer.lua

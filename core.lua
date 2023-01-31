@@ -57,8 +57,10 @@ function GR:OnInitialize()
   -- Window Consts
   GR.Win = {}
   GR.Win.Const = {}
-  GR.Win.Const.Tab1Width = 750
-  GR.Win.Const.Tab1Height = 510
+  GR.Win.Const.Tab1Width = 800
+  GR.Win.Const.Tab1Height = 640
+  GR.Win.Const.GameScreenWidth = 750
+  GR.Win.Const.GameScreenHeight = 500
   GR.Win.Const.Tab2Width = 310
   GR.Win.Const.Tab2Height = 250
   GR.Win.Const.Tab3Width = 310
@@ -93,6 +95,7 @@ function GR:OnInitialize()
   GR:CreateBattleships()
   GR:CreateAsteroids()
   GR:CreateSnake()
+  GR:CreateBouncyChicken()
   
   GR.db.realm.tab = 2
   GR:TabSelect()
@@ -156,6 +159,7 @@ function GR:CreateMainWindow()
       GR:ResizeBattleships()
       GR:SizeAsteroids()
       GR:SnakeSize()
+      GR:SizeBC()
   end)
   
   -- Game Room Title
@@ -448,6 +452,7 @@ function GR:CreateSoloGames()
   -- Game Buttons
   Tab2.SoloGames = CreateFrame("Frame", SoloGames, Tab2)
   local SoloGames = Tab2.SoloGames
+
   SoloGames.AsteroidsBtn = CreateFrame("Button", AsteroidsBtn, SoloGames, "UIPanelButtonTemplate")
   local AsteroidsBtn = SoloGames.AsteroidsBtn
   AsteroidsBtn.FS = AsteroidsBtn:CreateFontString(nil, "OVERLAY", "GameTooltipText")
@@ -459,6 +464,7 @@ function GR:CreateSoloGames()
       GR:AsteroidsShow()
     end
   end)
+
   SoloGames.SnakeBtn = CreateFrame("Button", SnakeBtn, SoloGames, "UIPanelButtonTemplate")
   local SnakeBtn = SoloGames.SnakeBtn
   SnakeBtn.FS = SnakeBtn:CreateFontString(nil, "OVERLAY", "GameTooltipText")
@@ -468,6 +474,19 @@ function GR:CreateSoloGames()
   SnakeBtn:SetScript("OnClick", function(self, button, down) 
     if (button == "LeftButton" and down == false) then
       GR.GameType = "Snake"
+      GR:ShowSoloGame()
+    end
+  end)
+
+  SoloGames.BCBtn = CreateFrame("Button", BCBtn, SoloGames, "UIPanelButtonTemplate")
+  local BCBtn = SoloGames.BCBtn
+  BCBtn.FS = BCBtn:CreateFontString(nil, "OVERLAY", "GameTooltipText")
+  local BCFS = BCBtn.FS
+  BCFS:SetTextColor(.8,.8,.8, 1)
+  BCFS:SetText("Bouncy Chicken")
+  BCBtn:SetScript("OnClick", function(self, button, down) 
+    if (button == "LeftButton" and down == false) then
+      GR.GameType = "Bouncy Chicken"
       GR:ShowSoloGame()
     end
   end)
@@ -482,8 +501,8 @@ function GR:ResizeMain()
   -- Resize Main Ratios
   -- In Game
   if (GR.db.realm.tab == 1) then
-    Main.XRatio = Main:GetWidth() / GR.Win.Const.Tab1Width
-    Main.YRatio = Main:GetHeight() / GR.Win.Const.Tab1Height
+    Main.XRatio = Main:GetWidth() / GR.Win.Const.GameScreenWidth
+    Main.YRatio = Main:GetHeight() / GR.Win.Const.GameScreenHeight
     Main.ScreenRatio = (Main.XRatio + Main.YRatio) / 2
   end
   -- Solo Games
@@ -625,6 +644,12 @@ function GR:ResizeSoloGames()
   local SnakeFS = SnakeBtn.FS
   SnakeFS:SetPoint("CENTER", 0, 0)
   SnakeFS:SetTextScale(1.4 * Main.ScreenRatio)
+  local BCBtn = SoloGames.BCBtn
+  BCBtn:SetPoint("TOPLEFT", 5 * Main.XRatio, -40 * Main.YRatio)
+  BCBtn:SetSize(120 * Main.XRatio, 30 * Main.YRatio)
+  local BCFS = BCBtn.FS
+  BCFS:SetPoint("CENTER", 0, 0)
+  BCFS:SetTextScale(1.1 * Main.ScreenRatio)
 end
 
 function GR:SizeAcceptDecline()
@@ -687,7 +712,7 @@ function GR:TabSelect()
   
   -- In Game
   if (tab == 1) then
-    local Width, Height, Change = CheckWidthHeight(GR.Win.Const.Tab1Width * Main.XRatio, GR.Win.Const.Tab1Height * Main.YRatio)
+    local Width, Height, Change = CheckWidthHeight(GR.Win.Const.GameScreenWidth * Main.XRatio, GR.Win.Const.GameScreenHeight * Main.YRatio)
 
     Main:SetSize(Width, Height)
     Main:SetPoint(point, relativeTo, relativePoint, xOfs, yOfs)
@@ -710,6 +735,9 @@ function GR:TabSelect()
     end
     if (GR.GameType == "Battleships") then
       GR:BattleshipsShow()
+    end
+    if (GR.GameType == "Bouncy Chicken") then
+      GR:BCShow()
     end
   end
   -- Solo Games
@@ -878,7 +906,7 @@ end
 
 -- GAMES
 -- chess
--- flappy bird
+-- flappy bird (bouncy chicken)
 -- pin-ball macheine
 
 -- FUNCTIONS

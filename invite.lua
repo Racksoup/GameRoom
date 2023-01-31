@@ -373,6 +373,11 @@ function GR:ExitGameClicked()
   if (GR.GameType == "Snake") then
     GR:SnakeHide()    
   end
+  
+  -- Bouncy Chicken
+  if (GR.GameType == "Bouncy Chicken") then
+    GR:BCHide()    
+  end
 
   GR.GameType = nil
   GR.db.realm.tab = 2
