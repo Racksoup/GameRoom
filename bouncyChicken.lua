@@ -2,14 +2,16 @@ function GR:CreateBouncyChicken()
   -- Constants
   GR.BC = {}
   GR.BC.Const = {}
-
+  GR.BC.Const.WallStartInt = 1
+  GR.BC.Const.WallSpeed = 140
+  
   -- Bouncy Chicken Frame
   GR_GUI.Main.BC = CreateFrame("Frame", BouncyChicken, GR_GUI.Main, "ThinBorderTemplate")
   local BC = GR_GUI.Main.BC
   BC:SetPoint("BOTTOM", 0, 25 * (GR_GUI.Main:GetHeight() / GR.Win.Const.Tab1Height))
   BC:SetSize(GR_GUI.Main:GetWidth() * (GR.Win.Const.GameScreenWidth / GR.Win.Const.Tab1Width), GR_GUI.Main:GetHeight() * (GR.Win.Const.GameScreenHeight / GR.Win.Const.Tab1Height))
   BC:Hide()
-
+  
   -- Variables
   GR.BC.XRatio = BC:GetWidth() / GR.Win.Const.GameScreenWidth
   GR.BC.YRatio = BC:GetHeight() / GR.Win.Const.GameScreenHeight
@@ -17,12 +19,14 @@ function GR:CreateBouncyChicken()
   GR.BC.ActiveState = "Stop"
   GR.BC.GameTime = 0
   GR.BC.Points = 0
+  GR.BC.WallSpeed = GR.BC.Const.WallSpeed
 
   -- Create
   GR:CreateBCGameLoop()
   GR:ControlsBC()
   GR:CreateBCActiveStatusBtns()
   GR:CreateBCInfo()
+  GR:CreateBCWalls()
 end
 
 function GR:CreateBCGameLoop()
@@ -114,19 +118,41 @@ function GR:CreateBCInfo()
   BC.Info:SetTextColor(.8,.8,.8, 1)
 end
 
+function GR:CreateBCWalls()
+  local BC = GR_GUI.Main.BC
+  BC.Walls = {}
+  local Walls = BC.Walls
+
+  for i = 1, 3, 1 do
+    Walls[i] = CreateFrame("Frame", nil, BC)
+    local Wall = Walls[i]
+    Wall.Tex = Wall:CreateTexture()
+    Wall.Tex:SetColorTexture(100, 0, 255, 1)
+    Wall.Tex:SetAllPoints(Wall)
+    Wall:Hide()
+    Wall.XPos = BC:GetWidth() * 2
+    Wall.YPos = GR.BC.YRatio * 100 
+  end
+end
+
 -- Size
 function GR:SizeBC()
   local Main = GR_GUI.Main
   local BC = GR_GUI.Main.BC
 
+  -- Game Screen
   BC:SetPoint("BOTTOM", 0, 25 * (Main:GetHeight() / GR.Win.Const.Tab1Height))
   BC:SetSize(Main:GetWidth() * (GR.Win.Const.GameScreenWidth / GR.Win.Const.Tab1Width), Main:GetHeight() * (GR.Win.Const.GameScreenHeight / GR.Win.Const.Tab1Height))
   GR.BC.XRatio = BC:GetWidth() / GR.Win.Const.GameScreenWidth
   GR.BC.YRatio = BC:GetHeight() / GR.Win.Const.GameScreenHeight
   GR.BC.ScreenRatio = (BC:GetWidth() / GR.Win.Const.GameScreenWidth + BC:GetHeight() / GR.Win.Const.GameScreenHeight) / 2
 
+  -- Variables
+  GR.BC.WallSpeed = GR.BC.Const.WallSpeed * GR.BC.XRatio
+
   GR:SizeBCActiveStatusBtns()
   GR:SizeBCInfo()
+  GR:SizeBCWalls()
 end
 
 function GR:SizeBCActiveStatusBtns()
@@ -182,6 +208,15 @@ function GR:SizeBCInfo()
   BC.Info:SetTextScale(1 * GR.BC.ScreenRatio)
 end
 
+function GR:SizeBCWalls()
+  local Walls = GR_GUI.Main.BC.Walls
+
+  for i = 1, #Walls, 1 do
+    local Wall = Walls[i]
+    Wall:SetSize(100 * GR.BC.XRatio, 100 * GR.BC.YRatio)
+  end
+end
+
 -- Update
 function GR:UpdateBC(self, elapsed)
   local BC = GR_GUI.Main.BC
@@ -189,6 +224,21 @@ function GR:UpdateBC(self, elapsed)
   GR.BC.GameTime = GR.BC.GameTime + elapsed
 
   BC.Timer:SetText(math.floor(GR.BC.GameTime * 100) / 100)
+
+  GR:UpdateBCWalls(self, elapsed)
+end
+
+function GR:UpdateBCWalls(self, elapsed)
+  local BC = GR_GUI.Main.BC
+  local Walls = BC.Walls
+
+  for i = 1, #Walls, 1 do
+    if (Walls[i]:IsShown()) then
+      local Wall = Walls[i]
+      Wall.XPos = Wall.XPos - elapsed * GR.BC.WallSpeed
+      Wall:SetPoint("BOTTOMLEFT", Wall.XPos, Wall.YPos)
+    end
+  end
 end
 
 -- Controls
@@ -205,6 +255,23 @@ end
 -- Functions
 function GR:BCBounce()
 
+end
+
+function GR:BCStartMovingWalls()
+  local Walls = GR_GUI.Main.BC.Walls
+
+  -- Show First Wall
+  Walls[1]:Show()
+  
+  -- Show Second Wall 
+  C_Timer.NewTimer(GR.BC.Const.WallStartInt, function()
+    Walls[2]:Show()
+  end)
+  
+  -- Show Third Wall 
+  C_Timer.NewTimer(GR.BC.Const.WallStartInt * 2, function()
+    Walls[3]:Show()
+  end)
 end
 
 -- Hide Show
@@ -231,10 +298,14 @@ function GR:BCStart()
   -- Reset Variables
   GR.BC.GameTime = 0
   GR.BC.Points = 0
+  GR.BC.WallSpeed = GR.BC.Const.WallSpeed * GR.BC.XRatio
 
-  BC.PointsFS:SetText(GR.BC.Points)
-
+  -- Start Game
   BC.Game:Show()
+  GR:BCStartMovingWalls()
+  
+  -- Show Game Info and Buttons
+  BC.PointsFS:SetText(GR.BC.Points)
   BC.Stopx:Show()
   BC.Pausex:Show()
   BC.Start:Hide()
@@ -243,6 +314,11 @@ end
 
 function GR:BCStop()
   local BC = GR_GUI.Main.BC
+
+  for i = 1, #Walls, 1 do
+    local Wall = Walls[i]
+    Wall.XPos = BC:GetWidth() * 2
+  end
   
   BC.Game:Hide()
   BC.Start:Show()
