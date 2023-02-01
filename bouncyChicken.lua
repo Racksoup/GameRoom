@@ -2,18 +2,18 @@ function GR:CreateBouncyChicken()
   -- Constants
   GR.BC = {}
   GR.BC.Const = {}
-  GR.BC.Const.WallStartInt = 1.8
-  GR.BC.Const.WallSpeed = 170
+  GR.BC.Const.WallStartInt = 1.65
+  GR.BC.Const.WallSpeed = 190
   GR.BC.Const.WallWidth = 80
   GR.BC.Const.WallHeight = 180
   GR.BC.Const.WallYPosOptions = { -120, -58, 4, 66, 128, 190, 252, 314, 376, 438 }
   GR.BC.Const.ChickenXPos = 100
   GR.BC.Const.ChickenYStart = 250
-  GR.BC.Const.ChickenWidth = 50
-  GR.BC.Const.ChickenHeight = 50
-  GR.BC.Const.ChickenGravity = -9
-  GR.BC.Const.ChickenMinVelY = -4.4
-  GR.BC.Const.ChickenMaxVelY = 4.2
+  GR.BC.Const.ChickenWidth = 46
+  GR.BC.Const.ChickenHeight = 52
+  GR.BC.Const.ChickenGravity = -9.5
+  GR.BC.Const.ChickenMinVelY = -3.8
+  GR.BC.Const.ChickenMaxVelY = 4.4
   
   -- Bouncy Chicken Frame
   GR_GUI.Main.BC = CreateFrame("Frame", BouncyChicken, GR_GUI.Main, "ThinBorderTemplate")
@@ -157,7 +157,7 @@ function GR:CreateBCWalls()
     local Wall = Walls[i]
     Wall:SetPoint("BOTTOMLEFT")
     Wall.Tex = Wall:CreateTexture()
-    Wall.Tex:SetColorTexture(1, 0, 1, 1)
+    Wall.Tex:SetColorTexture(.38, .84, 1, 1)
     Wall.Tex:SetAllPoints(Wall)
     Wall:Hide()
   end
@@ -172,7 +172,8 @@ function GR:CreateBCChicken()
   BC.Chicken.YPos = GR.BC.ChickenYStart
   Chicken.Tex = Chicken:CreateTexture()
   Chicken.Tex:SetAllPoints(Chicken)
-  Chicken.Tex:SetColorTexture(1, .6, .2, 1)
+  Chicken.Tex:SetTexture("Interface\\AddOns\\ZUI_GameRoom\\images\\Chicken.blp")
+  Chicken.Tex:SetTexCoord(0,0, 0,1, 1,0, 1,1)
   Chicken:Hide()
 end
 
@@ -239,7 +240,7 @@ function GR:SizeBCInfo()
   BC.PointsFS:SetTextScale(2 * GR.BC.ScreenRatio)
   
   -- Game Over
-  BC.GameOverFS:SetPoint("TOP", 0, -80 * GR.BC.YRatio)
+  BC.GameOverFS:SetPoint("TOP", BC, 0, -140 * GR.BC.YRatio)
   BC.GameOverFS:SetTextScale(3.7 * GR.BC.ScreenRatio)
   
   -- Controls Info
@@ -292,6 +293,8 @@ function GR:UpdateBC(self, elapsed)
 
   GR:UpdateBCWalls(self, elapsed)
   GR:UpdateBCChicken(self, elapsed)
+
+  GR:ColBC()
 end
 
 function GR:UpdateBCWalls(self, elapsed)
@@ -326,7 +329,72 @@ function GR:UpdateBCChicken(self, elapsed)
   if (Chicken.PosY == nil) then Chicken.PosY = GR.BC.ChickenYStart end
   Chicken.PosY = Chicken.PosY + Chicken.VelY
   Chicken:SetPoint("BOTTOMLEFT", GR.BC.ChickenXPos, Chicken.PosY)
+end
 
+-- Collisions
+function GR:ColBC()
+  -- Wall - Chicken
+  for i,v in pairs(GR_GUI.Main.BC.Walls) do
+    if (GR:ColBCChickenWall(v)) then GR:BCGameOver() end
+  end
+  -- Game Border - Chicken
+  if (GR:ColBCChickenBorder()) then GR:BCGameOver() end
+end
+
+function GR:ColBCChickenWall(Wall)
+  local Chicken = GR_GUI.Main.BC.Chicken
+
+  local point, relativeTo, relativePoint, xOfs, yOfs = Chicken:GetPoint()
+  local ChickenPoints = {
+    LLx = xOfs + (12 * GR.BC.XRatio),
+    LLy = yOfs + (12 * GR.BC.YRatio),
+    URx = xOfs + Chicken:GetWidth() - (12 * GR.BC.XRatio),
+    URy = yOfs + Chicken:GetHeight() - (12 * GR.BC.YRatio)
+  }
+  point, relativeTo, relativePoint, xOfs, yOfs = Wall:GetPoint()
+  local WallPoints = {
+    LLx = xOfs,
+    LLy = yOfs,
+    URx = xOfs + Wall:GetWidth(),
+    URy = yOfs + Wall:GetHeight()
+  }
+  
+  -- If Chicken Inside of Wall
+  if (Wall:IsVisible() and (ChickenPoints.URx > WallPoints.LLx and ChickenPoints.LLx < WallPoints.URx) and (ChickenPoints.URy > WallPoints.LLy and ChickenPoints.LLy < WallPoints.URy)) then 
+    return true
+  end
+  return false
+end
+
+function GR:ColBCChickenBorder()
+  local BC = GR_GUI.Main.BC
+  local Chicken = GR_GUI.Main.BC.Chicken
+
+  local point, relativeTo, relativePoint, xOfs, yOfs = Chicken:GetPoint()
+  local ChickenPoints = {
+    LLx = xOfs,
+    LLy = yOfs,
+    URx = xOfs + Chicken:GetWidth(),
+    URy = yOfs + Chicken:GetHeight()
+  }
+  point, relativeTo, relativePoint, xOfs, yOfs = BC:GetPoint()
+  local BCPoints = {
+    LLx = xOfs,
+    LLy = yOfs - (34 * GR.BC.YRatio),
+    URx = xOfs + BC:GetWidth(),
+    URy = yOfs + BC:GetHeight() - (23 * GR.BC.YRatio)
+  }
+  
+  -- If Chicken Touches Border
+  -- Chicken top higher than Border Top
+  if (ChickenPoints.URy > BCPoints.URy) then 
+    return true
+  end
+  -- Chicken bottom lower than Border bottom
+  if (ChickenPoints.LLy < BCPoints.LLy) then 
+    return true
+  end
+  return false
 end
 
 -- Controls
@@ -334,7 +402,7 @@ function GR:ControlsBC()
   local Game = GR_GUI.Main.BC.Game
 
   Game:SetScript("OnKeyDown", function(self, key)
-    if (key == "SPACE" or Key == "W" or Key == "UP") then 
+    if (key == "SPACE" or key == "W" or key == "w" or key == "UP") then 
       GR:BCBounce()
     end
   end)
@@ -370,12 +438,12 @@ function GR:BCStartMovingWalls()
   
   -- Show Second Wall
   GR.BC.WallTimer1 = C_Timer.NewTimer(GR.BC.Const.WallStartInt, function()
-    Walls[2]:Show()
+    if (GR.BC.ActiveState == "Start") then Walls[2]:Show() end
   end)
   
   -- Show Third Wall 
   GR.BC.WallTimer2 = C_Timer.NewTimer(GR.BC.Const.WallStartInt * 2, function()
-    Walls[3]:Show()
+    if (GR.BC.ActiveState == "Start") then Walls[3]:Show() end
   end)
 end
 
@@ -386,6 +454,14 @@ function GR:BCHide()
   GR:BCStop()
 
   BC:Hide()
+  BC:Hide()
+  BC.Start:Hide()
+  BC.Stopx:Hide()
+  BC.Pausex:Hide()
+  BC.Timer:Hide()
+  BC.PointsFS:Hide()
+  BC.GameOverFS:Hide()
+  BC.Info:Hide()
 end
 
 function GR:BCShow()
@@ -394,11 +470,22 @@ function GR:BCShow()
   GR:SizeBC()
 
   BC:Show()
+  BC.Start:Show()
+  BC.Timer:Show()
+  BC.PointsFS:Show()
+  BC.GameOverFS:Hide()
+  BC.Info:Show()
 end
 
 -- Start Stop Pause Unpause
 function GR:BCStart()
   local BC = GR_GUI.Main.BC
+  local Walls = GR_GUI.Main.BC.Walls
+
+  for i = 1, #Walls, 1 do
+    Walls[i]:Hide()
+  end
+  BC.Chicken:Hide()
 
   -- Reset Variables
   GR.BC.GameTime = 0
@@ -426,11 +513,6 @@ end
 function GR:BCStop()
   local BC = GR_GUI.Main.BC
   local Walls = BC.Walls
-
-  for i = 1, #Walls, 1 do
-    Walls[i]:Hide()
-  end
-  BC.Chicken:Hide()
 
   GR.BC.ActiveState = "Stop"
   BC.Game:Hide()

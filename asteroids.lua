@@ -987,7 +987,7 @@ function GR:AsteroidsColCometBullet(Asteroids, Comet, Bullet)
       URy = Bullet.PosY + SyOfs +0 * ((GR.Asteroids.ScreenXRatio * GR.Asteroids.ScreenYRatio) /2)
     }
 
-      -- check if bullet is inside of comet
+    -- check if bullet is inside of comet
     if ((Bulletx.URx > Cometx.LLx and Bulletx.LLx < Cometx.URx) and (Bulletx.URy > Cometx.LLy and Bulletx.LLy < Cometx.URy)) then 
       Bullet:Hide()
       Comet:Hide()
