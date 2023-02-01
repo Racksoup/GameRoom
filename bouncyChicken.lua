@@ -2,14 +2,17 @@ function GR:CreateBouncyChicken()
   -- Constants
   GR.BC = {}
   GR.BC.Const = {}
-  GR.BC.Const.WallStartInt = 1
-  GR.BC.Const.WallSpeed = 140
+  GR.BC.Const.WallStartInt = 2
+  GR.BC.Const.WallSpeed = 170
+  GR.BC.Const.WallWidth = 80
+  GR.BC.Const.WallHeight = 200
   
   -- Bouncy Chicken Frame
   GR_GUI.Main.BC = CreateFrame("Frame", BouncyChicken, GR_GUI.Main, "ThinBorderTemplate")
   local BC = GR_GUI.Main.BC
   BC:SetPoint("BOTTOM", 0, 25 * (GR_GUI.Main:GetHeight() / GR.Win.Const.Tab1Height))
   BC:SetSize(GR_GUI.Main:GetWidth() * (GR.Win.Const.GameScreenWidth / GR.Win.Const.Tab1Width), GR_GUI.Main:GetHeight() * (GR.Win.Const.GameScreenHeight / GR.Win.Const.Tab1Height))
+  BC:SetClipsChildren(true)
   BC:Hide()
   
   -- Variables
@@ -20,6 +23,8 @@ function GR:CreateBouncyChicken()
   GR.BC.GameTime = 0
   GR.BC.Points = 0
   GR.BC.WallSpeed = GR.BC.Const.WallSpeed
+  GR.BC.WallWidth = GR.BC.Const.WallWidth * GR.BC.XRatio
+  GR.BC.WallHeight = GR.BC.Const.WallHeight * GR.BC.YRatio
 
   -- Create
   GR:CreateBCGameLoop()
@@ -42,10 +47,11 @@ function GR:CreateBCGameLoop()
 end
 
 function GR:CreateBCActiveStatusBtns()
+  local Main = GR_GUI.Main
   local BC = GR_GUI.Main.BC
 
   -- Start / Unpause
-  BC.Start = CreateFrame("Button", Start, BC)
+  BC.Start = CreateFrame("Button", Start, Main)
   BC.Start.Line1 = BC.Start:CreateLine()
   BC.Start.Line1:SetColorTexture(0,1,0, 1)
   BC.Start.Line2 = BC.Start:CreateLine()
@@ -66,7 +72,7 @@ function GR:CreateBCActiveStatusBtns()
   end)
   
   -- Stop
-  BC.Stopx = CreateFrame("Button", Stopx, BC)
+  BC.Stopx = CreateFrame("Button", Stopx, Main)
   BC.Stopx.Tex = BC.Stopx:CreateTexture()
   BC.Stopx.Tex:SetColorTexture(1,0,0, 1)
   BC.Stopx.Tex:SetPoint("CENTER")
@@ -79,7 +85,7 @@ function GR:CreateBCActiveStatusBtns()
   BC.Stopx:Hide()
   
   -- Pause
-  BC.Pausex = CreateFrame("Button", Pausex, BC)
+  BC.Pausex = CreateFrame("Button", Pausex, Main)
   BC.Pausex.Tex1 = BC.Pausex:CreateTexture()
   BC.Pausex.Tex1:SetColorTexture(1,1,0, 1)
   BC.Pausex.Tex2 = BC.Pausex:CreateTexture()
@@ -94,26 +100,27 @@ function GR:CreateBCActiveStatusBtns()
 end
 
 function GR:CreateBCInfo()
+  local Main = GR_GUI.Main
   local BC = GR_GUI.Main.BC
 
   -- Timer
-  BC.Timer = BC:CreateFontString(nil, "ARTWORK", "GameTooltipText")
+  BC.Timer = Main:CreateFontString(nil, "ARTWORK", "GameTooltipText")
   BC.Timer:SetText(GR.BC.GameTime)
   BC.Timer:SetTextColor(.8,.8,.8, 1)
 
   -- Points
-  BC.PointsFS = BC:CreateFontString(nil, "ARTWORK", "GameTooltipText")
+  BC.PointsFS = Main:CreateFontString(nil, "ARTWORK", "GameTooltipText")
   BC.PointsFS:SetText(GR.BC.Points)
   BC.PointsFS:SetTextColor(.8,.8,.8, 1)
 
   -- GameOver
-  BC.GameOverFS = BC:CreateFontString(nil, "ARTWORK", "GameTooltipText")
+  BC.GameOverFS = Main:CreateFontString(nil, "ARTWORK", "GameTooltipText")
   BC.GameOverFS:SetText("Game Over")
   BC.GameOverFS:SetTextColor(.8,0,0, 1)
   BC.GameOverFS:Hide()
 
   -- Controls Info
-  BC.Info = BC:CreateFontString(nil, "ARTWORK", "GameTooltipText")
+  BC.Info = Main:CreateFontString(nil, "ARTWORK", "GameTooltipText")
   BC.Info:SetText("Bounce: Space, W, Up-Arrow")
   BC.Info:SetTextColor(.8,.8,.8, 1)
 end
@@ -147,9 +154,6 @@ function GR:SizeBC()
   GR.BC.YRatio = BC:GetHeight() / GR.Win.Const.GameScreenHeight
   GR.BC.ScreenRatio = (BC:GetWidth() / GR.Win.Const.GameScreenWidth + BC:GetHeight() / GR.Win.Const.GameScreenHeight) / 2
 
-  -- Variables
-  GR.BC.WallSpeed = GR.BC.Const.WallSpeed * GR.BC.XRatio
-
   GR:SizeBCActiveStatusBtns()
   GR:SizeBCInfo()
   GR:SizeBCWalls()
@@ -162,7 +166,7 @@ function GR:SizeBCActiveStatusBtns()
   local ScreenRatio = GR.BC.ScreenRatio
   
   -- Start
-  BC.Start:SetPoint("TOPLEFT", 50 * XRatio, 34 * YRatio)
+  BC.Start:SetPoint("TOPLEFT", BC, 50 * XRatio, 34 * YRatio)
   BC.Start:SetSize(30 * XRatio, 30 * YRatio)
   BC.Start.Line1:SetStartPoint("CENTER", -8 * XRatio, 8 * YRatio)
   BC.Start.Line1:SetEndPoint("CENTER", 8 * XRatio, 0)
@@ -175,12 +179,12 @@ function GR:SizeBCActiveStatusBtns()
   BC.Start.Line3:SetThickness(3 * ScreenRatio)
 
   -- Stop
-  BC.Stopx:SetPoint("TOPLEFT", 83 * XRatio, 34 * YRatio)
+  BC.Stopx:SetPoint("TOPLEFT", BC, 83 * XRatio, 34 * YRatio)
   BC.Stopx:SetSize(30 * XRatio, 30 * YRatio)
   BC.Stopx.Tex:SetSize(15 * XRatio, 15 * YRatio)
   
   -- Unpause
-  BC.Pausex:SetPoint("TOPLEFT", 50 * XRatio, 34 * YRatio)
+  BC.Pausex:SetPoint("TOPLEFT", BC, 50 * XRatio, 34 * YRatio)
   BC.Pausex:SetSize(30 * XRatio, 30 * YRatio)
   BC.Pausex.Tex1:SetSize(6 * XRatio, 15 * YRatio)
   BC.Pausex.Tex1:SetPoint("CENTER", -6 * XRatio, 0)
@@ -211,9 +215,14 @@ end
 function GR:SizeBCWalls()
   local Walls = GR_GUI.Main.BC.Walls
 
+  -- Variables
+  GR.BC.WallSpeed = GR.BC.Const.WallSpeed * GR.BC.XRatio
+  GR.BC.WallWidth = GR.BC.Const.WallWidth * GR.BC.XRatio
+  GR.BC.WallHeight = GR.BC.Const.WallHeight * GR.BC.YRatio
+
   for i = 1, #Walls, 1 do
     local Wall = Walls[i]
-    Wall:SetSize(100 * GR.BC.XRatio, 100 * GR.BC.YRatio)
+    Wall:SetSize(GR.BC.WallWidth, GR.BC.WallHeight)
   end
 end
 
@@ -246,7 +255,7 @@ function GR:ControlsBC()
   local Game = GR_GUI.Main.BC.Game
 
   Game:SetScript("OnKeyDown", function(self, key)
-    if (key == "SPACE") then 
+    if (key == "SPACE" or Key == "W" or Key == "UP") then 
       GR:BCBounce()
     end
   end)
@@ -314,10 +323,10 @@ end
 
 function GR:BCStop()
   local BC = GR_GUI.Main.BC
+  local Walls = BC.Walls
 
   for i = 1, #Walls, 1 do
-    local Wall = Walls[i]
-    Wall.XPos = BC:GetWidth() * 2
+    Walls[i].XPos = BC:GetWidth() * 2
   end
   
   BC.Game:Hide()
