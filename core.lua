@@ -906,8 +906,11 @@ end
 
 -- GAMES
 -- chess
--- flappy bird (bouncy chicken)
 -- pin-ball macheine
+-- tower defense
+-- boat launch game (like angry birds  but you shoot the boat then they shoot you)
+-- heli attack 3 (or something similar thats generated where you shoot targets, dodge attacks, get power ups)
+-- og mario
 
 -- FUNCTIONS
 -- rematch button
