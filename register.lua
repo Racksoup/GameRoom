@@ -178,9 +178,11 @@ function GR:RemoveDisconnectedFromFriendsList()
       local FactionName
       if (GR.Retail) then 
         local x = C_BattleNet.GetFriendAccountInfo(i)
-        Friend = x.gameAccountInfo.characterName
-        RealmName = x.gameAccountInfo.realmName
-        FactionName = x.gameAccountInfo.factionName
+        if (x) then
+          Friend = x.gameAccountInfo.characterName
+          RealmName = x.gameAccountInfo.realmName
+          FactionName = x.gameAccountInfo.factionName
+        end
       else
         Friend = select(5, BNGetFriendInfo(i))
       end
