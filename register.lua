@@ -601,14 +601,10 @@ end
 
 -- Server 
 function GR:JoinGRChannel()
-  -- GameRoom Chat Channel
-  LeaveChannelByName("gameroom");
-  
+  LeaveChannelByName("gameroom");  
   local delay = 3
   C_Timer.After(delay, function()
     JoinChannelByName("gameroom", "gameroompw");
-    -- ChatFrame_AddChannel(DEFAULT_CHAT_FRAME, "Gameroom");
-    -- print(GetChannelName('gameroom'))
     local tempChannelNum = 1 
     for i,v in ipairs({GetChannelList()}) do
       if (type(v) == 'number') then
@@ -619,13 +615,12 @@ function GR:JoinGRChannel()
         break
       end
     end    
-    -- for i = 1, 10 do
-    --   if _G["ChatFrame" .. i] then
-    --     ChatFrame_RemoveChannel(_G["ChatFrame" .. i], 'gameroom')
-    --   end
-    -- end
     ChatFrame_RemoveChannel(DEFAULT_CHAT_FRAME, 'gameroom')
   end)
+end
+
+function GR:LeaveGRChannel()
+
 end
 
 function GR:RegisterServerInviteReceived(sender)
@@ -634,7 +629,6 @@ function GR:RegisterServerInviteReceived(sender)
     Sender = UnitName("Player")
   }
 
-  print("here")
   table.insert(GR.Server, sender)
   GR:RemoveDuplicates(GR.Server)
   GR:RefreshServerListUI()
@@ -658,6 +652,8 @@ function GR:RefreshServerListUI()
   for i = 1, 100, 1 do
     Btns[i]:Hide()
   end
+
+  GR:RemoveDuplicates(GR.Server)
   
   for i,v in ipairs(GR.Server) do
     Btns[i].FS:SetText(v)

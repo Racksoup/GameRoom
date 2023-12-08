@@ -92,6 +92,7 @@ function GR:CreateBCActiveStatusBtns()
       end
     end
   end)
+  BC.Start:Hide()
   
   -- Stop
   BC.Stopx = CreateFrame("Button", Stopx, Main)
@@ -129,11 +130,13 @@ function GR:CreateBCInfo()
   BC.Timer = Main:CreateFontString(nil, "ARTWORK", "GameTooltipText")
   BC.Timer:SetText(GR.BC.GameTime)
   BC.Timer:SetTextColor(.8,.8,.8, 1)
+  BC.Timer:Hide()
 
   -- Points
   BC.PointsFS = Main:CreateFontString(nil, "ARTWORK", "GameTooltipText")
   BC.PointsFS:SetText(GR.BC.Points)
   BC.PointsFS:SetTextColor(.8,.8,.8, 1)
+  BC.PointsFS:Hide()
 
   -- GameOver
   BC.GameOverFS = Main:CreateFontString(nil, "ARTWORK", "GameTooltipText")
@@ -145,6 +148,7 @@ function GR:CreateBCInfo()
   BC.Info = Main:CreateFontString(nil, "ARTWORK", "GameTooltipText")
   BC.Info:SetText("Bounce: Space, W, Up-Arrow")
   BC.Info:SetTextColor(.8,.8,.8, 1)
+  BC.Info:Hide()
 end
 
 function GR:CreateBCWalls()
@@ -453,7 +457,6 @@ function GR:BCHide()
   
   GR:BCStop()
 
-  BC:Hide()
   BC:Hide()
   BC.Start:Hide()
   BC.Stopx:Hide()
