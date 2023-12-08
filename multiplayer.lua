@@ -88,11 +88,38 @@ function GR:CreateMultiInvite()
   end)
 
   GR:CreateInviteTab()
+  GR:CreateInviteServer()
   GR:CreateInviteFriends()
   GR:CreateInviteParty()
   GR:CreateInviteZone()
 
   GR:SizeMultiGames()
+end
+
+function GR:CreateInviteServer()
+  local Main = GR_GUI.Main
+  local Invite = Main.Tab3.Invite
+
+  Invite.ServerScrollFrame = CreateFrame("ScrollFrame", ServerScrollFrame, Invite, "UIPanelScrollFrameTemplate")
+  local ServerScrollFrame = Invite.ServerScrollFrame
+  ServerScrollFrame:SetScript("OnMouseWheel", ScrollFrame_OnMouseWheel)
+  
+  Invite.Server = CreateFrame("Frame", Server, ServerScrollFrame)
+  local Server = Invite.Server
+  ServerScrollFrame:SetScrollChild(Server)
+  ServerScrollFrame.FS = ServerScrollFrame:CreateFontString(nil, "ARTWORK", "GameTooltipText")
+  ServerScrollFrame.FS:SetText("Server")
+  
+  Invite.Server.Btns = {}
+  for i = 1, 100, 1 do
+    local Btn = CreateFrame("Button", nil, Server)
+    Btn:Hide()
+    Btn.FS = Btn:CreateFontString(nil, "ARTWORK", "GameTooltipText")
+    Btn.FS:SetPoint("TOPLEFT")
+    table.insert(Invite.Server.Btns, Btn)
+  end
+
+  ServerScrollFrame:Hide()
 end
 
 function GR:CreateInviteFriends()
@@ -202,18 +229,28 @@ function GR:CreateInviteTab()
   Tab3.Invite.Tab = CreateFrame("Frame", Tab, Tab3.Invite)
   local Tab = Tab3.Invite.Tab
 
+  -- Server
+  Tab.Server = CreateFrame("Button", FriendsBtn, Tab, "UIPanelButtonTemplate")
+  Tab.Server:SetPoint("TOPLEFT")
+  Tab.Server.FS = Tab.Server:CreateFontString(nil, "ARTWORK", "GameTooltipText")
+  Tab.Server.FS:SetPoint("CENTER")
+  Tab.Server.FS:SetTextColor(.8,.8,.8, 1)
+  Tab.Server.FS:SetText("Server")
+  -- Friends
   Tab.Friends = CreateFrame("Button", FriendsBtn, Tab, "UIPanelButtonTemplate")
-  Tab.Friends:SetPoint("TOPLEFT")
+  Tab.Friends:SetPoint("TOP", -35, 0)
   Tab.Friends.FS = Tab.Friends:CreateFontString(nil, "ARTWORK", "GameTooltipText")
   Tab.Friends.FS:SetPoint("CENTER")
   Tab.Friends.FS:SetTextColor(.8,.8,.8, 1)
   Tab.Friends.FS:SetText("Friends")
+  -- Party
   Tab.Party = CreateFrame("Button", FriendsBtn, Tab, "UIPanelButtonTemplate")
-  Tab.Party:SetPoint("TOP")
+  Tab.Party:SetPoint("TOP", 35, 0)
   Tab.Party.FS = Tab.Party:CreateFontString(nil, "ARTWORK", "GameTooltipText")
   Tab.Party.FS:SetPoint("CENTER")
   Tab.Party.FS:SetTextColor(.8,.8,.8, 1)
   Tab.Party.FS:SetText("Party")
+  -- Zone
   Tab.Zone = CreateFrame("Button", FriendsBtn, Tab, "UIPanelButtonTemplate")
   Tab.Zone:SetPoint("TOPRIGHT")
   Tab.Zone.FS = Tab.Zone:CreateFontString(nil, "ARTWORK", "GameTooltipText")
@@ -221,9 +258,21 @@ function GR:CreateInviteTab()
   Tab.Zone.FS:SetTextColor(.8,.8,.8, 1)
   Tab.Zone.FS:SetText("Zone")
   
+  Tab.Server:SetScript("OnClick", function(self, button, down) 
+    if (button == "LeftButton" and down == false) then
+      GR.Target = nil
+      Tab3.Invite.ServerScrollFrame:Show()
+      Tab3.Invite.FriendsScrollFrame:Hide()
+      Tab3.Invite.PartyScrollFrame:Hide()
+      Tab3.Invite.ZoneScrollFrame:Hide()
+      Tab3.Invite.SendBtn:Hide()
+    end
+  end)
+
   Tab.Friends:SetScript("OnClick", function(self, button, down) 
     if (button == "LeftButton" and down == false) then
       GR.Target = nil
+      Tab3.Invite.ServerScrollFrame:Hide()
       Tab3.Invite.FriendsScrollFrame:Show()
       Tab3.Invite.PartyScrollFrame:Hide()
       Tab3.Invite.ZoneScrollFrame:Hide()
@@ -234,6 +283,7 @@ function GR:CreateInviteTab()
   Tab.Party:SetScript("OnClick", function(self, button, down) 
     if (button == "LeftButton" and down == false) then
       GR.Target = nil
+      Tab3.Invite.ServerScrollFrame:Hide()
       Tab3.Invite.FriendsScrollFrame:Hide()
       Tab3.Invite.PartyScrollFrame:Show()
       Tab3.Invite.ZoneScrollFrame:Hide()
@@ -244,6 +294,7 @@ function GR:CreateInviteTab()
   Tab.Zone:SetScript("OnClick", function(self, button, down) 
     if (button == "LeftButton" and down == false) then
       GR.Target = nil
+      Tab3.Invite.ServerScrollFrame:Hide()
       Tab3.Invite.FriendsScrollFrame:Hide()
       Tab3.Invite.PartyScrollFrame:Hide()
       Tab3.Invite.ZoneScrollFrame:Show()
@@ -298,6 +349,7 @@ function GR:SizeMultiGames()
 
   GR:SizeInviteTab()
   GR:SizeMultiInvite()
+  GR:SizeInviteServer()
   GR:SizeInviteFriends()
   GR:SizeInviteParty()
   GR:SizeInviteZone()
@@ -317,6 +369,23 @@ function GR:SizeMultiInvite()
   Invite.SendBtn:SetPoint("BOTTOM")
   Invite.SendBtn:SetSize(268 * Main.XRatio, 50 * Main.YRatio)
   Invite.SendBtn.FS:SetTextScale(2 * Main.ScreenRatio)
+end
+
+function GR:SizeInviteServer()
+  local Main = GR_GUI.Main
+  local Invite = Main.Tab3.Invite
+
+  Invite.ServerScrollFrame:SetPoint("TOP", 0, -55 * Main.YRatio)
+  Invite.ServerScrollFrame:SetSize(200 * Main.XRatio, 100 * Main.YRatio)
+  Invite.Server:SetSize(200 * Main.XRatio, 700 * Main.YRatio)
+  Invite.ServerScrollFrame.FS:SetPoint("TOP", 0, 15 * Main.YRatio)
+  Invite.ServerScrollFrame.FS:SetTextScale(1 * Main.ScreenRatio)
+
+  for i = 1, #Invite.Server.Btns, 1 do
+    Invite.Server.Btns[i]:SetPoint("TOPLEFT", 0, (i*-14) * Main.YRatio)
+    Invite.Server.Btns[i]:SetSize(200 * Main.XRatio, 14 * Main.YRatio)
+    Invite.Server.Btns[i].FS:SetTextScale(1 * ((Main.XRatio + Main.YRatio) / 2))
+  end
 end
 
 function GR:SizeInviteFriends()
@@ -376,8 +445,10 @@ function GR:SizeInviteTab()
 
   local Tab = Tab3.Invite.Tab
   Tab:SetPoint("TOP", 0, - 15 * Main.YRatio)
-  Tab:SetSize(220 * Main.XRatio, 40 * Main.YRatio)
+  Tab:SetSize(280 * Main.XRatio, 40 * Main.YRatio)
 
+  Tab.Server:SetSize(70 * Main.XRatio, 20 * Main.YRatio)
+  Tab.Server.FS:SetTextScale(1 * Main.ScreenRatio) 
   Tab.Friends:SetSize(70 * Main.XRatio, 20 * Main.YRatio)
   Tab.Friends.FS:SetTextScale(1 * Main.ScreenRatio) 
   Tab.Party:SetSize(70 * Main.XRatio, 20 * Main.YRatio)

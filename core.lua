@@ -80,6 +80,7 @@ function GR:OnInitialize()
   GR.GameOver = false
   GR.IsChallenged = false
   GR.PlayerName = UnitName("player")
+  GR.ChannelNumber = nil
 
   -- Retail or Classic/Wrath
   version, build, datex, tocversion = GetBuildInfo()
@@ -88,6 +89,10 @@ function GR:OnInitialize()
   else
     GR.Retail = false
   end
+
+
+  
+
   
   GR:CreateMainWindow()
   GR:CreateRegister()
@@ -113,11 +118,7 @@ function GR:CreateMainWindow()
   GR_GUI.Main = CreateFrame("Frame", GameRoom, UIParent, "TranslucentFrameTemplate")
   local Main = GR_GUI.Main
   Main:SetSize(GR.Win.Const.Tab2Width, GR.Win.Const.Tab2Height)
-  if (select(4,GetBuildInfo()) > 30400) then 
-    Main:SetResizeBounds(100,120)
-  else
-    Main:SetMinResize(100,120)
-  end
+  Main:SetResizeBounds(100,120)
   Main:SetFrameStrata("HIGH")
   Main:SetPoint("TOP", UIParent, "TOP", 0, -130)
   Main:SetMovable(true)
@@ -903,6 +904,8 @@ end
 
 -- BUGS
 -- guild needs to unregister offline players
+-- resize shows wrong elements
+-- game stuff shows in settings
 
 -- GAMES
 -- chess

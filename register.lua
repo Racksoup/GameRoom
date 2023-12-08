@@ -3,6 +3,7 @@ function GR:CreateRegister()
   GR.Zone = {}
   GR.Group = {}
   GR.Guild = {}
+  GR.Server = {}
   GR.Target = nil
   GR.Opponent = nil
   GR.CanSendInvite = true
@@ -26,8 +27,17 @@ function GR:CreateRegister()
   Register:RegisterEvent("WHO_LIST_UPDATE")
   Register:RegisterEvent("GUILD_ROSTER_UPDATE")
   Register:RegisterEvent("PLAYER_ENTERING_WORLD")
+  Register:RegisterEvent("CHAT_MSG_CHANNEL_JOIN")
+
 
   Register:SetScript("OnEvent", function(self, event, ...)
+    if (event == "CHAT_MSG_CHANNEL_JOIN") then
+      local text, playerName, languageName, channelName, playerName2, specialFlags, zoneChannelID, channelIndex, channelBaseName, languageID, lineID, guid, bnSenderID, isMobile, isSubtitle, hideSenderInLetterbox, supressRaidIcons = ...
+      if (channelBaseName == 'gameroom') then
+        GR:RegisterServerInviteReceived(playerName)
+      end
+    end
+    
     if (event == "WHO_LIST_UPDATE" and GR_GUI.Main:IsVisible()) then
       GR:WhoListUpdate()
     end
@@ -61,17 +71,16 @@ function GR:CreateRegister()
       }
       GR:SendCommMessage("ZUI_GameRoom_Reg", GR:Serialize(GroupMessage), GroupDist) 
     end
-      
-    if (event == "GUILD_ROSTER_UPDATE") then
-      GR:CheckRemoveGuild()
-    end
     
-    if (event == "GROUP_ROSTER_UPDATE" or "GROUP_ROSTER_UPDATE") then
+    if (event == "GROUP_ROSTER_UPDATE" or event == "GROUP_ROSTER_UPDATE") then
       GR:CheckRemoveGroup()
     end
 
     -- on login/reload
     if (event == "PLAYER_ENTERING_WORLD") then
+      -- register server
+      GR:JoinGRChannel()
+
       -- register friends
       GR:UpdateFriendsList() 
 
@@ -102,8 +111,6 @@ function GR:CreateRegister()
       GR:SendCommMessage("ZUI_GameRoom_Reg", GR:Serialize(GroupMessage), GroupDist) 
     end
   end)
-
-
 end
 
 function GR:WhoListUpdate()
@@ -359,22 +366,22 @@ end
 
 -- Zone
 function GR:RefreshZoneList()
-    local Btns = GR_GUI.Main.Tab3.Invite.Zone.Btns
-    for i = 1, 100, 1 do
-      Btns[i]:Hide()
-    end
-    
-    for i,v in ipairs(GR.Zone) do
-      Btns[i].FS:SetText(v)
-      Btns[i]:Show()
-      Btns[i]:SetScript("OnClick", function(self, button, down)
-        if (button == "LeftButton" and down == false) then
-          GR.Target = v
-          GR_GUI.Main.Tab3.Invite.SendBtn.FS:SetText("Invite " .. GR.Target)
-          GR_GUI.Main.Tab3.Invite.SendBtn:Show()
-        end
-      end)
-    end 
+  local Btns = GR_GUI.Main.Tab3.Invite.Zone.Btns
+  for i = 1, 100, 1 do
+    Btns[i]:Hide()
+  end
+  
+  for i,v in ipairs(GR.Zone) do
+    Btns[i].FS:SetText(v)
+    Btns[i]:Show()
+    Btns[i]:SetScript("OnClick", function(self, button, down)
+      if (button == "LeftButton" and down == false) then
+        GR.Target = v
+        GR_GUI.Main.Tab3.Invite.SendBtn.FS:SetText("Invite " .. GR.Target)
+        GR_GUI.Main.Tab3.Invite.SendBtn:Show()
+      end
+    end)
+  end 
 end
 
 function GR:InviteSearchZone()
@@ -592,6 +599,79 @@ function GR:RemoveDuplicates(list)
   end
 end
 
+-- Server 
+function GR:JoinGRChannel()
+  -- GameRoom Chat Channel
+  LeaveChannelByName("gameroom");
+  
+  local delay = 3
+  C_Timer.After(delay, function()
+    JoinChannelByName("gameroom", "gameroompw");
+    -- ChatFrame_AddChannel(DEFAULT_CHAT_FRAME, "Gameroom");
+    -- print(GetChannelName('gameroom'))
+    local tempChannelNum = 1 
+    for i,v in ipairs({GetChannelList()}) do
+      if (type(v) == 'number') then
+        tempChannelNum = v
+      end
+      if (type(v) == 'string' and v == 'gameroom') then
+        GR.ChannelNumber = tempChannelNum
+        break
+      end
+    end    
+    -- for i = 1, 10 do
+    --   if _G["ChatFrame" .. i] then
+    --     ChatFrame_RemoveChannel(_G["ChatFrame" .. i], 'gameroom')
+    --   end
+    -- end
+    ChatFrame_RemoveChannel(DEFAULT_CHAT_FRAME, 'gameroom')
+  end)
+end
+
+function GR:RegisterServerInviteReceived(sender)
+  local Message = {
+    Tag = "Register Server Response",
+    Sender = UnitName("Player")
+  }
+
+  print("here")
+  table.insert(GR.Server, sender)
+  GR:RemoveDuplicates(GR.Server)
+  GR:RefreshServerListUI()
+  GR:SendCommMessage("ZUI_GameRoom_Reg", GR:Serialize(Message), "WHISPER", sender)
+end
+
+function GR:RegisterServerResponseReceived(text)
+  local P,V = GR:Deserialize(text)
+  
+  if P then 
+    if (string.match(V.Tag, "Register Server Response") and not string.match(V.Sender, UnitName("Player"))) then
+      table.insert(GR.Server, V.Sender)
+      GR:RemoveDuplicates(GR.Server)
+      GR:RefreshServerListUI()
+    end
+  end
+end
+
+function GR:RefreshServerListUI()
+  local Btns = GR_GUI.Main.Tab3.Invite.Server.Btns
+  for i = 1, 100, 1 do
+    Btns[i]:Hide()
+  end
+  
+  for i,v in ipairs(GR.Server) do
+    Btns[i].FS:SetText(v)
+    Btns[i]:Show()
+    Btns[i]:SetScript("OnClick", function(self, button, down)
+      if (button == "LeftButton" and down == false) then
+        GR.Target = v
+        GR_GUI.Main.Tab3.Invite.SendBtn.FS:SetText("Invite " .. GR.Target)
+        GR_GUI.Main.Tab3.Invite.SendBtn:Show()
+      end
+    end)
+  end 
+end
+
 -- Comms handler
 function GR:RegisterPlayers(...)
   local prefix, text, distribution, target = ...
@@ -608,4 +688,6 @@ function GR:RegisterPlayers(...)
 
   GR:RegisterFriendInviteReceived(text)
   GR:RegisterFriendResponseReceived(text)
+
+  GR:RegisterServerResponseReceived(text)
 end
