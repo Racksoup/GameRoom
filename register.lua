@@ -28,6 +28,7 @@ function GR:CreateRegister()
   Register:RegisterEvent("GUILD_ROSTER_UPDATE")
   Register:RegisterEvent("PLAYER_ENTERING_WORLD")
   Register:RegisterEvent("CHAT_MSG_CHANNEL_JOIN")
+  Register:RegisterEvent("CHAT_MSG_CHANNEL_LEAVE")
 
 
   Register:SetScript("OnEvent", function(self, event, ...)
@@ -35,6 +36,13 @@ function GR:CreateRegister()
       local text, playerName, languageName, channelName, playerName2, specialFlags, zoneChannelID, channelIndex, channelBaseName, languageID, lineID, guid, bnSenderID, isMobile, isSubtitle, hideSenderInLetterbox, supressRaidIcons = ...
       if (channelBaseName == 'gameroom') then
         GR:RegisterServerInviteReceived(playerName)
+      end
+    end
+
+    if (event == "CHAT_MSG_CHANNEL_LEAVE") then
+      local text, playerName, languageName, channelName, playerName2, specialFlags, zoneChannelID, channelIndex, channelBaseName, languageID, lineID, guid, bnSenderID, isMobile, isSubtitle, hideSenderInLetterbox, supressRaidIcons = ...
+      if (channelBaseName == 'gameroom') then
+        GR:LeaveGRChannel(playerName)
       end
     end
     
@@ -619,8 +627,13 @@ function GR:JoinGRChannel()
   end)
 end
 
-function GR:LeaveGRChannel()
-
+function GR:LeaveGRChannel(player)
+  for i,v in ipairs(GR.Server) do
+    if (v == player) then
+      table.remove(GR.Server, i)
+    end
+  end
+  GR:RefreshServerListUI()
 end
 
 function GR:RegisterServerInviteReceived(sender)
@@ -630,7 +643,6 @@ function GR:RegisterServerInviteReceived(sender)
   }
 
   table.insert(GR.Server, sender)
-  GR:RemoveDuplicates(GR.Server)
   GR:RefreshServerListUI()
   GR:SendCommMessage("ZUI_GameRoom_Reg", GR:Serialize(Message), "WHISPER", sender)
 end
@@ -641,7 +653,6 @@ function GR:RegisterServerResponseReceived(text)
   if P then 
     if (string.match(V.Tag, "Register Server Response") and not string.match(V.Sender, UnitName("Player"))) then
       table.insert(GR.Server, V.Sender)
-      GR:RemoveDuplicates(GR.Server)
       GR:RefreshServerListUI()
     end
   end
