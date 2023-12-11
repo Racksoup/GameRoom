@@ -130,13 +130,13 @@ function GR:CreateMainWindow()
   Main:SetScript("OnDragStop", Main.StopMovingOrSizing)
   Main:SetPropagateKeyboardInput(true)
   Main:SetScript("OnKeyDown", function(self, key)
-      if (key == "ESCAPE" and Main:IsVisible()) then
-          Main:Hide()
-          Main:SetPropagateKeyboardInput(false)
-          C_Timer.After(.001, function() 
-              Main:SetPropagateKeyboardInput(true)
-          end)
-      end
+    if (key == "ESCAPE" and Main:IsVisible()) then
+      Main:Hide()
+      Main:SetPropagateKeyboardInput(false)
+      C_Timer.After(.001, function() 
+        Main:SetPropagateKeyboardInput(true)
+      end)
+    end
   end)
   Main:Show()
   Main:SetAlpha(1)
@@ -152,17 +152,17 @@ function GR:CreateMainWindow()
   ResizeBtn:SetHighlightTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Highlight")
   ResizeBtn:SetPushedTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
   ResizeBtn:SetScript("OnMouseDown", function(self)
-      self:GetParent():StartSizing("BOTTOMRIGHT") 
+    self:GetParent():StartSizing("BOTTOMRIGHT") 
   end)
   ResizeBtn:SetScript("OnMouseUp", function()
-      Main:StopMovingOrSizing("BOTTOMRIGHT")
-      GR:ResizeMain()
-      GR:SizeTictactoe()
-      GR:ResizeBattleships()
-      GR:SizeAsteroids()
-      GR:SnakeSize()
-      GR:SizeBC()
-      GR:SuikaSize()
+    Main:StopMovingOrSizing("BOTTOMRIGHT")
+    GR:ResizeMain()
+    GR:SizeTictactoe()
+    GR:ResizeBattleships()
+    GR:SizeAsteroids()
+    GR:SnakeSize()
+    GR:SizeBC()
+    GR:SuikaSize()
   end)
   
   -- Game Room Title
@@ -191,17 +191,17 @@ function GR:CreateMainWindow()
   buttonTint:SetPoint("BOTTOMRIGHT", xButton, "BOTTOMRIGHT", -2, 2)
   buttonTint:SetColorTexture(0,0,0,0);
   Main.xButton:SetScript("OnClick", function(self, button, down) 
-      if(button == "LeftButton" and down == true) then Main.xButton.tex:SetTexture("Interface\\AddOns\\ZUI_GameRoom\\images\\XButtonDown.blp") end
-      if(button == "LeftButton" and down == false) then 
-          Main:Hide()
-      end
+    if(button == "LeftButton" and down == true) then Main.xButton.tex:SetTexture("Interface\\AddOns\\ZUI_GameRoom\\images\\XButtonDown.blp") end
+    if(button == "LeftButton" and down == false) then 
+      Main:Hide()
+    end
   end)
   Main.xButton:SetScript("OnEnter", function(self, motion)
-      Main.xButton.tint:SetColorTexture(0,0,0,.3);
+    Main.xButton.tint:SetColorTexture(0,0,0,.3);
   end)
   Main.xButton:SetScript("OnLeave", function(self, motion)
-      Main.xButton.tint:SetColorTexture(0,0,0,0);
-      Main.xButton.tex:SetTexture("Interface\\AddOns\\ZUI_GameRoom\\images\\XButton.blp")
+    Main.xButton.tint:SetColorTexture(0,0,0,0);
+    Main.xButton.tex:SetTexture("Interface\\AddOns\\ZUI_GameRoom\\images\\XButton.blp")
   end)
 
   -- Exit Button

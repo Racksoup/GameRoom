@@ -4,27 +4,33 @@ function GR:SuikaCreate()
   GR.Suika.Const = {}
   GR.Suika.Const.GameScreenWidth = 400
   GR.Suika.Const.Tab1Width = 450
+  GR.Suika.Const.BallSizes = {20, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100}
+  GR.Suika.Const.Gravity = -9.5
+  GR.Suika.Const.MinGravity = -4.5
 
   -- Suika Frame
   GR_GUI.Main.Suika = CreateFrame("Frame", Suika, GR_GUI.Main, "ThinBorderTemplate")
   local Suika = GR_GUI.Main.Suika
   Suika:SetPoint("BOTTOM", 0, 25 * (GR_GUI.Main:GetHeight() / GR.Win.Const.Tab1Height))
-  Suika:SetSize(GR_GUI.Main:GetWidth() * (GR.Win.Const.GameScreenWidth / GR.Win.Const.Tab1Width), GR_GUI.Main:GetHeight() * (GR.Win.Const.GameScreenHeight / GR.Win.Const.Tab1Height))
+  Suika:SetSize(GR_GUI.Main:GetWidth() * (GR.Suika.Const.GameScreenWidth / GR.Suika.Const.Tab1Width), GR_GUI.Main:GetHeight() * (GR.Win.Const.GameScreenHeight / GR.Win.Const.Tab1Height))
   Suika:SetClipsChildren(true)
   Suika:Hide()
 
   -- Variables
-  GR.Suika.XRatio = Suika:GetWidth() / GR.Win.Const.GameScreenWidth
+  GR.Suika.XRatio = Suika:GetWidth() / GR.Suika.Const.GameScreenWidth
   GR.Suika.YRatio = Suika:GetHeight() / GR.Win.Const.GameScreenHeight
-  GR.Suika.ScreenRatio = (Suika:GetWidth() / GR.Win.Const.GameScreenWidth + Suika:GetHeight() / GR.Win.Const.GameScreenHeight) / 2
-  GR.Suika.ActiveState = "Stop"
+  GR.Suika.ScreenRatio = (Suika:GetWidth() / GR.Suika.Const.GameScreenWidth + Suika:GetHeight() / GR.Win.Const.GameScreenHeight) / 2
+  GR.Suika.ActiveState = "Start"
   GR.Suika.Points = 0
+  GR.Suika.Gravity = GR.Suika.Const.Gravity * GR.Suika.YRatio
+  GR.Suika.MinGravity = GR.Suika.Const.MinGravity * GR.Suika.YRatio
 
   -- Create
   GR:SuikaGameLoop()
   GR:SuikaControls()
   GR:SuikaCreateStatusBtns()
   GR:SuikaCreateInfo()
+  GR:SuikaCreateBalls()
 end
 
 function GR:SuikaGameLoop()
@@ -90,6 +96,89 @@ function GR:SuikaCreateInfo()
   Suika.GameOverFS:Hide()
 end
 
+function GR:SuikaCreateBalls()
+  local Main = GR_GUI.Main
+  local Suika = Main.Suika
+
+  Suika.Balls = {}
+
+  local function CreateUseNextBall()
+    local Ball = nil
+    for i,v in pairs(Suika.Balls) do -- find usable ball
+      if (v.IsActive == false) then
+        Ball = v
+        break;
+      end
+    end
+    if (Ball == nil) then -- if no usable balls make one
+      Ball = CreateFrame("Frame", Ball, Suika)
+    end
+    Ball.Size = 1
+    Ball.IsClickable = true
+    Ball.IsActive = true
+    Ball.VelY = 0
+    Ball:SetSize(GR.Suika.Const.BallSizes[Ball.Size] * GR.Suika.XRatio, GR.Suika.Const.BallSizes[Ball.Size] * GR.Suika.YRatio)
+    Ball:SetPoint("CENTER", nil, "CENTER", 0, 240)
+    Ball:SetMovable(true)
+    Ball:EnableMouse(true)
+    Ball:SetPropagateKeyboardInput(true)
+    Ball:RegisterForDrag("LeftButton")
+    Ball:SetScript("OnMouseDown", function(self, button)
+      self:StartMoving(false)
+    end)
+    Ball:SetScript("OnMouseUp", function(self)
+      Ball.IsClickable = false
+      self:StopMovingOrSizing()
+      self:SetMovable(false)
+      self:EnableMouse()
+      local point, relativeTo, relativePoint, xOfs, yOfs = self:GetPoint()
+      self:ClearAllPoints()
+      self:SetParent(Suika)
+      self:SetPoint("CENTER", nil, "CENTER", xOfs, 240)
+      print(point, relativeTo, relativePoint, xOfs, yOfs)
+      CreateUseNextBall()
+    end)
+    if (Ball:GetRegions() == nil) then -- if new frame, create new texture
+      Ball.Tex = Ball:CreateTexture()
+      Ball.Tex:SetAllPoints(Ball)
+      Ball.Tex:SetColorTexture(1,0,0,1)
+    end
+    Ball:Show()
+    table.insert(Suika.Balls, Ball)
+  end
+
+  local Ball = CreateFrame("Frame", Ball, Suika)
+  Ball.Size = 1
+  Ball.IsClickable = true
+  Ball.IsActive = true
+  Ball.VelY = 0
+  Ball:SetSize(GR.Suika.Const.BallSizes[Ball.Size] * GR.Suika.XRatio, GR.Suika.Const.BallSizes[Ball.Size] * GR.Suika.YRatio)
+  Ball:SetPoint("CENTER", nil, "CENTER", 0, 240)
+  Ball:SetMovable(true)
+  Ball:EnableMouse(true)
+  Ball:SetPropagateKeyboardInput(true)
+  Ball:RegisterForDrag("LeftButton")
+  Ball:SetScript("OnMouseDown", function(self, button)
+    self:StartMoving(false)
+  end)
+  Ball:SetScript("OnMouseUp", function(self)
+    Ball.IsClickable = false
+    self:StopMovingOrSizing()
+    self:SetMovable(false)
+    self:EnableMouse()
+    local point, relativeTo, relativePoint, xOfs, yOfs = self:GetPoint()
+    self:ClearAllPoints()
+    self:SetParent(Suika)
+    self:SetPoint("CENTER", nil, "CENTER", xOfs, 240)
+    print(point, relativeTo, relativePoint, xOfs, yOfs)
+    CreateUseNextBall()
+  end)
+  Ball.Tex = Ball:CreateTexture()
+  Ball.Tex:SetAllPoints(Ball)
+  Ball.Tex:SetColorTexture(1,0,1,1)
+  table.insert(Suika.Balls, Ball)
+end
+
 -- Size
 function GR:SuikaSize()
   local Main = GR_GUI.Main
@@ -98,12 +187,17 @@ function GR:SuikaSize()
   -- Game Screen
   Suika:SetPoint("BOTTOM", 0, 25 * (Main:GetHeight() / GR.Win.Const.Tab1Height))
   Suika:SetSize(Main:GetWidth() * (GR.Suika.Const.GameScreenWidth / GR.Suika.Const.Tab1Width), Main:GetHeight() * (GR.Win.Const.GameScreenHeight / GR.Win.Const.Tab1Height))
-  GR.Suika.XRatio = Suika:GetWidth() / GR.Win.Const.GameScreenWidth
+  GR.Suika.XRatio = Suika:GetWidth() / GR.Suika.Const.GameScreenWidth
   GR.Suika.YRatio = Suika:GetHeight() / GR.Win.Const.GameScreenHeight
   GR.Suika.ScreenRatio = (Suika:GetWidth() / GR.Suika.Const.GameScreenWidth + Suika:GetHeight() / GR.Win.Const.GameScreenHeight) / 2
 
+  -- variables
+  GR.Suika.Gravity = GR.Suika.Const.Gravity * GR.Suika.YRatio
+  GR.Suika.MinGravity = GR.Suika.Const.MinGravity * GR.Suika.YRatio
+
   GR:SuikaSizeStatusBtns()
   GR:SuikaSizeInfo()
+  GR:SuikaSizeBalls()
 end
 
 function GR:SuikaSizeStatusBtns()
@@ -113,7 +207,7 @@ function GR:SuikaSizeStatusBtns()
   local ScreenRatio = GR.Suika.ScreenRatio
   
   -- Start
-  Suika.Start:SetPoint("TOPLEFT", Suika, 50 * XRatio, 34 * YRatio)
+  Suika.Start:SetPoint("TOPLEFT", Suika, 30 * XRatio, 39 * YRatio)
   Suika.Start:SetSize(30 * XRatio, 30 * YRatio)
   Suika.Start.Line1:SetStartPoint("CENTER", -8 * XRatio, 8 * YRatio)
   Suika.Start.Line1:SetEndPoint("CENTER", 8 * XRatio, 0)
@@ -126,7 +220,7 @@ function GR:SuikaSizeStatusBtns()
   Suika.Start.Line3:SetThickness(3 * ScreenRatio)
 
   -- Stop
-  Suika.Stopx:SetPoint("TOPLEFT", Suika, 83 * XRatio, 34 * YRatio)
+  Suika.Stopx:SetPoint("TOPLEFT", Suika, 30 * XRatio, 39 * YRatio)
   Suika.Stopx:SetSize(30 * XRatio, 30 * YRatio)
   Suika.Stopx.Tex:SetSize(15 * XRatio, 15 * YRatio)
 end
@@ -135,7 +229,7 @@ function GR:SuikaSizeInfo()
   local Suika = GR_GUI.Main.Suika
 
   -- Points
-  Suika.PointsFS:SetPoint("BOTTOMLEFT", Suika, "TOPLEFT", 160 * GR.Suika.XRatio, 6 * GR.Suika.YRatio)
+  Suika.PointsFS:SetPoint("BOTTOMLEFT", Suika, "TOPLEFT", 110 * GR.Suika.XRatio, 10 * GR.Suika.YRatio)
   Suika.PointsFS:SetTextScale(2 * GR.Suika.ScreenRatio)
   
   -- Game Over
@@ -143,9 +237,26 @@ function GR:SuikaSizeInfo()
   Suika.GameOverFS:SetTextScale(3.7 * GR.Suika.ScreenRatio)
 end
 
+function GR:SuikaSizeBalls()
+  for i,v in pairs(GR_GUI.Main.Suika.Balls) do
+    v:SetSize(GR.Suika.Const.BallSizes[v.Size] * GR.Suika.XRatio, GR.Suika.Const.BallSizes[v.Size] * GR.Suika.YRatio)
+  end
+end
+
 -- Update
 function GR:SuikaUpdate(self, elapsed)
+  GR:SuikaUpdateBalls(self, elapsed)
+end
 
+function GR:SuikaUpdateBalls(self, elapsed)
+  for i,v in pairs(GR_GUI.Main.Suika.Balls) do
+    if (v.IsClickable == false) then -- apply gravity
+      v.VelY = v.VelY + (GR.Suika.Gravity * elapsed)
+      if (v.VelY < GR.Suika.MinGravity) then v.VelY = GR.Suika.MinGravity end -- limit fall speed
+      local point, relativeTo, relativePoint, xOfs, yOfs = v:GetPoint()
+      v:SetPoint("CENTER", nil, "CENTER", xOfs, yOfs + v.VelY)
+    end
+  end
 end
 
 -- Collisions
@@ -170,7 +281,7 @@ function GR:SuikaShow()
   Suika.PointsFS:Show()
   Suika.GameOverFS:Hide()
   if (GR.Suika.ActiveState == 'Stop') then Suika.Start:Show() end
-  if (GR.Suika.ActiveState == 'Start') then Suika.Stopx:Show() end
+  if (GR.Suika.ActiveState == 'Start') then Suika.Stopx:Show() Suika.Game:Show() end
 end
 
 function GR:SuikaHide()
