@@ -101,6 +101,7 @@ function GR:OnInitialize()
   GR:CreateAsteroids()
   GR:CreateSnake()
   GR:CreateBouncyChicken()
+  GR:SuikaCreate()
   
   GR.db.realm.tab = 2
   GR:TabSelect()
@@ -161,6 +162,7 @@ function GR:CreateMainWindow()
       GR:SizeAsteroids()
       GR:SnakeSize()
       GR:SizeBC()
+      GR:SuikaSize()
   end)
   
   -- Game Room Title
@@ -492,6 +494,19 @@ function GR:CreateSoloGames()
     end
   end)
 
+  SoloGames.SuikaBtn = CreateFrame("Button", SuikaBtn, SoloGames, "UIPanelButtonTemplate")
+  local SuikaBtn = SoloGames.SuikaBtn
+  SuikaBtn.FS = SuikaBtn:CreateFontString(nil, "OVERLAY", "GameTooltipText")
+  local BCFS = SuikaBtn.FS
+  BCFS:SetTextColor(.8,.8,.8, 1)
+  BCFS:SetText("Suika")
+  SuikaBtn:SetScript("OnClick", function(self, button, down) 
+    if (button == "LeftButton" and down == false) then
+      GR.GameType = "Suika"
+      GR:ShowSoloGame()
+    end
+  end)
+
   Tab2:Hide()
 end
 
@@ -502,7 +517,11 @@ function GR:ResizeMain()
   -- Resize Main Ratios
   -- In Game
   if (GR.db.realm.tab == 1) then
-    Main.XRatio = Main:GetWidth() / GR.Win.Const.GameScreenWidth
+    if (GR.GameType == 'Suika') then 
+      Main.XRatio = Main:GetWidth() / GR.Suika.Const.GameScreenWidth
+    else
+      Main.XRatio = Main:GetWidth() / GR.Win.Const.GameScreenWidth
+    end
     Main.YRatio = Main:GetHeight() / GR.Win.Const.GameScreenHeight
     Main.ScreenRatio = (Main.XRatio + Main.YRatio) / 2
   end
@@ -651,6 +670,12 @@ function GR:ResizeSoloGames()
   local BCFS = BCBtn.FS
   BCFS:SetPoint("CENTER", 0, 0)
   BCFS:SetTextScale(1.1 * Main.ScreenRatio)
+  local SuikaBtn = SoloGames.SuikaBtn
+  SuikaBtn:SetPoint("TOPRIGHT", -5 * Main.XRatio, -40 * Main.YRatio)
+  SuikaBtn:SetSize(120 * Main.XRatio, 30 * Main.YRatio)
+  local SuikaFS = SuikaBtn.FS
+  SuikaFS:SetPoint("CENTER", 0, 0)
+  SuikaFS:SetTextScale(1.4 * Main.ScreenRatio)
 end
 
 function GR:SizeAcceptDecline()
@@ -713,7 +738,13 @@ function GR:TabSelect()
   
   -- In Game
   if (tab == 1) then
-    local Width, Height, Change = CheckWidthHeight(GR.Win.Const.GameScreenWidth * Main.XRatio, GR.Win.Const.GameScreenHeight * Main.YRatio)
+    local Width, Height, Change
+
+    if (GR.GameType == 'Suika') then 
+      Width, Height, Change = CheckWidthHeight((GR.Suika.Const.GameScreenWidth + 10) * Main.XRatio, GR.Win.Const.GameScreenHeight * Main.YRatio)
+    else
+      Width, Height, Change = CheckWidthHeight(GR.Win.Const.GameScreenWidth * Main.XRatio, GR.Win.Const.GameScreenHeight * Main.YRatio)
+    end
 
     Main:SetSize(Width, Height)
     Main:SetPoint(point, relativeTo, relativePoint, xOfs, yOfs)
@@ -739,6 +770,9 @@ function GR:TabSelect()
     end
     if (GR.GameType == "Bouncy Chicken") then
       GR:BCShow()
+    end
+    if (GR.GameType == "Suika") then
+      GR:SuikaShow()
     end
   end
   -- Solo Games

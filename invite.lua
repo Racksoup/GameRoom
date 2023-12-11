@@ -379,6 +379,12 @@ function GR:ExitGameClicked()
     GR:BCHide()    
   end
 
+  -- Suika
+  if (GR.GameType == "Suika") then
+    GR:SuikaHide()    
+  end
+
+  GR_GUI.Main.ExitBtn:Hide()
   GR.GameType = nil
   GR.db.realm.tab = 2
   GR:TabSelect()
