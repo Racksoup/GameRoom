@@ -5,8 +5,9 @@ function GR:SuikaCreate()
   GR.Suika.Const.GameScreenWidth = 400
   GR.Suika.Const.Tab1Width = 450
   GR.Suika.Const.BallSizes = {30, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100}
-  GR.Suika.Const.Gravity = -9.5
-  GR.Suika.Const.MinGravity = -4.5
+  GR.Suika.Const.Gravity = -200.5
+  GR.Suika.Const.MinGravity = -1.5
+  GR.Suika.Const.Drag = 1
   
   -- Suika Frame
   GR_GUI.Main.Suika = CreateFrame("Frame", Suika, GR_GUI.Main, "ThinBorderTemplate")
@@ -28,6 +29,8 @@ function GR:SuikaCreate()
   GR.Suika.Points = 0
   GR.Suika.Gravity = GR.Suika.Const.Gravity * GR.Suika.YRatio
   GR.Suika.MinGravity = GR.Suika.Const.MinGravity * GR.Suika.YRatio
+  GR.Suika.Drag = GR.Suika.Const.Drag * GR.Suika.ScreenRatio
+
 
   -- Create
   GR:SuikaGameLoop()
@@ -124,6 +127,8 @@ function GR:MakeBall(Ball)
   Ball.IsActive = true
   Ball.VelY = 0
   Ball.VelX = 0
+  Ball.AccY = 0
+  Ball.AccX = 0
   Ball:SetSize(GR.Suika.BallSizes[Ball.Size] * GR.Suika.XRatio, GR.Suika.BallSizes[Ball.Size] * GR.Suika.YRatio)
   Ball:SetPoint("CENTER", Suika, "BOTTOMLEFT", Suika:GetWidth() / 2, 400 * GR.Suika.YRatio)
   Ball:SetMovable(true)
@@ -168,6 +173,7 @@ function GR:SuikaSize()
   -- variables
   GR.Suika.Gravity = GR.Suika.Const.Gravity * GR.Suika.YRatio
   GR.Suika.MinGravity = GR.Suika.Const.MinGravity * GR.Suika.YRatio
+  GR.Suika.Drag = GR.Suika.Const.Drag * GR.Suika.ScreenRatio
 
   GR:SuikaSizeStatusBtns()
   GR:SuikaSizeInfo()
@@ -227,7 +233,10 @@ end
 function GR:SuikaUpdateBalls(self, elapsed)
   for i,v in pairs(GR_GUI.Main.Suika.Balls) do
     if (v.IsClickable == false) then -- apply gravity
-      v.VelY = v.VelY + (GR.Suika.Gravity * elapsed)
+      v.AccX = -v.VelX * .1
+      v.AccY = -v.VelY * .1
+      v.VelX = v.VelX + v.AccX
+      v.VelY = v.VelY + (GR.Suika.Gravity * elapsed) + v.AccY
       if (v.VelY < GR.Suika.MinGravity) then v.VelY = GR.Suika.MinGravity end -- limit fall speed
       local point, relativeTo, relativePoint, xOfs, yOfs = v:GetPoint()
       v:SetPoint(point, relativeTo, relativePoint, xOfs + v.VelX, yOfs + v.VelY)
@@ -239,14 +248,14 @@ end
 function GR:SuikaCol()
   local Suika = GR_GUI.Main.Suika
   local Balls = Suika.Balls
+  
+  -- Ball to Wall
   local Border = {
     top = Suika:GetHeight(),
     right = Suika:GetWidth(),
     bottom = 0,
     left = 0
   }
-
-  -- Ball to Wall
   for i,v in pairs(Balls) do
     if (v.IsActive and not v.IsClickable ) then
       local point, relativeTo, relativePoint, xOfs, yOfs = v:GetPoint()
@@ -289,30 +298,31 @@ function GR:SuikaCol()
     if (v.IsActive) then
       local p1, rf1, rp1, x1, y1 = v:GetPoint()
       r1 = GR.Suika.BallSizes[v.Size] / 2
-      -- local Ball1 = {
-      --   top = yOfs1 + BallSize,
-      --   right = xOfs1 + BallSize,
-      --   bottom = yOfs1 - BallSize,
-      --   left = xOfs1 - BallSize
-      -- }
-      
+
       for j,k in pairs(Balls) do
         if (k.IsActive and j ~= i) then
-          local p2, rf2, rp2, x2, y2 = v:GetPoint()
+          local p2, rf2, rp2, x2, y2 = k:GetPoint()
           r2 = GR.Suika.BallSizes[k.Size] / 2
-          -- local Ball2 = {
-          --   top = yOfs2 + BallSize,
-          --   right = xOfs2 + BallSize,
-          --   bottom = yOfs2 - BallSize,
-          --   left = xOfs2 - BallSize
-          -- }
+
           if(GR:DoCirclesOverlap(x1, y1, r1, x2, y2, r2)) then
-            -- print(((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2)), (r1+r2)*(r1+r2))
+            local distance = sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2))
+            local overlap = (distance - r1 - r2) * .5
+
+            v.VelX = -(x1-x2) / distance * 10
+            v.VelY = -(y1-y2) / distance * 10
+            k.VelX = (x1-x2) / distance * 10
+            k.VelY = (y1-y2) / distance * 10
+            v:SetPoint(p1,rf1,rp1, x1 - overlap * (x1-x2) / distance, y1 - overlap * (y1-y2) / distance)
+            k:SetPoint(p2,rf2,rp2, x2 + overlap * (x1-x2) / distance, y2 + overlap * (y1-y2) / distance)
           end
         end
       end
     end
   end
+end
+
+function GR:DoCirclesOverlap(x1, y1, r1, x2, y2, r2)
+  return abs((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2)) <= (r1+r2)*(r1+r2)
 end
 
 -- Controls
@@ -383,10 +393,6 @@ function GR:SuikaGameOver()
   GR:SuikaStop()
 
   GR_GUI.Main.Suika.GameOverFS:Show()
-end
-
-function GR:DoCirclesOverlap(x1, y1, r1, x2, y2, r2)
-  return abs((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2)) <= (r1+r2)*(r1+r2)
 end
 
 -- needs resize dimensions locked so circles stay circles
