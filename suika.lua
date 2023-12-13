@@ -7,7 +7,7 @@ function GR:SuikaCreate()
   GR.Suika.Const.BallSizes = {20, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100}
   GR.Suika.Const.Gravity = -9.5
   GR.Suika.Const.MinGravity = -4.5
-
+  
   -- Suika Frame
   GR_GUI.Main.Suika = CreateFrame("Frame", Suika, GR_GUI.Main, "ThinBorderTemplate")
   local Suika = GR_GUI.Main.Suika
@@ -15,11 +15,15 @@ function GR:SuikaCreate()
   Suika:SetSize(GR_GUI.Main:GetWidth() * (GR.Suika.Const.GameScreenWidth / GR.Suika.Const.Tab1Width), GR_GUI.Main:GetHeight() * (GR.Win.Const.GameScreenHeight / GR.Win.Const.Tab1Height))
   Suika:SetClipsChildren(true)
   Suika:Hide()
-
+  
   -- Variables
   GR.Suika.XRatio = Suika:GetWidth() / GR.Suika.Const.GameScreenWidth
   GR.Suika.YRatio = Suika:GetHeight() / GR.Win.Const.GameScreenHeight
   GR.Suika.ScreenRatio = (Suika:GetWidth() / GR.Suika.Const.GameScreenWidth + Suika:GetHeight() / GR.Win.Const.GameScreenHeight) / 2
+  GR.Suika.BallSizes = {}
+  for i,v in ipairs(GR.Suika.Const.BallSizes) do
+    GR.Suika.BallSizes[i] = v * GR.Suika.ScreenRatio
+  end
   GR.Suika.ActiveState = "Start"
   GR.Suika.Points = 0
   GR.Suika.Gravity = GR.Suika.Const.Gravity * GR.Suika.YRatio
@@ -102,7 +106,9 @@ function GR:SuikaCreateBalls()
 
   Suika.Balls = {}
 
-  local function CreateUseNextBall()
+
+
+  function CreateUseNextBall()
     local Ball = nil
     for i,v in pairs(Suika.Balls) do -- find usable ball
       if (v.IsActive == false) then
@@ -113,29 +119,32 @@ function GR:SuikaCreateBalls()
     if (Ball == nil) then -- if no usable balls make one
       Ball = CreateFrame("Frame", Ball, Suika)
     end
+    MakeBall(Ball)
+  end
+
+  function MakeBall(Ball)
     Ball.Size = 1
     Ball.IsClickable = true
     Ball.IsActive = true
     Ball.VelY = 0
-    Ball:SetSize(GR.Suika.Const.BallSizes[Ball.Size] * GR.Suika.XRatio, GR.Suika.Const.BallSizes[Ball.Size] * GR.Suika.YRatio)
-    Ball:SetPoint("CENTER", nil, "CENTER", 0, 240)
+    Ball:SetSize(GR.Suika.BallSizes[Ball.Size] * GR.Suika.XRatio, GR.Suika.BallSizes[Ball.Size] * GR.Suika.YRatio)
+    Ball:SetPoint("CENTER", Suika, "CENTER", 0, 150)
     Ball:SetMovable(true)
     Ball:EnableMouse(true)
     Ball:SetPropagateKeyboardInput(true)
     Ball:RegisterForDrag("LeftButton")
     Ball:SetScript("OnMouseDown", function(self, button)
-      self:StartMoving(false)
+      self:StartMoving()
     end)
     Ball:SetScript("OnMouseUp", function(self)
       Ball.IsClickable = false
       self:StopMovingOrSizing()
       self:SetMovable(false)
-      self:EnableMouse()
-      local point, relativeTo, relativePoint, xOfs, yOfs = self:GetPoint()
+      self:EnableMouse(false)
+      local left, bottom, width, height = self:GetRect()
+      local left2, bottom2, width2, height2 = Suika:GetRect()
       self:ClearAllPoints()
-      self:SetParent(Suika)
-      self:SetPoint("CENTER", nil, "CENTER", xOfs, 240)
-      print(point, relativeTo, relativePoint, xOfs, yOfs)
+      self:SetPoint("CENTER", Suika, "CENTER", (left - Suika:GetWidth() / 2) - left2 + 9, 150)
       CreateUseNextBall()
     end)
     if (Ball:GetRegions() == nil) then -- if new frame, create new texture
@@ -148,35 +157,9 @@ function GR:SuikaCreateBalls()
   end
 
   local Ball = CreateFrame("Frame", Ball, Suika)
-  Ball.Size = 1
-  Ball.IsClickable = true
-  Ball.IsActive = true
-  Ball.VelY = 0
-  Ball:SetSize(GR.Suika.Const.BallSizes[Ball.Size] * GR.Suika.XRatio, GR.Suika.Const.BallSizes[Ball.Size] * GR.Suika.YRatio)
-  Ball:SetPoint("CENTER", nil, "CENTER", 0, 240)
-  Ball:SetMovable(true)
-  Ball:EnableMouse(true)
-  Ball:SetPropagateKeyboardInput(true)
-  Ball:RegisterForDrag("LeftButton")
-  Ball:SetScript("OnMouseDown", function(self, button)
-    self:StartMoving(false)
-  end)
-  Ball:SetScript("OnMouseUp", function(self)
-    Ball.IsClickable = false
-    self:StopMovingOrSizing()
-    self:SetMovable(false)
-    self:EnableMouse()
-    local point, relativeTo, relativePoint, xOfs, yOfs = self:GetPoint()
-    self:ClearAllPoints()
-    self:SetParent(Suika)
-    self:SetPoint("CENTER", nil, "CENTER", xOfs, 240)
-    print(point, relativeTo, relativePoint, xOfs, yOfs)
-    CreateUseNextBall()
-  end)
-  Ball.Tex = Ball:CreateTexture()
-  Ball.Tex:SetAllPoints(Ball)
-  Ball.Tex:SetColorTexture(1,0,1,1)
-  table.insert(Suika.Balls, Ball)
+  MakeBall(Ball)
+
+
 end
 
 -- Size
@@ -239,13 +222,15 @@ end
 
 function GR:SuikaSizeBalls()
   for i,v in pairs(GR_GUI.Main.Suika.Balls) do
-    v:SetSize(GR.Suika.Const.BallSizes[v.Size] * GR.Suika.XRatio, GR.Suika.Const.BallSizes[v.Size] * GR.Suika.YRatio)
+    v:SetSize(GR.Suika.BallSizes[v.Size] * GR.Suika.XRatio, GR.Suika.BallSizes[v.Size] * GR.Suika.YRatio)
   end
 end
 
 -- Update
 function GR:SuikaUpdate(self, elapsed)
   GR:SuikaUpdateBalls(self, elapsed)
+
+  GR:SuikaCol()
 end
 
 function GR:SuikaUpdateBalls(self, elapsed)
@@ -254,14 +239,63 @@ function GR:SuikaUpdateBalls(self, elapsed)
       v.VelY = v.VelY + (GR.Suika.Gravity * elapsed)
       if (v.VelY < GR.Suika.MinGravity) then v.VelY = GR.Suika.MinGravity end -- limit fall speed
       local point, relativeTo, relativePoint, xOfs, yOfs = v:GetPoint()
-      v:SetPoint("CENTER", nil, "CENTER", xOfs, yOfs + v.VelY)
+      v:SetPoint(point, relativeTo, relativePoint, xOfs, yOfs + v.VelY)
     end
   end
 end
 
 -- Collisions
 function GR:SuikaCol()
+  local Suika = GR_GUI.Main.Suika
+  local Balls = Suika.Balls
+  local Border = {
+    top = Suika:GetHeight() /2,
+    right = Suika:GetWidth() /2,
+    bottom = - Suika:GetHeight() /2,
+    left= - Suika:GetWidth() /2
+  }
 
+
+  -- Ball to Wall
+  for i,v in pairs(Balls) do
+    if (v.IsActive) then
+      local point, relativeTo, relativePoint, xOfs, yOfs = v:GetPoint()
+      -- print(point, relativeTo, relativePoint, xOfs, yOfs)
+      BallSize = GR.Suika.BallSizes[v.Size] / 2
+      local Ball = {
+        top = yOfs + BallSize,
+        right = xOfs + BallSize,
+        bottom = yOfs - BallSize,
+        left = xOfs - BallSize
+      }
+
+      print(Border.bottom, Ball.bottom)
+
+      -- check if ship is outside of border
+      -- circle top past border top
+      local pos = {x = xOfs, y = yOfs}
+      if (Ball.top > Border.top) then 
+        pos.y = Border.bottom - BallSize
+      end
+      -- circle right past border right
+      if (Ball.right > Border.right) then 
+        pos.x = Border.right - BallSize
+      end
+      -- circle bottom past border bottom
+      if (Ball.bottom < Border.bottom) then 
+        pos.y = Border.bottom + BallSize
+      end
+      -- circle left past border left
+      if (Ball.left < Border.left) then 
+        pos.x = Border.left + BallSize
+      end
+      
+      -- apply pos change if collision
+      if (pos.x ~= xOfs or pos.y ~= yOfs) then
+        v:SetPoint("CENTER", pos.x, pos.y)
+      end
+    end
+  end
 end
 
 -- Controls
@@ -325,3 +359,14 @@ function GR:SuikaGameOver()
 
   GR_GUI.Main.Suika.GameOverFS:Show()
 end
+
+function GR:ColSquareCircle(cir, rect)
+  local MarginX = 9 * (GR_GUI.Main:GetWidth() / 800)
+  local MarginY = 9 * (GR_GUI.Main:GetHeight() / 640)
+  if (cir.left + MarginX > rect.br.x - MarginX or cir.top - MarginY < rect.br.y + MarginY or cir.right - MarginX < rect.tl.x + MarginX or cir.bottom + MarginY > rect.tl.y - MarginY) then
+    return false
+  end
+  return true
+end
+
+-- needs resize dimensions locked so circles stay circles
