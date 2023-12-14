@@ -11,12 +11,12 @@ function GR:SuikaCreate()
   GR.Suika.Const.MinGravity = -1500
   GR.Suika.Const.MaxSpeed = 2000
   GR.Suika.Const.Colors = {
-    {1,1,0,1},
-    {.66,0,.66,1},
-    {0,.6,1,1},
-    {1,0,1,1},
-    {.75,.75,0,1},
-    {.50,0,.50,1},
+    {1,0,0,1},
+    {0,1,0,1},
+    {0,0,1,1},
+    {.5,0,.5,1},
+    {.5,.5,0,1},
+    {0,.5,.5,1},
     {1,1,0,1},
     {.66,0,.66,1},
     {0,0,.33,1},
@@ -152,7 +152,6 @@ end
 
 function GR:MakeBall(Ball)
   local Suika = GR_GUI.Main.Suika
-  print(GR.Suika.XRatio, GR.Suika.YRatio)
   
   Ball.Size = math.random(3)
   Ball.IsClickable = true
@@ -186,14 +185,14 @@ function GR:MakeBall(Ball)
   if (Ball:GetRegions() == nil) then -- if new frame, create new texture
     Ball.Tex = Ball:CreateTexture()
     Ball.Tex:SetAllPoints(Ball)
-    local color = GR.Suika.Const.Colors[Ball.Size]
-    Ball.Tex:SetColorTexture(color[1],color[2],color[3],color[4])
     Ball.Mask = Ball:CreateMaskTexture()
+    Ball.Tex:AddMaskTexture(Ball.Mask)
     Ball.Mask:SetAllPoints(Ball)
     Ball.Mask:SetTexture("Interface\\AddOns\\ZUI_GameRoom\\images\\Circle.blp")
     Ball.Mask:SetTexCoord(0,1,0,1)
-    Ball.Tex:AddMaskTexture(Ball.Mask)
   end
+  local color = GR.Suika.Const.Colors[Ball.Size]
+  Ball.Tex:SetColorTexture(color[1],color[2],color[3],color[4])
   Ball:Show()
   if (Ball.New) then
     table.insert(Suika.Balls, Ball)
@@ -485,7 +484,8 @@ function GR:SuikaGameOver()
   GR_GUI.Main.Suika.GameOverFS:Show()
 end
 
+-- frames jiggle more at low fps 
+-- balls spawn with left offset
 -- needs resize dimensions locked so circles stay circles
--- colors bug
 -- points
 -- end-game
