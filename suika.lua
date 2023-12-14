@@ -5,8 +5,8 @@ function GR:SuikaCreate()
   GR.Suika.Const.GameScreenWidth = 400
   GR.Suika.Const.Tab1Width = 450
   GR.Suika.Const.BallSizes = {120, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100}
-  GR.Suika.Const.Gravity = -200.5
-  GR.Suika.Const.MinGravity = -1.5
+  GR.Suika.Const.Gravity = -3.5
+  GR.Suika.Const.MinGravity = -2.2
   GR.Suika.Const.Drag = 1
   
   -- Suika Frame
@@ -289,7 +289,7 @@ function GR:SuikaCol()
       -- circle bottom past border bottom
       if (Ball.bottom < Border.bottom) then 
         pos.y = Border.bottom + r
-        v.VelY = v.VelY +20
+        v.VelY = v.VelY +2
       end
       -- circle left past border left
       if (Ball.left < Border.left) then 
