@@ -4,10 +4,10 @@ function GR:SuikaCreate()
   GR.Suika.Const = {}
   GR.Suika.Const.GameScreenWidth = 400
   GR.Suika.Const.Tab1Width = 450
-  GR.Suika.Const.BallSizes = {120, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100}
-  GR.Suika.Const.Gravity = -3.5
-  GR.Suika.Const.MinGravity = -2.2
-  GR.Suika.Const.Drag = 1
+  GR.Suika.Const.BallSizes = {25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100}
+  GR.Suika.Const.Gravity = -800
+  GR.Suika.Const.MinGravity = -1500
+  GR.Suika.Const.MaxSpeed = 2000
   
   -- Suika Frame
   GR_GUI.Main.Suika = CreateFrame("Frame", Suika, GR_GUI.Main, "ThinBorderTemplate")
@@ -29,8 +29,7 @@ function GR:SuikaCreate()
   GR.Suika.Points = 0
   GR.Suika.Gravity = GR.Suika.Const.Gravity * GR.Suika.YRatio
   GR.Suika.MinGravity = GR.Suika.Const.MinGravity * GR.Suika.YRatio
-  GR.Suika.Drag = GR.Suika.Const.Drag * GR.Suika.ScreenRatio
-
+  GR.Suika.MaxSpeed = GR.Suika.Const.MaxSpeed * GR.Suika.ScreenRatio
 
   -- Create
   GR:SuikaGameLoop()
@@ -122,13 +121,14 @@ end
 function GR:MakeBall(Ball)
   local Suika = GR_GUI.Main.Suika
   
-  Ball.Size = 1
+  Ball.Size = math.random(3)
   Ball.IsClickable = true
   Ball.IsActive = true
   Ball.VelY = 0
   Ball.VelX = 0
   Ball.AccY = 0
   Ball.AccX = 0
+  Ball.Mass = GR.Suika.BallSizes[Ball.Size] * 10
   Ball:SetSize(GR.Suika.BallSizes[Ball.Size] * GR.Suika.XRatio, GR.Suika.BallSizes[Ball.Size] * GR.Suika.YRatio)
   Ball:SetPoint("CENTER", Suika, "BOTTOMLEFT", Suika:GetWidth() / 2, 400 * GR.Suika.YRatio)
   Ball:SetMovable(true)
@@ -181,7 +181,7 @@ function GR:SuikaSize()
   -- variables
   GR.Suika.Gravity = GR.Suika.Const.Gravity * GR.Suika.YRatio
   GR.Suika.MinGravity = GR.Suika.Const.MinGravity * GR.Suika.YRatio
-  GR.Suika.Drag = GR.Suika.Const.Drag * GR.Suika.ScreenRatio
+  GR.Suika.MaxSpeed = GR.Suika.Const.MaxSpeed * GR.Suika.ScreenRatio
 
   GR:SuikaSizeStatusBtns()
   GR:SuikaSizeInfo()
@@ -240,15 +240,26 @@ end
 
 function GR:SuikaUpdateBalls(self, elapsed)
   for i,v in pairs(GR_GUI.Main.Suika.Balls) do
-    if (v.IsClickable == false) then -- apply gravity
-      v.AccX = -v.VelX * .8
-      -- v.AccY = -v.VelY * .8
-      v.VelX = v.VelX + (v.AccX * elapsed)
-      v.VelY = v.VelY + (GR.Suika.Gravity * elapsed) 
-      --+ (v.AccY * elapsed)
+    if (v.IsClickable == false) then
+      if (v.VelX > GR.Suika.MaxSpeed) then -- limit speed
+        v.VelX = GR.Suika.MaxSpeed
+      end
+      if (v.VelX < -GR.Suika.MaxSpeed) then
+        v.VelX = -GR.Suika.MaxSpeed
+      end
+      if (v.VelY > GR.Suika.MaxSpeed) then
+        v.VelY = GR.Suika.MaxSpeed
+      end
+      if (v.VelY < -GR.Suika.MaxSpeed) then
+        v.VelY = -GR.Suika.MaxSpeed
+      end
+      v.AccX = -v.VelX * 0.8 -- drag
+      v.AccY = -v.VelY * 0.8
+      v.VelX = v.VelX + (v.AccX * elapsed) -- Vel
+      v.VelY = v.VelY + (GR.Suika.Gravity * elapsed) + (v.AccY * elapsed)
       if (v.VelY < GR.Suika.MinGravity) then v.VelY = GR.Suika.MinGravity end -- limit fall speed
       local point, relativeTo, relativePoint, xOfs, yOfs = v:GetPoint()
-      v:SetPoint(point, relativeTo, relativePoint, xOfs + v.VelX, yOfs + v.VelY)
+      v:SetPoint(point, relativeTo, relativePoint, xOfs + v.VelX * elapsed, yOfs + v.VelY * elapsed) -- apply speed
     end
   end
 end
@@ -280,20 +291,23 @@ function GR:SuikaCol()
       -- circle top past border top
       local pos = {x = xOfs, y = yOfs}
       if (Ball.top > Border.top) then 
-        pos.y = Border.bottom - r
+        pos.y = Border.top - r
+        v.VelY = v.VelY - v.VelY * 1.9
       end
       -- circle right past border right
       if (Ball.right > Border.right) then 
         pos.x = Border.right - r
+        v.VelX = v.VelX - v.VelX * 1.9
       end
       -- circle bottom past border bottom
       if (Ball.bottom < Border.bottom) then 
         pos.y = Border.bottom + r
-        v.VelY = v.VelY +2
+        v.VelY = v.VelY - v.VelY * 1.9
       end
       -- circle left past border left
       if (Ball.left < Border.left) then 
         pos.x = Border.left + r
+        v.VelX = v.VelX - v.VelX * 1.9
       end
       
       -- apply pos change if collision
@@ -305,7 +319,7 @@ function GR:SuikaCol()
 
   -- Ball to Ball 
   for i,v in pairs(Balls) do
-    if (v.IsActive) then
+    if (v.IsActive and not v.IsClickable) then
       local p1, rf1, rp1, x1, y1 = v:GetPoint()
       local r1 = GR.Suika.BallSizes[v.Size] / 2
 
@@ -318,16 +332,27 @@ function GR:SuikaCol()
             local distance = sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2))
             local overlap = (distance - r1 - r2) * .5
 
-            -- v.VelX = -(x1-x2) / distance
-            -- v.VelY = -(y1-y2) / distance
-            -- k.VelX = (x1-x2) / distance
-            -- k.VelY = (y1-y2) / distance
-            -- v.VelX = v.VelX *4
-            -- v.VelY = v.VelY *4
-            -- k.VelX = k.VelX *4
-            -- k.VelY = k.VelY *4
             v:SetPoint(p1,rf1,rp1, x1 - overlap * (x1-x2) / distance, y1 - overlap * (y1-y2) / distance)
             k:SetPoint(p2,rf2,rp2, x2 + overlap * (x1-x2) / distance, y2 + overlap * (y1-y2) / distance)
+
+            -- dynamic collision
+            local nx = (x2 - x1) / distance
+            local ny = (y2 - y1) / distance
+            local tx = -ny
+            local ty = nx
+            local dpTan1 = v.VelX * tx + v.VelY * ty
+            local dpTan2 = k.VelX * tx + k.VelY * ty
+            local dpNorm1 = v.VelX * nx + v.VelY * ny
+            local dpNorm2 = k.VelX * nx + k.VelY * ny
+
+            -- conservation of momentum in 1D
+            local m1 = (dpNorm1 * (v.Mass - k.Mass) + 2.0 * k.Mass * dpNorm2) / (v.Mass + k.Mass)
+            local m2 = (dpNorm2 * (k.Mass - v.Mass) + 2.0 * v.Mass * dpNorm1) / (v.Mass + k.Mass)
+
+            v.VelX = (tx * dpTan1 + nx * m1) *.97
+            v.VelY = (ty * dpTan1 + ny * m1) *.97
+            k.VelX = (tx * dpTan2 + nx * m2) *.97
+            k.VelY = (ty * dpTan2 + ny * m2) *.97
           end
         end
       end
