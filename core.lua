@@ -519,6 +519,7 @@ function GR:ResizeMain()
   if (GR.db.realm.tab == 1) then
     if (GR.GameType == 'Suika') then 
       Main.XRatio = Main:GetWidth() / GR.Suika.Const.GameScreenWidth
+      Main.YRatio = Main:GetHeight() / GR.Suika.Const.GameScreenHeight
     else
       Main.XRatio = Main:GetWidth() / GR.Win.Const.GameScreenWidth
     end
@@ -741,7 +742,7 @@ function GR:TabSelect()
     local Width, Height, Change
 
     if (GR.GameType == 'Suika') then 
-      Width, Height, Change = CheckWidthHeight((GR.Suika.Const.GameScreenWidth + 10) * Main.XRatio, GR.Win.Const.GameScreenHeight * Main.YRatio)
+      Width, Height, Change = CheckWidthHeight((GR.Suika.Const.GameScreenWidth + 10) * Main.XRatio, GR.Suika.Const.GameScreenHeight * Main.YRatio)
     else
       Width, Height, Change = CheckWidthHeight(GR.Win.Const.GameScreenWidth * Main.XRatio, GR.Win.Const.GameScreenHeight * Main.YRatio)
     end
