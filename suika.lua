@@ -4,7 +4,7 @@ function GR:SuikaCreate()
   GR.Suika.Const = {}
   GR.Suika.Const.GameScreenWidth = 400
   GR.Suika.Const.Tab1Width = 450
-  GR.Suika.Const.BallSizes = {30, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100}
+  GR.Suika.Const.BallSizes = {120, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100}
   GR.Suika.Const.Gravity = -200.5
   GR.Suika.Const.MinGravity = -1.5
   GR.Suika.Const.Drag = 1
@@ -152,7 +152,15 @@ function GR:MakeBall(Ball)
   if (Ball:GetRegions() == nil) then -- if new frame, create new texture
     Ball.Tex = Ball:CreateTexture()
     Ball.Tex:SetAllPoints(Ball)
-    Ball.Tex:SetColorTexture(1,0,0,1)
+    Ball.Tex:SetColorTexture(math.random(),math.random(),math.random(),1)
+    Ball.Mask = Ball:CreateMaskTexture()
+    Ball.Mask:SetAllPoints(Ball)
+    Ball.Mask:SetTexture("Interface\\AddOns\\ZUI_GameRoom\\images\\Circle.blp")
+    Ball.Mask:SetTexCoord(0,1,0,1)
+    Ball.Tex:AddMaskTexture(Ball.Mask)
+    -- Ball.Mask:SetBlendMode("ADD")
+    -- Ball.Tex:SetBlendMode("BLEND")
+    -- Ball.Tex:SetColorTexture(1,0,0,1)
   end
   Ball:Show()
   table.insert(Suika.Balls, Ball)
@@ -233,10 +241,11 @@ end
 function GR:SuikaUpdateBalls(self, elapsed)
   for i,v in pairs(GR_GUI.Main.Suika.Balls) do
     if (v.IsClickable == false) then -- apply gravity
-      v.AccX = -v.VelX * .1
-      v.AccY = -v.VelY * .1
-      v.VelX = v.VelX + v.AccX
-      v.VelY = v.VelY + (GR.Suika.Gravity * elapsed) + v.AccY
+      v.AccX = -v.VelX * .8
+      -- v.AccY = -v.VelY * .8
+      v.VelX = v.VelX + (v.AccX * elapsed)
+      v.VelY = v.VelY + (GR.Suika.Gravity * elapsed) 
+      --+ (v.AccY * elapsed)
       if (v.VelY < GR.Suika.MinGravity) then v.VelY = GR.Suika.MinGravity end -- limit fall speed
       local point, relativeTo, relativePoint, xOfs, yOfs = v:GetPoint()
       v:SetPoint(point, relativeTo, relativePoint, xOfs + v.VelX, yOfs + v.VelY)
@@ -280,6 +289,7 @@ function GR:SuikaCol()
       -- circle bottom past border bottom
       if (Ball.bottom < Border.bottom) then 
         pos.y = Border.bottom + r
+        v.VelY = v.VelY +20
       end
       -- circle left past border left
       if (Ball.left < Border.left) then 
@@ -297,21 +307,25 @@ function GR:SuikaCol()
   for i,v in pairs(Balls) do
     if (v.IsActive) then
       local p1, rf1, rp1, x1, y1 = v:GetPoint()
-      r1 = GR.Suika.BallSizes[v.Size] / 2
+      local r1 = GR.Suika.BallSizes[v.Size] / 2
 
       for j,k in pairs(Balls) do
         if (k.IsActive and j ~= i) then
           local p2, rf2, rp2, x2, y2 = k:GetPoint()
-          r2 = GR.Suika.BallSizes[k.Size] / 2
+          local r2 = GR.Suika.BallSizes[k.Size] / 2
 
           if(GR:DoCirclesOverlap(x1, y1, r1, x2, y2, r2)) then
             local distance = sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2))
             local overlap = (distance - r1 - r2) * .5
 
-            v.VelX = -(x1-x2) / distance * 10
-            v.VelY = -(y1-y2) / distance * 10
-            k.VelX = (x1-x2) / distance * 10
-            k.VelY = (y1-y2) / distance * 10
+            -- v.VelX = -(x1-x2) / distance
+            -- v.VelY = -(y1-y2) / distance
+            -- k.VelX = (x1-x2) / distance
+            -- k.VelY = (y1-y2) / distance
+            -- v.VelX = v.VelX *4
+            -- v.VelY = v.VelY *4
+            -- k.VelX = k.VelX *4
+            -- k.VelY = k.VelY *4
             v:SetPoint(p1,rf1,rp1, x1 - overlap * (x1-x2) / distance, y1 - overlap * (y1-y2) / distance)
             k:SetPoint(p2,rf2,rp2, x2 + overlap * (x1-x2) / distance, y2 + overlap * (y1-y2) / distance)
           end
