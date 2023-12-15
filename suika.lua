@@ -6,10 +6,12 @@ function GR:SuikaCreate()
   GR.Suika.Const.GameScreenHeight = 580
   GR.Suika.Const.Tab1Width = 450
   GR.Suika.Const.Tab1Height = 720
-  GR.Suika.Const.BallSizes = {65, 84.5, 109.8, 143, 186, 241, 277.15, 318.7, 366.5, 403.1, 443.5, 487.8, 536.6, 590.3, 649.3, 714.2, 785.6}
+  GR.Suika.Const.BallSizes = {37, 67, 106.8, 132, 173, 213, 241.15, 280.7, 320.5, 380.1, 423.5, 467.8, 536.6, 590.3, 649.3, 714.2, 785.6}
   GR.Suika.Const.Gravity = -1100
   GR.Suika.Const.MinGravity = -1500
   GR.Suika.Const.MaxSpeed = 2000
+  GR.Suika.Const.StartSizes = 4
+  GR.Suika.Const.TargetFrameTime = 1.0 / 60
   GR.Suika.Const.Colors = {
     {1,0,0,1},
     {0,1,0,1},
@@ -61,10 +63,10 @@ function GR:SuikaCreate()
   GR.Suika.Gravity = GR.Suika.Const.Gravity * GR.Suika.YRatio
   GR.Suika.MinGravity = GR.Suika.Const.MinGravity * GR.Suika.YRatio
   GR.Suika.MaxSpeed = GR.Suika.Const.MaxSpeed * GR.Suika.ScreenRatio
+  GR.Suika.SimTime = 0
 
   -- Create
   GR:SuikaGameLoop()
-  GR:SuikaControls()
   GR:SuikaCreateStatusBtns()
   GR:SuikaCreateInfo()
   Suika.Balls = {}
@@ -153,7 +155,7 @@ end
 function GR:MakeBall(Ball)
   local Suika = GR_GUI.Main.Suika
   
-  Ball.Size = math.random(3)
+  Ball.Size = math.random(GR.Suika.Const.StartSizes)
   Ball.IsClickable = true
   Ball.IsActive = false
   Ball.VelY = 0
@@ -267,7 +269,15 @@ end
 
 -- Update
 function GR:SuikaUpdate(self, elapsed)
-  GR:SuikaUpdateBalls(self, elapsed)
+  if (elapsed > 1 /60.0) then elapsed = 1 /60.0 end
+
+  GR.Suika.SimTime = GR.Suika.SimTime + elapsed
+
+  while (GR.Suika.SimTime >= GR.Suika.Const.TargetFrameTime) do
+    GR:SuikaUpdateBalls(self, GR.Suika.Const.TargetFrameTime)
+    GR.Suika.SimTime = GR.Suika.SimTime - GR.Suika.Const.TargetFrameTime 
+  end
+  
 
   GR:SuikaCol()
 end
@@ -287,8 +297,8 @@ function GR:SuikaUpdateBalls(self, elapsed)
       if (v.VelY < -GR.Suika.MaxSpeed) then
         v.VelY = -GR.Suika.MaxSpeed
       end
-      v.AccX = -v.VelX * 0.8 -- drag
-      v.AccY = -v.VelY * 0.8
+      v.AccX = -v.VelX * 1 -- drag
+      v.AccY = -v.VelY * 1
       v.VelX = v.VelX + (v.AccX * elapsed) -- Vel
       v.VelY = v.VelY + (GR.Suika.Gravity * elapsed) + (v.AccY * elapsed)
       if (v.VelY < GR.Suika.MinGravity) then v.VelY = GR.Suika.MinGravity end -- limit fall speed
@@ -326,22 +336,22 @@ function GR:SuikaCol()
       local pos = {x = xOfs, y = yOfs}
       if (Ball.top > Border.top) then 
         pos.y = Border.top - r
-        v.VelY = v.VelY - v.VelY * 1.9
+        v.VelY = v.VelY - v.VelY * 1.3
       end
       -- circle right past border right
       if (Ball.right > Border.right) then 
         pos.x = Border.right - r
-        v.VelX = v.VelX - v.VelX * 1.9
+        v.VelX = v.VelX - v.VelX * 1.3
       end
       -- circle bottom past border bottom
       if (Ball.bottom < Border.bottom) then 
         pos.y = Border.bottom + r
-        v.VelY = v.VelY - v.VelY * 1.9
+        v.VelY = v.VelY - v.VelY * 1.3
       end
       -- circle left past border left
       if (Ball.left < Border.left) then 
         pos.x = Border.left + r
-        v.VelX = v.VelX - v.VelX * 1.9
+        v.VelX = v.VelX - v.VelX * 1.3
       end
       
       -- apply pos change if collision
@@ -397,10 +407,10 @@ function GR:SuikaCol()
               local m1 = (dpNorm1 * (v.Mass - k.Mass) + 2.0 * k.Mass * dpNorm2) / (v.Mass + k.Mass)
               local m2 = (dpNorm2 * (k.Mass - v.Mass) + 2.0 * v.Mass * dpNorm1) / (v.Mass + k.Mass)
               
-              v.VelX = (tx * dpTan1 + nx * m1) *.95
-              v.VelY = (ty * dpTan1 + ny * m1) *.95
-              k.VelX = (tx * dpTan2 + nx * m2) *.95
-              k.VelY = (ty * dpTan2 + ny * m2) *.95
+              v.VelX = (tx * dpTan1 + nx * m1)
+              v.VelY = (ty * dpTan1 + ny * m1)
+              k.VelX = (tx * dpTan2 + nx * m2)
+              k.VelY = (ty * dpTan2 + ny * m2)
             end
           end
         end
@@ -411,11 +421,6 @@ end
 
 function GR:DoCirclesOverlap(x1, y1, r1, x2, y2, r2)
   return abs((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2)) <= (r1+r2)*(r1+r2)
-end
-
--- Controls
-function GR:SuikaControls()
-
 end
 
 -- Functions
@@ -451,6 +456,7 @@ function GR:SuikaStart()
   
   -- Reset Variables
   GR.Suika.Points = 0
+  GR.Suika.SimTime = 0
 
   -- Start Game
   Suika.Game:Show()
@@ -484,7 +490,6 @@ function GR:SuikaGameOver()
   GR_GUI.Main.Suika.GameOverFS:Show()
 end
 
--- frames jiggle more at low fps 
 -- balls spawn with left offset
 -- needs resize dimensions locked so circles stay circles
 -- points
