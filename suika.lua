@@ -2,19 +2,19 @@ function GR:SuikaCreate()
   -- Contants
   GR.Suika = {}
   GR.Suika.Const = {}
-  GR.Suika.Const.GameScreenWidth = 400
-  GR.Suika.Const.GameScreenHeight = 580
-  GR.Suika.Const.Tab1Width = 450
-  GR.Suika.Const.Tab1Height = 720
-  GR.Suika.Const.BallSizes = {42, 67, 106.8, 132, 173, 213, 241.15, 280.7, 320.5, 380.1, 423.5, 467.8, 536.6, 590.3, 649.3, 714.2, 785.6}
-  GR.Suika.Const.Gravity = -100000
-  GR.Suika.Const.MinGravity = -100000
-  GR.Suika.Const.MaxSpeed = 100000
-  GR.Suika.Const.StartSizes = 4
-  GR.Suika.Const.TargetFrameTime = 1.0 / 500
-  GR.Suika.Const.DampingFactorX = .9
-  GR.Suika.Const.DampingFactorY = .9
-  GR.Suika.Const.MinVelThres = 700
+  GR.Suika.Const.GameScreenWidth = 425
+  GR.Suika.Const.GameScreenHeight = 660
+  GR.Suika.Const.Tab1Width = 475
+  GR.Suika.Const.Tab1Height = 800
+  GR.Suika.Const.BallSizes = {42, 67, 82.8, 105, 133, 213, 241.15, 280.7, 320.5, 380.1, 423.5, 467.8, 536.6, 590.3, 649.3, 714.2, 785.6}
+  GR.Suika.Const.Gravity = -1300
+  GR.Suika.Const.MinGravity = -6000
+  GR.Suika.Const.MaxSpeed = 2900
+  GR.Suika.Const.StartSizes = 5
+  GR.Suika.Const.TargetFrameTime = 1.0 / 60
+  GR.Suika.Const.DampingFactorX = .8
+  GR.Suika.Const.DampingFactorY = .8
+  GR.Suika.Const.MinVelThres = 5000
   GR.Suika.Const.Colors = {
     {1,0,0,1},
     {0,1,0,1},
@@ -166,9 +166,9 @@ function GR:MakeBall(Ball)
   Ball.AccY = 0
   Ball.AccX = 0
   Ball.SkipGravity = false
-  Ball.Mass = (4/3) * math.pi * (Ball.Size / 2)^3
+  Ball.Mass = (4/3) * math.pi * (GR.Suika.BallSizes[Ball.Size] / 2)^3
   Ball:SetSize(GR.Suika.BallSizes[Ball.Size] * GR.Suika.XRatio, GR.Suika.BallSizes[Ball.Size] * GR.Suika.YRatio)
-  Ball:SetPoint("CENTER", Suika, "BOTTOMLEFT", Suika:GetWidth() / 2, 405 * GR.Suika.YRatio)
+  Ball:SetPoint("CENTER", Suika, "BOTTOMLEFT", Suika:GetWidth() / 2, 475 * GR.Suika.YRatio)
   Ball:SetMovable(true)
   Ball:EnableMouse(true)
   Ball:SetPropagateKeyboardInput(true)
@@ -185,7 +185,7 @@ function GR:MakeBall(Ball)
     local left, bottom, width, height = self:GetRect()
     local left2, bottom2, width2, height2 = Suika:GetRect()
     self:ClearAllPoints()
-    self:SetPoint("CENTER", Suika, "BOTTOMLEFT", left - left2, 405 * GR.Suika.YRatio)
+    self:SetPoint("CENTER", Suika, "BOTTOMLEFT", left - left2, 475 * GR.Suika.YRatio)
     GR:CreateUseNextBall()
   end)
   if (Ball:GetRegions() == nil) then -- if new frame, create new texture
@@ -320,26 +320,28 @@ function GR:SuikaUpdateBalls(self, elapsed)
       if (v.VelY < -GR.Suika.MaxSpeed) then
         v.VelY = -GR.Suika.MaxSpeed
       end
-      v.AccX = -v.VelX * .8 -- drag
-      v.AccY = -v.VelY * .8
-      v.VelX = v.VelX + (v.AccX * elapsed) -- Vel
-      -- v.VelY = v.VelY + (v.AccY * elapsed)
-      if not v.SkipGravity then 
-        v.VelY = v.VelY + (GR.Suika.Gravity * elapsed) -- gravity
-      else 
-        v.VelY = v.VelY + (GR.Suika.Gravity * elapsed) * .35 -- smaller gravity
-      end
-      if (v.VelY < GR.Suika.MinGravity) then v.VelY = GR.Suika.MinGravity end -- limit fall speed
+      v.AccX = -v.VelX * .1 -- drag
+      v.AccY = -v.VelY * .1
+      v.VelX = v.VelX + v.AccX -- Vel
+      v.VelY = v.VelY + v.AccY
       v.SkipGravity = false
       v.VelX = v.VelX * GR.Suika.Const.DampingFactorX -- dampening for jiggle
       v.VelY = v.VelY * GR.Suika.Const.DampingFactorY
       if math.abs(v.VelX) < GR.Suika.Const.MinVelThres * elapsed then
-          v.VelX = 0
+        v.VelX = 0
       end
-      if math.abs(v.VelY) < GR.Suika.Const.MinVelThres * elapsed then
-          v.VelY = 0
+      -- if math.abs(v.VelY) < GR.Suika.Const.MinVelThres * elapsed then
+      --   v.VelY = 0
+      -- end
+      if not v.SkipGravity then 
+        v.VelY = v.VelY + (GR.Suika.Gravity * elapsed) -- gravity
+      else 
+        v.VelY = v.VelY + (GR.Suika.Gravity * elapsed) * .1 -- smaller gravity
       end
-      -- print(v.VelY, GR.Suika.Gravity, GR.Suika.MinGravity, GR.Suika.MaxSpeed)
+      if (v.VelY < GR.Suika.MinGravity * elapsed) then v.VelY = GR.Suika.MinGravity * elapsed end -- limit fall speed
+      
+      -- print(GR.Suika.MinGravity * elapsed, v.VelY, GR.Suika.Const.MinVelThres * elapsed)
+      
       local point, relativeTo, relativePoint, xOfs, yOfs = v:GetPoint()
       v:SetPoint(point, relativeTo, relativePoint, xOfs + v.VelX * elapsed, yOfs + v.VelY * elapsed) -- apply speed
     end
@@ -359,9 +361,9 @@ function GR:SuikaCol()
     left = 0
   }
   for i,v in pairs(Balls) do
-    if (v.IsActive and not v.IsClickable ) then
-      local point, relativeTo, relativePoint, xOfs, yOfs = v:GetPoint()
-      r = GR.Suika.BallSizes[v.Size] / 2
+    if v.IsActive and not v.IsClickable then
+      local point, _, _, xOfs, yOfs = v:GetPoint()
+      local r = GR.Suika.BallSizes[v.Size] / 2
       local Ball = {
         top = yOfs + r,
         right = xOfs + r,
@@ -371,31 +373,27 @@ function GR:SuikaCol()
 
       -- check if circle is outside of border
       -- circle top past border top
-      local pos = {x = xOfs, y = yOfs}
       if (Ball.top > Border.top) then 
-        pos.y = Border.top - r
-        -- v.VelY = v.VelY - v.VelY * 1
+        yOfs = Border.top - r
+        v.VelY = -v.VelY * 1
       end
       -- circle right past border right
       if (Ball.right > Border.right) then 
-        pos.x = Border.right - r
-        -- v.VelX = v.VelX - v.VelX * 1
+        xOfs = Border.right - r
+        v.VelX = -v.VelX * 1
       end
       -- circle bottom past border bottom
       if (Ball.bottom < Border.bottom) then 
-        pos.y = Border.bottom + r
-        -- v.VelY = v.VelY - v.VelY * 1
+        yOfs = Border.bottom + r
+        v.VelY = -v.VelY * 1
       end
       -- circle left past border left
       if (Ball.left < Border.left) then 
-        pos.x = Border.left + r
-        -- v.VelX = v.VelX - v.VelX * 1
+        xOfs = Border.left + r
+        v.VelX = -v.VelX * 1
       end
       
-      -- apply pos change if collision
-      if (pos.x ~= xOfs or pos.y ~= yOfs) then
-        v:SetPoint("CENTER", Suika, "BOTTOMLEFT", pos.x, pos.y)
-      end
+      v:SetPoint("CENTER", Suika, "BOTTOMLEFT", xOfs, yOfs)
     end
   end
 
@@ -423,7 +421,7 @@ function GR:SuikaCol()
               v.AccY = 0
               v.AccX = 0
               -- v.Mass = v.Size
-              v.Mass = (4/3) * math.pi * (v.Size / 2)^3
+              v.Mass = (4/3) * math.pi * (GR.Suika.BallSizes[v.Size] / 2)^3
               local color = GR.Suika.Const.Colors[v.Size]
               v.Tex:SetColorTexture(color[1], color[2], color[3], color[4])
               v:SetSize(GR.Suika.BallSizes[v.Size] * GR.Suika.XRatio, GR.Suika.BallSizes[v.Size] * GR.Suika.YRatio)
