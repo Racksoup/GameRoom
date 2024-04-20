@@ -77,7 +77,7 @@ function GR:CreateRegister()
         Tag = "Register Group Invite",
         Sender = UnitName("Player")
       }
-      GR:SendCommMessage("ZUI_GameRoom_Reg", GR:Serialize(GroupMessage), GroupDist) 
+      GR:SendCommMessage("GameRoom_Reg", GR:Serialize(GroupMessage), GroupDist) 
     end
     
     if (event == "GROUP_ROSTER_UPDATE" or event == "GROUP_ROSTER_UPDATE") then
@@ -98,7 +98,7 @@ function GR:CreateRegister()
           Tag = "Register Guild Invite",
           Sender = UnitName("Player")
         }
-        GR:SendCommMessage("ZUI_GameRoom_Reg", GR:Serialize(GuildMessage), "GUILD") 
+        GR:SendCommMessage("GameRoom_Reg", GR:Serialize(GuildMessage), "GUILD") 
       end
 
       -- register group send invite
@@ -116,7 +116,7 @@ function GR:CreateRegister()
         Tag = "Register Group Invite",
         Sender = UnitName("Player")
       }
-      GR:SendCommMessage("ZUI_GameRoom_Reg", GR:Serialize(GroupMessage), GroupDist) 
+      GR:SendCommMessage("GameRoom_Reg", GR:Serialize(GroupMessage), GroupDist) 
     end
   end)
 end
@@ -129,7 +129,7 @@ function GR:WhoListUpdate()
       for j,v in pairs(WhoPlayer) do
         if (string.match(j, "fullName") and not string.match(v, UnitName("player"))) then
           local PlayerName  = UnitName("player")
-          GR:SendCommMessage("ZUI_GameRoom_Reg", "Register Zone, " .. PlayerName, "WHISPER", v)
+          GR:SendCommMessage("GameRoom_Reg", "Register Zone, " .. PlayerName, "WHISPER", v)
         end
       end
     end
@@ -269,7 +269,7 @@ function GR:AddToFriendsList()
 
     -- Friendlist target not found in GR.Friends
     if (not InFriends and Friend.connected) then
-        GR:SendCommMessage("ZUI_GameRoom_Reg", SerialMessage, "WHISPER", Friend.name)
+        GR:SendCommMessage("GameRoom_Reg", SerialMessage, "WHISPER", Friend.name)
     end
   end
   
@@ -309,13 +309,13 @@ function GR:AddToFriendsList()
         if (GR.Retail) then
           if (FactionName ~= nil and ClientProgram ~= nil and RealmName ~= nil) then
             if (string.match(ClientProgram, "WoW") and string.match(RealmName, select(2, UnitFullName("Player"))) and string.match(FactionName, select(2, UnitFactionGroup("Player")))) then
-              GR:SendCommMessage("ZUI_GameRoom_Reg", SerialMessage, "WHISPER", Friend)
+              GR:SendCommMessage("GameRoom_Reg", SerialMessage, "WHISPER", Friend)
             end
           end
         else
           if (ClientProgram ~= nil) then
             if (string.match(ClientProgram, "WoW")) then
-              GR:SendCommMessage("ZUI_GameRoom_Reg", SerialMessage, "WHISPER", Friend)
+              GR:SendCommMessage("GameRoom_Reg", SerialMessage, "WHISPER", Friend)
             end
           end
         end
@@ -336,7 +336,7 @@ function GR:AddToFriendsList()
 
       -- if rival not found in GR.Friends
       if (not InFriends) then
-        GR:SendCommMessage("ZUI_GameRoom_Reg", SerialMessage, "WHISPER", GR.db.realm.Rivals[i])
+        GR:SendCommMessage("GameRoom_Reg", SerialMessage, "WHISPER", GR.db.realm.Rivals[i])
       end
     end
   end
@@ -358,7 +358,7 @@ function GR:RegisterFriendInviteReceived(text)
       Sender = UnitName("Player")
     }
     local SerialMessage = GR:Serialize(Message) 
-    GR:SendCommMessage("ZUI_GameRoom_Reg", SerialMessage, "WHISPER", V.Sender)
+    GR:SendCommMessage("GameRoom_Reg", SerialMessage, "WHISPER", V.Sender)
   end
 end
 
@@ -404,7 +404,7 @@ function GR:InviteSearchZone()
       local WhoPlayer = C_FriendList.GetWhoInfo(i)
       for j,v in pairs(WhoPlayer) do
         if (string.match(j, "fullName") and not string.match(v, UnitName("player"))) then
-          GR:SendCommMessage("ZUI_GameRoom_Reg", "Register Zone, " .. UnitName("player"), "WHISPER", v)
+          GR:SendCommMessage("GameRoom_Reg", "Register Zone, " .. UnitName("player"), "WHISPER", v)
         end
       end
     end
@@ -430,7 +430,7 @@ function GR:RegisterZone(text, PlayerName)
       table.insert(GR.Zone, Value3)
     end
     GR:RefreshZoneList()
-    GR:SendCommMessage("ZUI_GameRoom_Reg", "Zone Registered, " .. PlayerName, "WHISPER", Value3)
+    GR:SendCommMessage("GameRoom_Reg", "Zone Registered, " .. PlayerName, "WHISPER", Value3)
   end
 end
 
@@ -481,7 +481,7 @@ function GR:RegisterGroupInviteReceived(text)
       table.insert(GR.Group, V.Sender)
       GR:RemoveDuplicates(GR.Group)
       GR:RefreshGuildGroupListUI()
-      GR:SendCommMessage("ZUI_GameRoom_Reg", GR:Serialize(Message), Dist)
+      GR:SendCommMessage("GameRoom_Reg", GR:Serialize(Message), Dist)
     end
   end
 end
@@ -521,7 +521,7 @@ function GR:RegisterGuildInviteReceived(text)
       table.insert(GR.Guild, V.Sender)
       GR:RemoveDuplicates(GR.Guild)
       GR:RefreshGuildGroupListUI()
-      GR:SendCommMessage("ZUI_GameRoom_Reg", GR:Serialize(Message), "WHISPER", V.Sender)
+      GR:SendCommMessage("GameRoom_Reg", GR:Serialize(Message), "WHISPER", V.Sender)
     end
   end
 end
@@ -644,7 +644,7 @@ function GR:RegisterServerInviteReceived(sender)
 
   table.insert(GR.Server, sender)
   GR:RefreshServerListUI()
-  GR:SendCommMessage("ZUI_GameRoom_Reg", GR:Serialize(Message), "WHISPER", sender)
+  GR:SendCommMessage("GameRoom_Reg", GR:Serialize(Message), "WHISPER", sender)
 end
 
 function GR:RegisterServerResponseReceived(text)

@@ -178,11 +178,11 @@ function GR:CreateInviteParty()
     local PartyMember = UnitName(PlayerIndex)
     local PlayerName = UnitName("player")
     if (type(PartyMember) == "string"  and UnitIsConnected(PlayerIndex)) then
-      GR:SendCommMessage("ZUI_GameRoom_Reg", "Register Party, " .. PlayerName, "PARTY")
+      GR:SendCommMessage("GameRoom_Reg", "Register Party, " .. PlayerName, "PARTY")
     end
   end
   if (IsInGuild()) then
-    GR:SendCommMessage("ZUI_GameRoom_Reg", "Register Guild, " .. UnitName("player"), "GUILD")
+    GR:SendCommMessage("GameRoom_Reg", "Register Guild, " .. UnitName("player"), "GUILD")
   end
 
   PartyScrollFrame:Hide()
@@ -212,7 +212,7 @@ function GR:CreateInviteZone()
   end
 
   local function RegisterYell()
-    GR:SendCommMessage("ZUI_GameRoom_Reg", "Register Zone, " .. UnitName("player"), "YELL")
+    GR:SendCommMessage("GameRoom_Reg", "Register Zone, " .. UnitName("player"), "YELL")
     C_Timer.After(5, function() 
       RegisterYell()
     end)

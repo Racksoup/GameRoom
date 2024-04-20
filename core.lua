@@ -1,8 +1,8 @@
 -- Author: Connor Rack
--- Git: https://github.com/Racksoup/ZUI_GameRoom
+-- Git: https://github.com/Racksoup/GameRoom
 
-GR = LibStub("AceAddon-3.0"):NewAddon("ZUI_GameRoom", "AceConsole-3.0", "AceComm-3.0", "AceSerializer-3.0" )
-L = LibStub("AceLocale-3.0"):GetLocale("ZUI_GameRoomLocale")
+GR = LibStub("AceAddon-3.0"):NewAddon("GameRoom", "AceConsole-3.0", "AceComm-3.0", "AceSerializer-3.0" )
+L = LibStub("AceLocale-3.0"):GetLocale("GameRoomLocale")
 GR_GUI = {}
 local icon = LibStub("LibDBIcon-1.0")
 local GR_LDB = LibStub("LibDataBroker-1.1"):NewDataObject("GR", {
@@ -50,8 +50,8 @@ local defaults = {
 
 -- Create
 function GR:OnInitialize()
-  self.db = LibStub("AceDB-3.0"):New("ZUI_GameRoomDB", defaults, true)
-  icon:Register("ZUI_GameRoom", GR_LDB, self.db.realm.minimap)
+  self.db = LibStub("AceDB-3.0"):New("GameRoomDB", defaults, true)
+  icon:Register("GameRoom", GR_LDB, self.db.realm.minimap)
   GR:RegisterChatCommand("gr", "OpenClose")
 
   -- Window Consts
@@ -106,10 +106,10 @@ function GR:OnInitialize()
   GR.db.realm.tab = 2
   GR:TabSelect()
 
-  GR:RegisterComm("ZUI_GameRoom_Reg", function(...) GR:RegisterPlayers(...) end)
-  GR:RegisterComm("ZUI_GameRoom_Inv", function(...) GR:Invite(...) end)
-  GR:RegisterComm("ZUI_GameRoom_TiG", function(...) GR:TicTacToeComm(...) end)
-  GR:RegisterComm("ZUI_GameRoom_BSG", function(...) GR:BattleshipsComm(...) end)
+  GR:RegisterComm("GameRoom_Reg", function(...) GR:RegisterPlayers(...) end)
+  GR:RegisterComm("GameRoom_Inv", function(...) GR:Invite(...) end)
+  GR:RegisterComm("GameRoom_TiG", function(...) GR:TicTacToeComm(...) end)
+  GR:RegisterComm("GameRoom_BSG", function(...) GR:BattleshipsComm(...) end)
   
   GR_GUI.Main:Hide()
 end
@@ -183,7 +183,7 @@ function GR:CreateMainWindow()
   Main.xButton.tex = xButton:CreateTexture()
   local buttonTex = Main.xButton.tex
   buttonTex:SetAllPoints(xButton)
-  buttonTex:SetTexture("Interface\\AddOns\\ZUI_GameRoom\\images\\XButton.blp")
+  buttonTex:SetTexture("Interface\\AddOns\\GameRoom\\images\\XButton.blp")
   buttonTex:SetTexCoord(0, 1, 0, 1)
   Main.xButton.tint = xButton:CreateTexture()
   local buttonTint = Main.xButton.tint
@@ -191,7 +191,7 @@ function GR:CreateMainWindow()
   buttonTint:SetPoint("BOTTOMRIGHT", xButton, "BOTTOMRIGHT", -2, 2)
   buttonTint:SetColorTexture(0,0,0,0);
   Main.xButton:SetScript("OnClick", function(self, button, down) 
-    if(button == "LeftButton" and down == true) then Main.xButton.tex:SetTexture("Interface\\AddOns\\ZUI_GameRoom\\images\\XButtonDown.blp") end
+    if(button == "LeftButton" and down == true) then Main.xButton.tex:SetTexture("Interface\\AddOns\\GameRoom\\images\\XButtonDown.blp") end
     if(button == "LeftButton" and down == false) then 
       Main:Hide()
     end
@@ -201,7 +201,7 @@ function GR:CreateMainWindow()
   end)
   Main.xButton:SetScript("OnLeave", function(self, motion)
     Main.xButton.tint:SetColorTexture(0,0,0,0);
-    Main.xButton.tex:SetTexture("Interface\\AddOns\\ZUI_GameRoom\\images\\XButton.blp")
+    Main.xButton.tex:SetTexture("Interface\\AddOns\\GameRoom\\images\\XButton.blp")
   end)
 
   -- Exit Button
@@ -250,10 +250,10 @@ function GR:CreateHeaderInfo()
       if (button == "LeftButton" and down == false) then
           local UserName = UnitName("player")
           if (GR.GameType == "Tictactoe") then
-              GR:SendCommMessage("ZUI_GameRoom_Inv", "TicTacToe_Challenge, " .. UserName, "WHISPER", GR.Opponent)
+              GR:SendCommMessage("GameRoom_Inv", "TicTacToe_Challenge, " .. UserName, "WHISPER", GR.Opponent)
           end
           if (GR.GameType == "Battleships") then
-              GR:SendCommMessage("ZUI_GameRoom_Inv", "Battleships_Challenge, " .. UserName, "WHISPER", GR.Opponent)
+              GR:SendCommMessage("GameRoom_Inv", "Battleships_Challenge, " .. UserName, "WHISPER", GR.Opponent)
           end
           GR.CanSendInvite = false
           ReInvite:Hide()
@@ -282,13 +282,13 @@ function GR:CreateHeaderInfo()
           end
           if (GR.GameType == "Tictactoe") then
               GR:TicTacToeHideContent()
-              GR:SendCommMessage("ZUI_GameRoom_Inv", "TicTacToe_Accept, " .. Rand .. ", " .. UnitName("Player"), "WHISPER", Opponent)
+              GR:SendCommMessage("GameRoom_Inv", "TicTacToe_Accept, " .. Rand .. ", " .. UnitName("Player"), "WHISPER", Opponent)
               GR.db.realm.tab = 1
               GR:TabSelect()
             end
             if (GR.GameType == "Battleships") then
               GR:BattleshipsHideContent()
-              GR:SendCommMessage("ZUI_GameRoom_Inv", "Battleships_Accept, " .. Rand .. ", " .. UnitName("player"), "WHISPER", Opponent)
+              GR:SendCommMessage("GameRoom_Inv", "Battleships_Accept, " .. Rand .. ", " .. UnitName("player"), "WHISPER", Opponent)
               GR.db.realm.tab = 1
               GR:TabSelect()
           end

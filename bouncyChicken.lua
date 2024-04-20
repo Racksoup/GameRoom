@@ -176,7 +176,7 @@ function GR:CreateBCChicken()
   BC.Chicken.YPos = GR.BC.ChickenYStart
   Chicken.Tex = Chicken:CreateTexture()
   Chicken.Tex:SetAllPoints(Chicken)
-  Chicken.Tex:SetTexture("Interface\\AddOns\\ZUI_GameRoom\\images\\Chicken.blp")
+  Chicken.Tex:SetTexture("Interface\\AddOns\\GameRoom\\images\\Chicken.blp")
   Chicken.Tex:SetTexCoord(0,0, 0,1, 1,0, 1,1)
   Chicken:Hide()
 end

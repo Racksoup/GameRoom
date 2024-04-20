@@ -194,7 +194,7 @@ function GR:MakeBall(Ball)
     Ball.Mask = Ball:CreateMaskTexture()
     Ball.Tex:AddMaskTexture(Ball.Mask)
     Ball.Mask:SetAllPoints(Ball)
-    Ball.Mask:SetTexture("Interface\\AddOns\\ZUI_GameRoom\\images\\Circle.blp")
+    Ball.Mask:SetTexture("Interface\\AddOns\\GameRoom\\images\\Circle.blp")
     Ball.Mask:SetTexCoord(0,1,0,1)
   end
   local color = GR.Suika.Const.Colors[Ball.Size]

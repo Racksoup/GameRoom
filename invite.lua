@@ -43,10 +43,10 @@ function GR:SendGameInvite(self, button, down)
     if (not IsCrossServer) then
       -- send invite
       if (GR.GameType == "Battleships") then
-        GR:SendCommMessage("ZUI_GameRoom_Inv", GR:Serialize(Message), "WHISPER", GR.Target)
+        GR:SendCommMessage("GameRoom_Inv", GR:Serialize(Message), "WHISPER", GR.Target)
       end
       if (GR.GameType == "Tictactoe") then
-        GR:SendCommMessage("ZUI_GameRoom_Inv", GR:Serialize(Message), "WHISPER", GR.Target)
+        GR:SendCommMessage("GameRoom_Inv", GR:Serialize(Message), "WHISPER", GR.Target)
       end
     else
       -- if target is cross-server they are in a party or raid
@@ -57,10 +57,10 @@ function GR:SendGameInvite(self, button, down)
       -- send invite
       GR.UseGroupChat = true
       if (GR.GameType == "Battleships") then
-        GR:SendCommMessage("ZUI_GameRoom_Inv", GR:Serialize(Message), ChatChannel)
+        GR:SendCommMessage("GameRoom_Inv", GR:Serialize(Message), ChatChannel)
       end
       if (GR.GameType == "Tictactoe") then
-        GR:SendCommMessage("ZUI_GameRoom_Inv", GR:Serialize(Message), ChatChannel)
+        GR:SendCommMessage("GameRoom_Inv", GR:Serialize(Message), ChatChannel)
       end
     end
   end
@@ -206,9 +206,9 @@ function GR:AcceptGameClicked()
     Message.Tag = "TicTacToe_Accept"
     
     if (GR.GroupType == nil) then
-      GR:SendCommMessage("ZUI_GameRoom_Inv", GR:Serialize(Message), "WHISPER", GR.Opponent)
+      GR:SendCommMessage("GameRoom_Inv", GR:Serialize(Message), "WHISPER", GR.Opponent)
     else
-      GR:SendCommMessage("ZUI_GameRoom_Inv", GR:Serialize(Message), ChatChannel)
+      GR:SendCommMessage("GameRoom_Inv", GR:Serialize(Message), ChatChannel)
       GR.UseGroupChat = true
     end
     -- hide and reshowin GR:TabSelect()
@@ -219,9 +219,9 @@ function GR:AcceptGameClicked()
     Message.Tag = "Battleships_Accept"
     
     if (GR.GroupType == nil) then
-      GR:SendCommMessage("ZUI_GameRoom_Inv", GR:Serialize(Message), "WHISPER", GR.Opponent)
+      GR:SendCommMessage("GameRoom_Inv", GR:Serialize(Message), "WHISPER", GR.Opponent)
     else
-      GR:SendCommMessage("ZUI_GameRoom_Inv", GR:Serialize(Message), ChatChannel)
+      GR:SendCommMessage("GameRoom_Inv", GR:Serialize(Message), ChatChannel)
       GR.UseGroupChat = true
     end
     -- hide and reshow in GR:TabSelect()
@@ -247,17 +247,17 @@ function GR:DeclineGameClicked()
   if (GR.GameType == "Tictactoe") then
     Message.Tag = "TicTacToe_Decline"
     if (GR.GroupType == nil) then
-      GR:SendCommMessage("ZUI_GameRoom_Inv", GR:Serialize(Message), "WHISPER", GR.Opponent)
+      GR:SendCommMessage("GameRoom_Inv", GR:Serialize(Message), "WHISPER", GR.Opponent)
     else
-      GR:SendCommMessage("ZUI_GameRoom_Inv", GR:Serialize(Message), ChatChannel)
+      GR:SendCommMessage("GameRoom_Inv", GR:Serialize(Message), ChatChannel)
     end
   end 
   if (GR.GameType == "Battleships") then
     Message.Tag = "Battleships_Decline"
     if (GR.GroupType == nil) then
-      GR:SendCommMessage("ZUI_GameRoom_Inv", GR:Serialize(Message), "WHISPER", GR.Opponent)
+      GR:SendCommMessage("GameRoom_Inv", GR:Serialize(Message), "WHISPER", GR.Opponent)
     else
-      GR:SendCommMessage("ZUI_GameRoom_Inv", GR:Serialize(Message), ChatChannel)
+      GR:SendCommMessage("GameRoom_Inv", GR:Serialize(Message), ChatChannel)
     end
   end 
 
@@ -345,9 +345,9 @@ function GR:ExitGameClicked()
     Message.Tag = "TicTacToe_GameEnd"
     if (GR.UseGroupChat) then 
       Message.Target = GR.Opponent
-      GR:SendCommMessage("ZUI_GameRoom_Inv", GR:Serialize(Message), ChatChannel)
+      GR:SendCommMessage("GameRoom_Inv", GR:Serialize(Message), ChatChannel)
     else
-      GR:SendCommMessage("ZUI_GameRoom_Inv", GR:Serialize(Message), "WHISPER", GR.Opponent)
+      GR:SendCommMessage("GameRoom_Inv", GR:Serialize(Message), "WHISPER", GR.Opponent)
     end
     GR:TicTacToeEndGame()
   end
@@ -357,9 +357,9 @@ function GR:ExitGameClicked()
     Message.Tag = "Battleships_GameEnd"
     if (GR.UseGroupChat) then 
       Message.Target = GR.Opponent
-      GR:SendCommMessage("ZUI_GameRoom_Inv", GR:Serialize(Message), ChatChannel)
+      GR:SendCommMessage("GameRoom_Inv", GR:Serialize(Message), ChatChannel)
     else
-      GR:SendCommMessage("ZUI_GameRoom_Inv", GR:Serialize(Message), "WHISPER", GR.Opponent)
+      GR:SendCommMessage("GameRoom_Inv", GR:Serialize(Message), "WHISPER", GR.Opponent)
     end
     GR:BattleshipsEndGame()
   end

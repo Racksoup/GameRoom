@@ -1,8 +1,8 @@
-## Interface: 11500
-## Title: ZUI Game Room
+## Interface: 100206
+## Title: Game Room
 ## Author: ZUI
 ## DefaultState: enabled
-## SavedVariables: ZUI_GameRoomDB
+## SavedVariables: GameRoomDB
 ## OptionalDeps: Ace3
 ## X-Embeds: Ace3
 

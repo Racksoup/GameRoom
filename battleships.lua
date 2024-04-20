@@ -270,7 +270,7 @@ function GR:CreateShips()
     Ship:SetSize((Battleships.Board:GetWidth() / 10) * ShipsSize[i].width -(18 * (Battleships:GetWidth() / 770)), (Battleships.Board:GetHeight() / 10) * ShipsSize[i].height -(8 * (Battleships:GetHeight() / 450)))
     local ShipTex = Ship:CreateTexture()
     ShipTex:SetAllPoints(Ship)
-    ShipTex:SetTexture("Interface\\AddOns\\ZUI_GameRoom\\images\\Battleship" .. i ..".blp")
+    ShipTex:SetTexture("Interface\\AddOns\\GameRoom\\images\\Battleship" .. i ..".blp")
     ShipTex:SetTexCoord(ShipsCoords[i].ULx,ShipsCoords[i].ULy, ShipsCoords[i].LLx,ShipsCoords[i].LLy, ShipsCoords[i].URx,ShipsCoords[i].URy, ShipsCoords[i].LRx,ShipsCoords[i].LRy)
     Ship:SetMovable(true)
     Ship:EnableMouse(true)
@@ -386,35 +386,35 @@ function GR:CreateLegend()
 
     -- Player Textures
     Legend.PlayerShip1Tex = Legend:CreateTexture()
-    Legend.PlayerShip1Tex:SetTexture("Interface\\AddOns\\ZUI_GameRoom\\images\\Battleship1.blp")
+    Legend.PlayerShip1Tex:SetTexture("Interface\\AddOns\\GameRoom\\images\\Battleship1.blp")
     Legend.PlayerShip1Tex:SetTexCoord(0,.73, .5,.73, 0,.02, .5,.02)
     Legend.PlayerShip2Tex = Legend:CreateTexture()
-    Legend.PlayerShip2Tex:SetTexture("Interface\\AddOns\\ZUI_GameRoom\\images\\Battleship2.blp")
+    Legend.PlayerShip2Tex:SetTexture("Interface\\AddOns\\GameRoom\\images\\Battleship2.blp")
     Legend.PlayerShip2Tex:SetTexCoord(0,.75, .25,.75, 0,0, .25,0)
     Legend.PlayerShip3Tex = Legend:CreateTexture()
-    Legend.PlayerShip3Tex:SetTexture("Interface\\AddOns\\ZUI_GameRoom\\images\\Battleship3.blp")
+    Legend.PlayerShip3Tex:SetTexture("Interface\\AddOns\\GameRoom\\images\\Battleship3.blp")
     Legend.PlayerShip3Tex:SetTexCoord(0,1, .5,1, 0,0, .5,0)
     Legend.PlayerShip4Tex = Legend:CreateTexture()
-    Legend.PlayerShip4Tex:SetTexture("Interface\\AddOns\\ZUI_GameRoom\\images\\Battleship4.blp")
+    Legend.PlayerShip4Tex:SetTexture("Interface\\AddOns\\GameRoom\\images\\Battleship4.blp")
     Legend.PlayerShip4Tex:SetTexCoord(0,.47, .5,.47, 0,.03, .5,.03)
     Legend.PlayerShip5Tex = Legend:CreateTexture()
-    Legend.PlayerShip5Tex:SetTexture("Interface\\AddOns\\ZUI_GameRoom\\images\\Battleship5.blp")
+    Legend.PlayerShip5Tex:SetTexture("Interface\\AddOns\\GameRoom\\images\\Battleship5.blp")
     Legend.PlayerShip5Tex:SetTexCoord(.14,1, .36,1, .14,0, .36,0)
     -- Opponent Textures
     Legend.OppShip1Tex = Legend:CreateTexture()
-    Legend.OppShip1Tex:SetTexture("Interface\\AddOns\\ZUI_GameRoom\\images\\Battleship1.blp")
+    Legend.OppShip1Tex:SetTexture("Interface\\AddOns\\GameRoom\\images\\Battleship1.blp")
     Legend.OppShip1Tex:SetTexCoord(0,.73, .5,.73, 0,.02, .5,.02)
     Legend.OppShip2Tex = Legend:CreateTexture()
-    Legend.OppShip2Tex:SetTexture("Interface\\AddOns\\ZUI_GameRoom\\images\\Battleship2.blp")
+    Legend.OppShip2Tex:SetTexture("Interface\\AddOns\\GameRoom\\images\\Battleship2.blp")
     Legend.OppShip2Tex:SetTexCoord(0,.75, .25,.75, 0,0, .25,0)
     Legend.OppShip3Tex = Legend:CreateTexture()
-    Legend.OppShip3Tex:SetTexture("Interface\\AddOns\\ZUI_GameRoom\\images\\Battleship3.blp")
+    Legend.OppShip3Tex:SetTexture("Interface\\AddOns\\GameRoom\\images\\Battleship3.blp")
     Legend.OppShip3Tex:SetTexCoord(0,1, .5,1, 0,0, .5,0)
     Legend.OppShip4Tex = Legend:CreateTexture()
-    Legend.OppShip4Tex:SetTexture("Interface\\AddOns\\ZUI_GameRoom\\images\\Battleship4.blp")
+    Legend.OppShip4Tex:SetTexture("Interface\\AddOns\\GameRoom\\images\\Battleship4.blp")
     Legend.OppShip4Tex:SetTexCoord(0,.47, .5,.47, 0,.03, .5,.03)
     Legend.OppShip5Tex = Legend:CreateTexture()
-    Legend.OppShip5Tex:SetTexture("Interface\\AddOns\\ZUI_GameRoom\\images\\Battleship5.blp")
+    Legend.OppShip5Tex:SetTexture("Interface\\AddOns\\GameRoom\\images\\Battleship5.blp")
     Legend.OppShip5Tex:SetTexCoord(.14,1, .36,1, .14,0, .36,0)
 
     Legend:Hide()
@@ -894,9 +894,9 @@ function GR:BattleshipsPhase1CompleteBtn(self, button, down)
     if (GR.UseGroupChat) then 
       Message.Target = GR.Target
       if (GR.GroupType == "PART") then GR.GroupType = "PARTY" end
-      GR:SendCommMessage("ZUI_GameRoom_BSG", GR:Serialize(Message), GR.GroupType)
+      GR:SendCommMessage("GameRoom_BSG", GR:Serialize(Message), GR.GroupType)
     else
-      GR:SendCommMessage("ZUI_GameRoom_BSG", GR:Serialize(Message), "WHISPER", GR.Opponent)
+      GR:SendCommMessage("GameRoom_BSG", GR:Serialize(Message), "WHISPER", GR.Opponent)
     end
 
     -- make ships unmovable
@@ -1229,9 +1229,9 @@ function GR:BattleshipsGridButton(self, button, down, i)
     if (GR.UseGroupChat) then 
       Message.Target = GR.Target
 
-      GR:SendCommMessage("ZUI_GameRoom_BSG", GR:Serialize(Message), GR.GroupType)
+      GR:SendCommMessage("GameRoom_BSG", GR:Serialize(Message), GR.GroupType)
     else
-      GR:SendCommMessage("ZUI_GameRoom_BSG", GR:Serialize(Message), "WHISPER", GR.Opponent)
+      GR:SendCommMessage("GameRoom_BSG", GR:Serialize(Message), "WHISPER", GR.Opponent)
     end
 
     -- change turn string

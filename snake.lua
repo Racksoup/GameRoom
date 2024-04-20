@@ -6,7 +6,7 @@ function GR:CreateSnake()
   GR.Snake = {}
   GR.Snake.Const = {}
   GR.Snake.Const.Width = 720 
-  GR.Snake.Const.Height = 395
+  GR.Snake.Const.Height = 385
   GR.Snake.Const.NumOfCols = 60
   GR.Snake.Const.NumOfRows = 30
   GR.Snake.Const.MoveInterval = .11

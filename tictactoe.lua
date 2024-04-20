@@ -170,14 +170,14 @@ function GR:TicTacToeComm(...)
       for i,v in ipairs(Buttons) do 
         if (i == V.Place and string.match(V.Tile, "O")) then 
           local BtnTex = v:GetRegions()
-          BtnTex:SetTexture("Interface\\AddOns\\ZUI_GameRoom\\images\\TicTacToeO.blp")
+          BtnTex:SetTexture("Interface\\AddOns\\GameRoom\\images\\TicTacToeO.blp")
           BtnTex:SetTexCoord(0,0, 0,y, x,0, x,y)
           BtnTex:Show()
           GR.TicBoard[i] = 2
         end
         if (i == V.Place and string.match(V.Tile, "X")) then 
           local BtnTex = v:GetRegions()
-          BtnTex:SetTexture("Interface\\AddOns\\ZUI_GameRoom\\images\\TicTacToeX.blp")
+          BtnTex:SetTexture("Interface\\AddOns\\GameRoom\\images\\TicTacToeX.blp")
           BtnTex:SetTexCoord(0,0, 0,y, x,0, x,y)
           BtnTex:Show()
           GR.TicBoard[i] = 1
@@ -202,24 +202,24 @@ function GR:TictactoeGridButton(self, button, down, i, BtnTex)
   -- set game board and send opponent turn data
   if (button == "LeftButton" and down == false and GR.IsPlayerTurn and GR.GameOver == false and GR.TicBoard[i] == 0) then
     if (GR.PlayerPos == 1) then 
-      BtnTex:SetTexture("Interface\\AddOns\\ZUI_GameRoom\\images\\TicTacToeX.blp")
+      BtnTex:SetTexture("Interface\\AddOns\\GameRoom\\images\\TicTacToeX.blp")
       GR.TicBoard[i] = 1
       Message.Tile = "X"
       -- cross server
       if (GR.UseGroupChat) then
-        GR:SendCommMessage("ZUI_GameRoom_TiG", GR:Serialize(Message), GR.GroupType)
+        GR:SendCommMessage("GameRoom_TiG", GR:Serialize(Message), GR.GroupType)
       else
-        GR:SendCommMessage("ZUI_GameRoom_TiG", GR:Serialize(Message), "WHISPER", GR.Opponent)
+        GR:SendCommMessage("GameRoom_TiG", GR:Serialize(Message), "WHISPER", GR.Opponent)
       end
     end
     if (GR.PlayerPos == 2) then 
-      BtnTex:SetTexture("Interface\\AddOns\\ZUI_GameRoom\\images\\TicTacToeO.blp")
+      BtnTex:SetTexture("Interface\\AddOns\\GameRoom\\images\\TicTacToeO.blp")
       GR.TicBoard[i] = 2
       Message.Tile = "O"
       if (GR.UseGroupChat) then
-        GR:SendCommMessage("ZUI_GameRoom_TiG", GR:Serialize(Message), GR.GroupType)
+        GR:SendCommMessage("GameRoom_TiG", GR:Serialize(Message), GR.GroupType)
       else
-        GR:SendCommMessage("ZUI_GameRoom_TiG", GR:Serialize(Message), "WHISPER", GR.Opponent)
+        GR:SendCommMessage("GameRoom_TiG", GR:Serialize(Message), "WHISPER", GR.Opponent)
       end
     end
 
