@@ -2,34 +2,6 @@ function GR:CreateMultiGames()
   local Main = GR_GUI.Main
   Main.Tab3 = CreateFrame("Frame", Tab3, Main)
   local Tab3 = Main.Tab3
-
-  --Nav
-  Tab3.Nav = CreateFrame("Frame", Nav, Tab3)
-  local Nav = Tab3.Nav
-  Nav.SoloBtn = CreateFrame("Button", SoloBtn, Nav, "UIPanelButtonTemplate")
-  local SoloBtn = Nav.SoloBtn
-  SoloBtn.FS = SoloBtn:CreateFontString(nil, "OVERLAY", "GameTooltipText")
-  local SoloFS = SoloBtn.FS
-  SoloFS:SetText("Single Player")
-  SoloFS:SetTextColor(.8,.8,.8, 1)
-  SoloBtn:SetScript("OnClick", function(self, button, down) 
-    if (button == "LeftButton" and down == false) then
-      GR.db.realm.tab = 2
-      GR:TabSelect()
-    end
-  end)
-  Nav.SettingsBtn = CreateFrame("Button", SettingsBtn, Nav, "UIPanelButtonTemplate")
-  local SettingsBtn = Nav.SettingsBtn
-  SettingsBtn.FS = SettingsBtn:CreateFontString(nil, "OVERLAY", "GameTooltipText")
-  local SettingsFS = SettingsBtn.FS
-  SettingsFS:SetText("Settings")
-  SettingsFS:SetTextColor(.8,.8,.8, 1)
-  SettingsBtn:SetScript("OnClick", function(self, button, down) 
-    if (button == "LeftButton" and down == false) then
-      GR.db.realm.tab = 4
-      GR:TabSelect()
-    end
-  end)
   
   -- Game Buttons
   Tab3.MultiGames = CreateFrame("Frame", MultiGames, Tab3)
@@ -312,27 +284,10 @@ function GR:SizeMultiGames()
   local Tab3 = Main.Tab3
   Tab3:SetPoint("TOP", 0, -50 * Main.YRatio)
   Tab3:SetSize(250 * Main.XRatio, 200 * Main.YRatio)
-  
-  -- Nav
-  local Nav = Tab3.Nav
-  Nav:SetPoint("TOP", 0, 0)
-  Nav:SetSize(240 * Main.XRatio, 40 * Main.YRatio)
-  local SoloBtn = Nav.SoloBtn
-  SoloBtn:SetPoint("TOPLEFT", 5 * Main.XRatio, -5 * Main.YRatio)
-  SoloBtn:SetSize(110 * Main.XRatio, 30 * Main.YRatio)
-  local SoloFS = SoloBtn.FS
-  SoloFS:SetPoint("CENTER", 0, 0)
-  SoloFS:SetTextScale(1.3 * Main.ScreenRatio)
-  local SettingsBtn = Nav.SettingsBtn
-  SettingsBtn:SetPoint("TOPRIGHT", -5 * Main.XRatio, -5 * Main.YRatio)
-  SettingsBtn:SetSize(110 * Main.XRatio, 30 * Main.YRatio)
-  local SettingsFS = SettingsBtn.FS
-  SettingsFS:SetPoint("CENTER", 0, 0)
-  SettingsFS:SetTextScale(1.3 * Main.ScreenRatio)
 
   -- Game Buttons
   local MultiGames = Tab3.MultiGames
-  MultiGames:SetPoint("TOP", 0 * Main.XRatio, -75 * Main.YRatio)
+  MultiGames:SetPoint("TOP", 0 * Main.XRatio, -18 * Main.YRatio)
   MultiGames:SetSize(250 * Main.XRatio, 100 * Main.YRatio)
   local TicTacToeBtn = MultiGames.TicTacToeBtn
   TicTacToeBtn:SetPoint("TOPLEFT", 5 * Main.XRatio, -5 * Main.YRatio)

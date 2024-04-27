@@ -65,8 +65,8 @@ function GR:OnInitialize()
   GR.Win.Const.Tab2Height = 250
   GR.Win.Const.Tab3Width = 310
   GR.Win.Const.Tab3Height = 460
-  GR.Win.Const.Tab4Width = 450
-  GR.Win.Const.Tab4Height = 570
+  GR.Win.Const.Tab4Width = 425
+  GR.Win.Const.Tab4Height = 470
 
   -- Window Varibales
   GR.Win.XRatio = 1
@@ -116,10 +116,14 @@ end
 
 function GR:CreateMainWindow()
   -- Main Window
-  GR_GUI.Main = CreateFrame("Frame", GameRoom, UIParent, "TranslucentFrameTemplate")
+  -- GR_GUI.Main = CreateFrame("Frame", GameRoom, UIParent, "SimplePanelTemplate")
+  -- GR_GUI.Main = CreateFrame("Frame", GameRoom, UIParent, "DefaultPanelTemplate")
+  GR_GUI.Main = CreateFrame("Frame", "GameRoom", UIParent, "DefaultPanelFlatTemplate")
+  -- GR_GUI.Main = CreateFrame("Frame", GameRoom, UIParent, "PortraitFrameFlatBaseTemplate")
+  -- GR_GUI.Main = CreateFrame("Frame", GameRoom, UIParent, "PortraitFrameTemplate")
   local Main = GR_GUI.Main
   Main:SetSize(GR.Win.Const.Tab2Width, GR.Win.Const.Tab2Height)
-  Main:SetResizeBounds(100,120)
+  Main:SetResizeBounds(250,240)
   Main:SetFrameStrata("HIGH")
   Main:SetPoint("TOP", UIParent, "TOP", 0, -130)
   Main:SetMovable(true)
@@ -139,14 +143,20 @@ function GR:CreateMainWindow()
     end
   end)
   Main:Show()
-  Main:SetAlpha(1)
+  -- Main:SetAlpha(1)
   Main.XRatio = 1
   Main.YRatio = 1
   Main.ScreenRatio = 1
 
+  -- close button
+  Main.XButton = CreateFrame("Button", "XButton", Main, "UIPanelCloseButtonDefaultAnchors")
+  Main.XButton:SetPoint("TOPRIGHT", 0, -2)
+
   -- Resize Button
   Main.ResizeBtn = CreateFrame("Button", nil, Main)
-  local ResizeBtn = Main.ResizeBtn    
+  local ResizeBtn = Main.ResizeBtn  
+  Main.ResizeBtn:SetPoint("BOTTOMRIGHT", -7, 6)
+  Main.ResizeBtn:SetSize(16, 16)  
   ResizeBtn:EnableMouse("true")
   ResizeBtn:SetNormalTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Down")
   ResizeBtn:SetHighlightTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Highlight")
@@ -166,43 +176,79 @@ function GR:CreateMainWindow()
   end)
   
   -- Game Room Title
-  Main.H1 =  Main:CreateFontString(nil, "OVERLAY", "GameTooltipText")
+  Main.TitleContainer = CreateFrame("Frame", "TitleContainer", Main)
+  local TitleContainer = Main.TitleContainer
+  TitleContainer:SetFrameStrata("TOOLTIP")
+  TitleContainer:SetSize(100, 18)
+  TitleContainer:SetPoint("TOP", 0, -6)
+  Main.H1 =  TitleContainer:CreateFontString(nil, "OVERLAY", "GameFontNormalMed3")
   local H1 = Main.H1
-  H1:SetTextColor(.8,.8,.8,1)
   H1:SetText("Game Room")
+  H1:SetPoint("TOP")
+  H1:SetTextScale(1)
+
+  -- tabs
+  Main.TabButton1 = CreateFrame("Button", "TabButton1", Main, "PanelTabButtonTemplate")
+  local TabButton1 = Main.TabButton1
+  TabButton1:SetPoint("BOTTOMLEFT", 10, -30)
+  TabButton1:SetText("Solo")
+  TabButton1:SetScript("OnClick", function()
+    GR.db.realm.tab = 2 
+    GR:TabSelect()
+  end)
+  
+  Main.TabButton2 = CreateFrame("Button", "TabButton2", Main, "PanelTabButtonTemplate")
+  local TabButton2 = Main.TabButton2
+  TabButton2:SetPoint("BOTTOMLEFT", 90, -30)
+  TabButton2:SetText("Multi")
+  TabButton2:SetScript("OnClick", function()
+    GR.db.realm.tab = 3 
+    GR:TabSelect()
+  end)
+
+  Main.TabButton3 = CreateFrame("Button", "TabButton3", Main, "PanelTabButtonTemplate")
+  local TabButton3 = Main.TabButton3
+  TabButton3:SetPoint("BOTTOMLEFT", 170, -30)
+  TabButton3:SetText("Settings")
+  TabButton3:SetScript("OnClick", function()
+    GR.db.realm.tab = 4 
+    GR:TabSelect()
+  end)
+
+
+
+  -- -- Close XButton
+  -- Main.xButton = CreateFrame("Button", XButton, Main)
+  -- local xButton = Main.xButton
+  -- xButton:RegisterForClicks("AnyUp", "AnyDown")
+  -- Main.xButton.tex = xButton:CreateTexture()
+  -- local buttonTex = Main.xButton.tex
+  -- buttonTex:SetAllPoints(xButton)
+  -- buttonTex:SetTexture("Interface\\AddOns\\GameRoom\\images\\XButton.blp")
+  -- buttonTex:SetTexCoord(0, 1, 0, 1)
+  -- Main.xButton.tint = xButton:CreateTexture()
+  -- local buttonTint = Main.xButton.tint
+  -- buttonTint:SetPoint("TOPLEFT", xButton, "TOPLEFT", 2, -2)
+  -- buttonTint:SetPoint("BOTTOMRIGHT", xButton, "BOTTOMRIGHT", -2, 2)
+  -- buttonTint:SetColorTexture(0,0,0,0);
+  -- Main.xButton:SetScript("OnClick", function(self, button, down) 
+  --   if(button == "LeftButton" and down == true) then Main.xButton.tex:SetTexture("Interface\\AddOns\\GameRoom\\images\\XButtonDown.blp") end
+  --   if(button == "LeftButton" and down == false) then 
+  --     Main:Hide()
+  --   end
+  -- end)
+  -- Main.xButton:SetScript("OnEnter", function(self, motion)
+  --   Main.xButton.tint:SetColorTexture(0,0,0,.3);
+  -- end)
+  -- Main.xButton:SetScript("OnLeave", function(self, motion)
+  --   Main.xButton.tint:SetColorTexture(0,0,0,0);
+  --   Main.xButton.tex:SetTexture("Interface\\AddOns\\GameRoom\\images\\XButton.blp")
+  -- end)
 
   -- Header 2
   Main.H2 = Main:CreateFontString(nil, "OVERLAY", "GameTooltipText")
   local H2 = Main.H2
   H2:SetTextColor(.8,.8,.8,1)
-
-  -- Close XButton
-  Main.xButton = CreateFrame("Button", XButton, Main)
-  local xButton = Main.xButton
-  xButton:RegisterForClicks("AnyUp", "AnyDown")
-  Main.xButton.tex = xButton:CreateTexture()
-  local buttonTex = Main.xButton.tex
-  buttonTex:SetAllPoints(xButton)
-  buttonTex:SetTexture("Interface\\AddOns\\GameRoom\\images\\XButton.blp")
-  buttonTex:SetTexCoord(0, 1, 0, 1)
-  Main.xButton.tint = xButton:CreateTexture()
-  local buttonTint = Main.xButton.tint
-  buttonTint:SetPoint("TOPLEFT", xButton, "TOPLEFT", 2, -2)
-  buttonTint:SetPoint("BOTTOMRIGHT", xButton, "BOTTOMRIGHT", -2, 2)
-  buttonTint:SetColorTexture(0,0,0,0);
-  Main.xButton:SetScript("OnClick", function(self, button, down) 
-    if(button == "LeftButton" and down == true) then Main.xButton.tex:SetTexture("Interface\\AddOns\\GameRoom\\images\\XButtonDown.blp") end
-    if(button == "LeftButton" and down == false) then 
-      Main:Hide()
-    end
-  end)
-  Main.xButton:SetScript("OnEnter", function(self, motion)
-    Main.xButton.tint:SetColorTexture(0,0,0,.3);
-  end)
-  Main.xButton:SetScript("OnLeave", function(self, motion)
-    Main.xButton.tint:SetColorTexture(0,0,0,0);
-    Main.xButton.tex:SetTexture("Interface\\AddOns\\GameRoom\\images\\XButton.blp")
-  end)
 
   -- Exit Button
   Main.ExitBtn = CreateFrame("Button", ExitBtn, Main, "UIPanelButtonTemplate")
@@ -423,34 +469,6 @@ function GR:CreateSoloGames()
   local Main = GR_GUI.Main
   Main.Tab2 = CreateFrame("Frame", Tab2, Main)
   local Tab2 = Main.Tab2
-
-  -- Nav
-  Tab2.Nav = CreateFrame("Frame", Nav, Tab2)
-  local Nav = Tab2.Nav
-  Nav.MultiBtn = CreateFrame("Button", MultiBtn, Nav, "UIPanelButtonTemplate")
-  local MultiBtn = Nav.MultiBtn
-  MultiBtn.FS = MultiBtn:CreateFontString(nil, "OVERLAY", "GameTooltipText")
-  local MultiFS = MultiBtn.FS
-  MultiFS:SetText("Multiplayer")
-  MultiFS:SetTextColor(.8,.8,.8, 1)
-  MultiBtn:SetScript("OnClick", function(self, button, down) 
-    if (button == "LeftButton" and down == false) then
-      GR.db.realm.tab = 3
-      GR:TabSelect()
-    end
-  end)
-  Nav.SettingsBtn = CreateFrame("Button", SettingsBtn, Nav, "UIPanelButtonTemplate")
-  local SettingsBtn = Nav.SettingsBtn
-  SettingsBtn.FS = SettingsBtn:CreateFontString(nil, "OVERLAY", "GameTooltipText")
-  local SettingsFS = SettingsBtn.FS
-  SettingsFS:SetText("Settings")
-  SettingsFS:SetTextColor(.8,.8,.8, 1)
-  SettingsBtn:SetScript("OnClick", function(self, button, down) 
-    if (button == "LeftButton" and down == false) then
-      GR.db.realm.tab = 4
-      GR:TabSelect()
-    end
-  end)
   
   -- Game Buttons
   Tab2.SoloGames = CreateFrame("Frame", SoloGames, Tab2)
@@ -555,21 +573,15 @@ function GR:ResizeMainNoRatioChange()
   local HeaderInfo = Main.HeaderInfo
 
   -- Main
-  Main.ResizeBtn:SetPoint("BOTTOMRIGHT", -11 * Main.XRatio, 10 * Main.YRatio)
-  Main.ResizeBtn:SetSize(16 * Main.XRatio, 16 * Main.YRatio)
-
-  Main.H1:SetPoint("TOP", 0, -18 * Main.YRatio)
-  Main.H1:SetTextScale(2.8 * Main.ScreenRatio)
-
   if (GR.db.realm.tab == 2 or GR.db.realm.tab == 3 or GR.db.realm.tab == 4) then
-    Main.H2:SetPoint("TOP", 0, -105 * Main.YRatio)
+    Main.H2:SetPoint("TOP", 0, -44 * Main.YRatio)
   else
     Main.H2:SetPoint("TOP", 0, -65 * Main.YRatio)
   end
   Main.H2:SetTextScale(1.7 * Main.ScreenRatio)
 
-  Main.xButton:SetSize(25 * Main.XRatio, 25 * Main.YRatio)
-  Main.xButton:SetPoint("TOPRIGHT", -13 * Main.XRatio, -13 * Main.YRatio)
+  -- Main.xButton:SetSize(25 * Main.XRatio, 25 * Main.YRatio)
+  -- Main.xButton:SetPoint("TOPRIGHT", -13 * Main.XRatio, -13 * Main.YRatio)
 
   -- Exit Button
   Main.ExitBtn:SetPoint("TOPRIGHT", -40 * Main.XRatio, -56 * Main.YRatio)
@@ -632,51 +644,34 @@ function GR:ResizeSoloGames()
   Tab2:SetPoint("TOP", 0, -50 * Main.YRatio)
   Tab2:SetSize(250 * Main.XRatio, 200 * Main.YRatio)
 
-  -- Nav
-  local Nav = Tab2.Nav
-  Nav:SetPoint("TOP", 0, 0)
-  Nav:SetSize(240 * Main.XRatio, 40 * Main.YRatio)
-  local MultiBtn = Nav.MultiBtn
-  MultiBtn:SetPoint("TOPLEFT", 5 * Main.XRatio, -5 * Main.YRatio)
-  MultiBtn:SetSize(110 * Main.XRatio, 30 * Main.YRatio)
-  local MultiFS = MultiBtn.FS
-  MultiFS:SetPoint("CENTER", 0, 0)
-  MultiFS:SetTextScale(1.3 * Main.ScreenRatio)
-  local SettingsBtn = Nav.SettingsBtn
-  SettingsBtn:SetPoint("TOPRIGHT", -5 * Main.XRatio, -5 * Main.YRatio)
-  SettingsBtn:SetSize(110 * Main.XRatio, 30 * Main.YRatio)
-  local SettingsFS = SettingsBtn.FS
-  SettingsFS:SetPoint("CENTER", 0, 0)
-  SettingsFS:SetTextScale(1.3 * Main.ScreenRatio)
-
   -- Game Buttons
   local SoloGames = Tab2.SoloGames
-  SoloGames:SetPoint("TOP", 0 * Main.XRatio, -75 * Main.YRatio)
-  SoloGames:SetSize(250 * Main.XRatio, 100 * Main.YRatio)
+  SoloGames:SetPoint("TOP", 0 * Main.XRatio, -18 * Main.YRatio)
+  SoloGames:SetSize(255 * Main.XRatio, 100 * Main.YRatio)
   local AsteroidsBtn = SoloGames.AsteroidsBtn
   AsteroidsBtn:SetPoint("TOPLEFT", 5 * Main.XRatio, -5 * Main.YRatio)
   AsteroidsBtn:SetSize(120 * Main.XRatio, 30 * Main.YRatio)
   local AsteroidsFS = AsteroidsBtn.FS
   AsteroidsFS:SetPoint("CENTER", 0, 0)
-  AsteroidsFS:SetTextScale(1.4 * Main.ScreenRatio)
+  AsteroidsFS:SetTextScale(1 * Main.ScreenRatio)
   local SnakeBtn = SoloGames.SnakeBtn
   SnakeBtn:SetPoint("TOPRIGHT", -5 * Main.XRatio, -5 * Main.YRatio)
   SnakeBtn:SetSize(120 * Main.XRatio, 30 * Main.YRatio)
   local SnakeFS = SnakeBtn.FS
   SnakeFS:SetPoint("CENTER", 0, 0)
-  SnakeFS:SetTextScale(1.4 * Main.ScreenRatio)
+  SnakeFS:SetTextScale(1 * Main.ScreenRatio)
   local BCBtn = SoloGames.BCBtn
   BCBtn:SetPoint("TOPLEFT", 5 * Main.XRatio, -40 * Main.YRatio)
   BCBtn:SetSize(120 * Main.XRatio, 30 * Main.YRatio)
   local BCFS = BCBtn.FS
   BCFS:SetPoint("CENTER", 0, 0)
-  BCFS:SetTextScale(1.1 * Main.ScreenRatio)
+  BCFS:SetTextScale(1 * Main.ScreenRatio)
   local SuikaBtn = SoloGames.SuikaBtn
   SuikaBtn:SetPoint("TOPRIGHT", -5 * Main.XRatio, -40 * Main.YRatio)
   SuikaBtn:SetSize(120 * Main.XRatio, 30 * Main.YRatio)
   local SuikaFS = SuikaBtn.FS
   SuikaFS:SetPoint("CENTER", 0, 0)
-  SuikaFS:SetTextScale(1.4 * Main.ScreenRatio)
+  SuikaFS:SetTextScale(1 * Main.ScreenRatio)
 end
 
 function GR:SizeAcceptDecline()
@@ -830,6 +825,72 @@ function GR:TabSelect()
     Main.Tab4:Show()
     Main.H2:SetText("Settings")
   end
+
+  GR:ToggleTab()
+end
+
+function GR:ToggleTab()
+  local tabIndex = GR.db.realm.tab
+  local tab1 = GR_GUI.Main.TabButton1
+  local tab2 = GR_GUI.Main.TabButton2
+  local tab3 = GR_GUI.Main.TabButton3
+  
+  local function normal(tab)
+    tab.Left:Show()
+    tab.LeftActive:Hide()
+    tab.LeftHighlight:Hide()
+    tab.Middle:Show()
+    tab.MiddleActive:Hide()
+    tab.MiddleHighlight:Hide()
+    tab.Right:Show()
+    tab.RightActive:Hide()
+    tab.RightHighlight:Hide() 
+    tab.Text:SetPoint("CENTER", 0, 0)
+    tab.Text:SetTextColor(1,.82,0,1)
+  end
+
+  local function active(tab)
+    tab.Left:Hide()
+    tab.LeftActive:Show()
+    tab.LeftHighlight:Hide()
+    tab.Middle:Hide()
+    tab.MiddleActive:Show()
+    tab.MiddleHighlight:Hide()
+    tab.Right:Hide()
+    tab.RightActive:Show()
+    tab.RightHighlight:Hide() 
+    tab.Text:SetPoint("CENTER", 0, -4)
+    tab.Text:SetTextColor(1,1,1,1)
+  end
+
+  local function highlight(tab)
+    tab.Left:Hide()
+    tab.LeftActive:Hide()
+    tab.LeftHighlight:Show()
+    tab.Middle:Hide()
+    tab.MiddleActive:Hide()
+    tab.MiddleHighlight:Show()
+    tab.Right:Hide()
+    tab.RightActive:Hide()
+    tab.RightHighlight:Show() 
+  end
+  
+  if (tabIndex == 2) then
+    active(tab1)
+    normal(tab2)
+    normal(tab3)
+  end
+  if (tabIndex == 3) then
+    normal(tab1)
+    active(tab2)
+    normal(tab3)
+  end
+  if (tabIndex == 4) then
+    normal(tab1)
+    normal(tab2)
+    active(tab3)
+  end
+
 end
 
 function GR:SetTurnString()

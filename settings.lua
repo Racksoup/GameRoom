@@ -19,7 +19,6 @@ function GR:CreateSettings()
 
   GR:CreateMainSettings()
   GR:CreateSettingsLists() 
-  GR:CreateSettingsNav()
 
   GR:SizeSettings()
 end
@@ -441,37 +440,6 @@ function GR:CreateSettingsLists()
   Settings.Whitelist:Hide()
 end
 
-function GR:CreateSettingsNav()
-  --Nav
-  local Tab4 = GR_GUI.Main.Tab4
-  Tab4.Nav = CreateFrame("Frame", Nav, Tab4)
-  local Nav = Tab4.Nav
-  Nav.SoloBtn = CreateFrame("Button", SoloBtn, Nav, "UIPanelButtonTemplate")
-  local SoloBtn = Nav.SoloBtn
-  SoloBtn.FS = SoloBtn:CreateFontString(nil, "OVERLAY", "GameTooltipText")
-  local SoloFS = SoloBtn.FS
-  SoloFS:SetText("Single Player")
-  SoloFS:SetTextColor(.8,.8,.8, 1)
-  SoloBtn:SetScript("OnClick", function(self, button, down) 
-    if (button == "LeftButton" and down == false) then
-      GR.db.realm.tab = 2
-      GR:TabSelect()
-    end
-  end)
-  Nav.MultiBtn = CreateFrame("Button", MultiBtn, Nav, "UIPanelButtonTemplate")
-  local MultiBtn = Nav.MultiBtn
-  MultiBtn.FS = MultiBtn:CreateFontString(nil, "OVERLAY", "GameTooltipText")
-  local MultiFS = MultiBtn.FS
-  MultiFS:SetText("Multi-Player")
-  MultiFS:SetTextColor(.8,.8,.8, 1)
-  MultiBtn:SetScript("OnClick", function(self, button, down) 
-    if (button == "LeftButton" and down == false) then
-      GR.db.realm.tab = 3
-      GR:TabSelect()
-    end
-  end)
-end
-
 -- Resize
 function GR:SizeSettings()
   local Main = GR_GUI.Main
@@ -480,7 +448,7 @@ function GR:SizeSettings()
   -- Main Settings Window & Scroll
   Tab4:SetPoint("TOP", 0, -50 * Main.YRatio)
   Tab4:SetSize(250 * Main.XRatio, 200 * Main.YRatio)
-  Tab4.SettingsScroll:SetPoint("TOP", 0, -76 * Main.YRatio)
+  Tab4.SettingsScroll:SetPoint("TOP", 0, -18 * Main.YRatio)
   Tab4.SettingsScroll:SetSize(360 * Main.XRatio, 375 * Main.YRatio)
   local Settings = Tab4.Settings
   Settings:SetPoint("TOPLEFT", 0, 0 * Main.XRatio)
@@ -541,7 +509,6 @@ function GR:SizeSettings()
   Settings.WhiteFriendsBtn:SetSize(25 * Main.XRatio, 25 * Main.YRatio)
 
   GR:SizeSettingsList()
-  GR:ResizeSettingsNav()
 end
 
 function GR:SizeSettingsList()
@@ -625,26 +592,6 @@ function GR:SizeSettingsList()
     v:SetPoint("TOPLEFT", 0, i*-14)
     v:SetSize(300, 14)
   end
-end
-
-function GR:ResizeSettingsNav()
-  -- Nav
-  local Main = GR_GUI.Main
-  local Nav = Main.Tab4.Nav
-  Nav:SetPoint("TOP", 0, 0)
-  Nav:SetSize(240 * Main.XRatio, 40 * Main.YRatio)
-  local SoloBtn = Nav.SoloBtn
-  SoloBtn:SetPoint("TOPLEFT", 5 * Main.XRatio, -5 * Main.YRatio)
-  SoloBtn:SetSize(110 * Main.XRatio, 30 * Main.YRatio)
-  local SoloFS = SoloBtn.FS
-  SoloFS:SetPoint("CENTER", 0, 0)
-  SoloFS:SetTextScale(1.3 * Main.ScreenRatio)
-  local MultiBtn = Nav.MultiBtn
-  MultiBtn:SetPoint("TOPRIGHT", -5 * Main.XRatio, -5 * Main.YRatio)
-  MultiBtn:SetSize(110 * Main.XRatio, 30 * Main.YRatio)
-  local MultiFS = MultiBtn.FS
-  MultiFS:SetPoint("CENTER", 0, 0)
-  MultiFS:SetTextScale(1.3 * Main.ScreenRatio)
 end
 
 -- functionality
