@@ -62,9 +62,9 @@ function GR:OnInitialize()
   GR.Win.Const.GameScreenWidth = 750
   GR.Win.Const.GameScreenHeight = 500
   GR.Win.Const.Tab2Width = 310
-  GR.Win.Const.Tab2Height = 250
-  GR.Win.Const.Tab3Width = 310
-  GR.Win.Const.Tab3Height = 460
+  GR.Win.Const.Tab2Height = 156
+  GR.Win.Const.Tab3Width = 330
+  GR.Win.Const.Tab3Height = 300
   GR.Win.Const.Tab4Width = 425
   GR.Win.Const.Tab4Height = 470
 
@@ -123,7 +123,6 @@ function GR:CreateMainWindow()
   -- GR_GUI.Main = CreateFrame("Frame", GameRoom, UIParent, "PortraitFrameTemplate")
   local Main = GR_GUI.Main
   Main:SetSize(GR.Win.Const.Tab2Width, GR.Win.Const.Tab2Height)
-  Main:SetResizeBounds(250,240)
   Main:SetFrameStrata("HIGH")
   Main:SetPoint("TOP", UIParent, "TOP", 0, -130)
   Main:SetMovable(true)
@@ -143,14 +142,15 @@ function GR:CreateMainWindow()
     end
   end)
   Main:Show()
-  -- Main:SetAlpha(1)
+  Main:SetAlpha(1)
   Main.XRatio = 1
   Main.YRatio = 1
   Main.ScreenRatio = 1
 
   -- close button
   Main.XButton = CreateFrame("Button", "XButton", Main, "UIPanelCloseButtonDefaultAnchors")
-  Main.XButton:SetPoint("TOPRIGHT", 0, -2)
+  Main.XButton:SetPoint("TOPRIGHT", 0, -1)
+  Main.XButton:SetSize(21, 21)
 
   -- Resize Button
   Main.ResizeBtn = CreateFrame("Button", nil, Main)
@@ -574,7 +574,7 @@ function GR:ResizeMainNoRatioChange()
 
   -- Main
   if (GR.db.realm.tab == 2 or GR.db.realm.tab == 3 or GR.db.realm.tab == 4) then
-    Main.H2:SetPoint("TOP", 0, -44 * Main.YRatio)
+    Main.H2:SetPoint("TOP", 0, -38 * Main.YRatio)
   else
     Main.H2:SetPoint("TOP", 0, -65 * Main.YRatio)
   end
@@ -646,7 +646,7 @@ function GR:ResizeSoloGames()
 
   -- Game Buttons
   local SoloGames = Tab2.SoloGames
-  SoloGames:SetPoint("TOP", 0 * Main.XRatio, -18 * Main.YRatio)
+  SoloGames:SetPoint("TOP", 0 * Main.XRatio, -12 * Main.YRatio)
   SoloGames:SetSize(255 * Main.XRatio, 100 * Main.YRatio)
   local AsteroidsBtn = SoloGames.AsteroidsBtn
   AsteroidsBtn:SetPoint("TOPLEFT", 5 * Main.XRatio, -5 * Main.YRatio)
@@ -744,6 +744,8 @@ function GR:TabSelect()
 
     Main:SetSize(Width, Height)
     Main:SetPoint(point, relativeTo, relativePoint, xOfs, yOfs)
+    Main:SetResizeBounds(GR.Win.Const.Tab1Width /2, GR.Win.Const.Tab1Height /2)
+
 
     if (Change) then
       GR:ResizeMain()
@@ -775,7 +777,11 @@ function GR:TabSelect()
   if (tab == 2) then
     local Width, Height, Change = CheckWidthHeight(GR.Win.Const.Tab2Width * Main.XRatio, GR.Win.Const.Tab2Height * Main.YRatio)
 
-    Main:SetSize(Width, Height)
+    Main.XRatio = 1
+    Main.YRatio = 1
+    Main.ScreenRatio = 1
+    Main:SetSize(GR.Win.Const.Tab2Width, GR.Win.Const.Tab2Height)
+    Main:SetResizeBounds(GR.Win.Const.Tab2Width, GR.Win.Const.Tab2Height)
     if (point == nil) then
     else
       Main:SetPoint(point, relativeTo, relativePoint, xOfs, yOfs)
@@ -794,8 +800,12 @@ function GR:TabSelect()
   if (tab == 3) then
     local Width, Height, Change = CheckWidthHeight(GR.Win.Const.Tab3Width * Main.XRatio, GR.Win.Const.Tab3Height * Main.YRatio)
 
-    Main:SetSize(Width, Height)
+    Main.XRatio = 1
+    Main.YRatio = 1
+    Main.ScreenRatio = 1
+    Main:SetSize(GR.Win.Const.Tab3Width, GR.Win.Const.Tab3Height)
     Main:SetPoint(point, relativeTo, relativePoint, xOfs, yOfs)
+    Main:SetResizeBounds(GR.Win.Const.Tab3Width, GR.Win.Const.Tab3Height)
     
     if (Change) then
       GR:ResizeMain()
@@ -804,17 +814,21 @@ function GR:TabSelect()
     end
 
     Main.Tab3:Show()
-    Main.Tab3.Invite:Hide()
-    Main.Tab3.Invite.Tab:Hide()
-    Main.Tab3.Invite.SendBtn:Hide()
-    Main.H2:SetText("Multi-Player Games")
+    Main.Tab3.Invite:Show()
+    Main.Tab3.InviteText:Hide()
+    Main.Tab3.GameButtons:Hide()
+    Main.H2:SetText("Multi Player Games")
   end
   -- Settings
   if (tab == 4) then
     local Width, Height, Change = CheckWidthHeight(GR.Win.Const.Tab4Width * Main.XRatio, GR.Win.Const.Tab4Height * Main.YRatio)
 
-    Main:SetSize(Width, Height)
+    Main.XRatio = 1
+    Main.YRatio = 1
+    Main.ScreenRatio = 1
+    Main:SetSize(GR.Win.Const.Tab4Width, GR.Win.Const.Tab4Height)
     Main:SetPoint(point, relativeTo, relativePoint, xOfs, yOfs)
+    Main:SetResizeBounds(GR.Win.Const.Tab4Width, GR.Win.Const.Tab4Height)
     
     if (Change) then
       GR:ResizeMain()
@@ -875,6 +889,15 @@ function GR:ToggleTab()
     tab.RightHighlight:Show() 
   end
   
+  if (tabIndex == 1) then
+    tab1:Hide()
+    tab2:Hide()
+    tab3:Hide()
+  else 
+    tab1:Show()
+    tab2:Show()
+    tab3:Show()
+  end
   if (tabIndex == 2) then
     active(tab1)
     normal(tab2)

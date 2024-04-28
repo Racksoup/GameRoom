@@ -31,18 +31,16 @@ function GR:CreateMainSettings()
   local AlphaFS = Settings.AlphaFS
   AlphaFS:SetTextColor(.8,.8,.8,1)
   AlphaFS:SetText("Alpha")
-  Settings.AlphaSlider = CreateFrame("Button", AlphaSlider, Settings)
+  Settings.AlphaSlider = CreateFrame("Slider", "AlphaSlider", Settings, "UISliderTemplate")
   local AlphaSlider = Settings.AlphaSlider
-  AlphaSlider:SetScript("OnClick", function(self, button, down) 
-    if (button == "LeftButton" and down == false) then     
-      local x,y = GetCursorPosition()
-      GR.WinAlpha = (x - 591 * GR_GUI.Main.XRatio) / (188 * GR_GUI.Main.XRatio)
-      GR_GUI.Main:SetAlpha(GR.WinAlpha)
-    end
+  AlphaSlider:SetScript("OnValueChanged", function(self, value) 
+    GR.WinAlpha = value / 100
+    GR_GUI.Main:SetAlpha(GR.WinAlpha)
   end)
-  Settings.AlphaTex = AlphaSlider:CreateTexture()
-  Settings.AlphaTex:SetAllPoints(AlphaSlider)
-  Settings.AlphaTex:SetColorTexture(0,.5,1,1)
+  AlphaSlider:SetValue(50)
+  AlphaSlider:SetMinMaxValues(20, 100)
+  AlphaSlider:SetValueStep(10)
+  AlphaSlider:SetObeyStepOnDrag(true)
   
   -- Disable Battle Net Friends
   Settings.BNString = Settings:CreateFontString(nil, "ARTWORK", "GameTooltipText")
@@ -457,54 +455,54 @@ function GR:SizeSettings()
   -- Settings
   -- Alpha SLider
   Settings.AlphaFS:SetPoint("TOPLEFT", 0, -20 * Main.YRatio)
-  Settings.AlphaFS:SetTextScale(1.1 * Main.ScreenRatio)
+  Settings.AlphaFS:SetTextScale(1 * Main.ScreenRatio)
   Settings.AlphaSlider:SetPoint("TOPRIGHT", 0, -20 * Main.YRatio)
   Settings.AlphaSlider:SetSize(250 * Main.XRatio, 15 * Main.YRatio)
   -- Hide Challenge In Combat
   Settings.CombatString:SetPoint("TOPLEFT", 0, -45 * Main.YRatio)
-  Settings.CombatString:SetTextScale(1.1 * Main.ScreenRatio)
+  Settings.CombatString:SetTextScale(1 * Main.ScreenRatio)
   Settings.CombatBtn:SetPoint("TOPRIGHT", 0, -40 * Main.YRatio)
   Settings.CombatBtn:SetSize(25 * Main.XRatio, 25 * Main.YRatio)
   -- Moveable Challenge Button
   Settings.MoveableChalString:SetPoint("TOPLEFT", 0, -70 * Main.YRatio)
-  Settings.MoveableChalString:SetTextScale(1.1 * Main.ScreenRatio)
+  Settings.MoveableChalString:SetTextScale(1 * Main.ScreenRatio)
   Settings.MoveableChalBtn:SetPoint("TOPRIGHT", 0, -65 * Main.YRatio)
   Settings.MoveableChalBtn:SetSize(50 * Main.XRatio, 25 * Main.YRatio)
   Settings.MoveableChalBtnString:SetPoint("CENTER")
-  Settings.MoveableChalBtnString:SetTextScale(1.1 * Main.ScreenRatio)
+  Settings.MoveableChalBtnString:SetTextScale(1 * Main.ScreenRatio)
   -- Battle Net Friends
   Settings.BNString:SetPoint("TOPLEFT", 0, -95 * Main.YRatio)
-  Settings.BNString:SetTextScale(1.1 * Main.ScreenRatio)
+  Settings.BNString:SetTextScale(1 * Main.ScreenRatio)
   Settings.BNBtn:SetPoint("TOPRIGHT", 0, -90 * Main.YRatio)
   Settings.BNBtn:SetSize(25 * Main.XRatio, 25 * Main.YRatio)
   -- Show Challenge As Message
   Settings.ShowChallengeString:SetPoint("TOPLEFT", 0, -120 * Main.YRatio)
-  Settings.ShowChallengeString:SetTextScale(1.1 * Main.ScreenRatio)
+  Settings.ShowChallengeString:SetTextScale(1 * Main.ScreenRatio)
   Settings.ShowChallengeBtn:SetPoint("TOPRIGHT", 0, -115 * Main.YRatio)
   Settings.ShowChallengeBtn:SetSize(25 * Main.XRatio, 25 * Main.YRatio)
   -- Disable Incoming Challenge
   Settings.IncString:SetPoint("TOPLEFT", 0, -165 * Main.YRatio)
-  Settings.IncString:SetTextScale(1.1 * Main.ScreenRatio)
+  Settings.IncString:SetTextScale(1 * Main.ScreenRatio)
   Settings.IncBtn:SetPoint("TOPRIGHT", 0, -160 * Main.YRatio)
   Settings.IncBtn:SetSize(25 * Main.XRatio, 25 * Main.YRatio)
   -- Whitelist Checkbox
   Settings.WhitelistString:SetPoint("TOPLEFT", 0, -190 * Main.YRatio)
-  Settings.WhitelistString:SetTextScale(1.1 * Main.ScreenRatio)
+  Settings.WhitelistString:SetTextScale(1 * Main.ScreenRatio)
   Settings.WhitelistBtn:SetPoint("TOPRIGHT", 0, -185 * Main.YRatio)
   Settings.WhitelistBtn:SetSize(25 * Main.XRatio, 25 * Main.YRatio)
   -- Whitelist Guild
   Settings.WhiteGuildString:SetPoint("TOPLEFT", 0, -215 * Main.YRatio)
-  Settings.WhiteGuildString:SetTextScale(1.1 * Main.ScreenRatio)
+  Settings.WhiteGuildString:SetTextScale(1 * Main.ScreenRatio)
   Settings.WhiteGuildBtn:SetPoint("TOPRIGHT", 0, -210 * Main.YRatio)
   Settings.WhiteGuildBtn:SetSize(25 * Main.XRatio, 25 * Main.YRatio)
   -- Whitelist Party
   Settings.WhitePartyString:SetPoint("TOPLEFT", 0, -240 * Main.YRatio)
-  Settings.WhitePartyString:SetTextScale(1.1 * Main.ScreenRatio)
+  Settings.WhitePartyString:SetTextScale(1 * Main.ScreenRatio)
   Settings.WhitePartyBtn:SetPoint("TOPRIGHT", 0, -235 * Main.YRatio)
   Settings.WhitePartyBtn:SetSize(25 * Main.XRatio, 25 * Main.YRatio)
   --
   Settings.WhiteFriendsString:SetPoint("TOPLEFT", 0, -265 * Main.YRatio)
-  Settings.WhiteFriendsString:SetTextScale(1.1 * Main.ScreenRatio)
+  Settings.WhiteFriendsString:SetTextScale(1 * Main.ScreenRatio)
   Settings.WhiteFriendsBtn:SetPoint("TOPRIGHT", 0, -260 * Main.YRatio)
   Settings.WhiteFriendsBtn:SetSize(25 * Main.XRatio, 25 * Main.YRatio)
 

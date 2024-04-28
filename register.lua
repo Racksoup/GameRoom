@@ -150,8 +150,9 @@ function GR:RefreshFriendsListUI()
     Btns[i]:SetScript("OnClick", function(self, button, down)
       if (button == "LeftButton" and down == false) then
         GR.Target = v
-        GR_GUI.Main.Tab3.Invite.SendBtn.FS:SetText("Invite " .. GR.Target)
-        GR_GUI.Main.Tab3.Invite.SendBtn:Show()
+        GR_GUI.Main.Tab3.InviteText:SetText("Challenge " .. GR.Target)
+        GR_GUI.Main.Tab3.InviteText:Show()
+        GR_GUI.Main.Tab3.GameButtons:Show()
       end
     end)
   end
@@ -385,8 +386,9 @@ function GR:RefreshZoneList()
     Btns[i]:SetScript("OnClick", function(self, button, down)
       if (button == "LeftButton" and down == false) then
         GR.Target = v
-        GR_GUI.Main.Tab3.Invite.SendBtn.FS:SetText("Invite " .. GR.Target)
-        GR_GUI.Main.Tab3.Invite.SendBtn:Show()
+        GR_GUI.Main.Tab3.InviteText:SetText("Challenge " .. GR.Target)
+        GR_GUI.Main.Tab3.InviteText:Show()
+        GR_GUI.Main.Tab3.GameButtons:Show()
       end
     end)
   end 
@@ -587,8 +589,9 @@ function GR:RefreshGuildGroupListUI()
     Btns[i]:SetScript("OnClick", function(self, button, down)
       if (button == "LeftButton" and down == false) then
         GR.Target = JoinedList[i]
-        GR_GUI.Main.Tab3.Invite.SendBtn.FS:SetText("Invite " .. GR.Target)
-        GR_GUI.Main.Tab3.Invite.SendBtn:Show()
+        GR_GUI.Main.Tab3.InviteText:SetText("Challenge " .. GR.Target)
+        GR_GUI.Main.Tab3.InviteText:Show()
+        GR_GUI.Main.Tab3.GameButtons:Show()
       end
     end)
   end
@@ -672,8 +675,9 @@ function GR:RefreshServerListUI()
     Btns[i]:SetScript("OnClick", function(self, button, down)
       if (button == "LeftButton" and down == false) then
         GR.Target = v
-        GR_GUI.Main.Tab3.Invite.SendBtn.FS:SetText("Invite " .. GR.Target)
-        GR_GUI.Main.Tab3.Invite.SendBtn:Show()
+        GR_GUI.Main.Tab3.InviteText:SetText("Challenge " .. GR.Target)
+        GR_GUI.Main.Tab3.InviteText:Show()
+        GR_GUI.Main.Tab3.GameButtons:Show()
       end
     end)
   end 

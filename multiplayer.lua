@@ -3,11 +3,25 @@ function GR:CreateMultiGames()
   Main.Tab3 = CreateFrame("Frame", Tab3, Main)
   local Tab3 = Main.Tab3
   
+  Tab3:Hide()
+  
+  GR:CreateGameButtons()
+  GR:CreateMultiInvite()
+end
+
+-- Create
+function GR:CreateGameButtons()
+  local Main = GR_GUI.Main
+  local Tab3 = Main.Tab3
   -- Game Buttons
-  Tab3.MultiGames = CreateFrame("Frame", MultiGames, Tab3)
-  local MultiGames = Tab3.MultiGames
-  MultiGames.TicTacToeBtn = CreateFrame("Button", TicTacToeBtn, MultiGames, "UIPanelButtonTemplate")
-  local TicTacToeBtn = MultiGames.TicTacToeBtn
+  Tab3.GameButtons = CreateFrame("Frame", "GameButtons", Tab3)
+  local GameButtons = Tab3.GameButtons
+
+  Tab3.InviteText = Tab3:CreateFontString(nil, "ARTWORK", "GameTooltipText")
+  Tab3.InviteText:SetText("Challenge ...")
+
+  GameButtons.TicTacToeBtn = CreateFrame("Button", "TicTacToeBtn", GameButtons, "UIPanelButtonTemplate")
+  local TicTacToeBtn = GameButtons.TicTacToeBtn
   TicTacToeBtn.FS = TicTacToeBtn:CreateFontString(nil, "OVERLAY", "GameTooltipText")
   local TicTacToeFS = TicTacToeBtn.FS
   TicTacToeFS:SetTextColor(.8,.8,.8, 1)
@@ -15,13 +29,14 @@ function GR:CreateMultiGames()
   TicTacToeBtn:SetScript("OnClick", function(self, button, down) 
     if (button == "LeftButton" and down == false) then
       GR.GameType = "Tictactoe"
-      Tab3.Invite.Header:SetText("Invite Player to Play TicTacToe")
-      Tab3.Invite:Show()
-      Tab3.Invite.Tab:Show()
+      Tab3.InviteText:SetText("Challenged " .. GR.Target .. " To " .. GR.GameType)
+      Tab3.GameButtons:Hide()
+      GR:SendGameInvite(self, button, down)
     end
   end)
-  MultiGames.BattleshipsBtn = CreateFrame("Button", BattleshipsBtn, MultiGames, "UIPanelButtonTemplate")
-  local BattleshipsBtn = MultiGames.BattleshipsBtn
+
+  GameButtons.BattleshipsBtn = CreateFrame("Button", "BattleshipsBtn", GameButtons, "UIPanelButtonTemplate")
+  local BattleshipsBtn = GameButtons.BattleshipsBtn
   BattleshipsBtn.FS = BattleshipsBtn:CreateFontString(nil, "OVERLAY", "GameTooltipText")
   local BattleshipsFS = BattleshipsBtn.FS
   BattleshipsFS:SetTextColor(.8,.8,.8, 1)
@@ -29,35 +44,20 @@ function GR:CreateMultiGames()
   BattleshipsBtn:SetScript("OnClick", function(self, button, down) 
     if (button == "LeftButton" and down == false) then
       GR.GameType = "Battleships"
-      Tab3.Invite.Header:SetText("Invite Player to Play Battleships")
-      Tab3.Invite:Show()
-      Tab3.Invite.Tab:Show()
+      Tab3.InviteText:SetText("Challenged " .. GR.Target .. " To " .. GR.GameType)
+      Tab3.GameButtons:Hide()
+      GR:SendGameInvite(self, button, down)
     end
   end)
-
-  Tab3:Hide()
-
-  GR:CreateMultiInvite()
 end
 
--- Create
 function GR:CreateMultiInvite()
   local Main = GR_GUI.Main
   local Tab3 = Main.Tab3
 
   Tab3.Invite = CreateFrame("Frame", Invite, Tab3)
   local Invite = Tab3.Invite
-
-  Invite.Header = Invite:CreateFontString(nil, "OVERLAY", "GameTooltipText")
-  Invite.Header:SetTextColor(.8,.8,.8, 1)
-
-  Invite.SendBtn = CreateFrame("Button", SendBtn, Invite, "UIPanelButtonTemplate")
-  Invite.SendBtn.FS = Invite.SendBtn:CreateFontString(nil, "ARTWORK", "GameTooltipText")
-  Invite.SendBtn.FS:SetPoint("CENTER")
-  Invite.SendBtn.FS:SetTextColor(.8,.8,.8, 1)
-  Invite.SendBtn:SetScript("OnClick", function(self, button, down) 
-    GR:SendGameInvite(self, button, down)
-  end)
+  Invite.ActiveTab = "server"
 
   GR:CreateInviteTab()
   GR:CreateInviteServer()
@@ -75,12 +75,11 @@ function GR:CreateInviteServer()
   Invite.ServerScrollFrame = CreateFrame("ScrollFrame", ServerScrollFrame, Invite, "UIPanelScrollFrameTemplate")
   local ServerScrollFrame = Invite.ServerScrollFrame
   ServerScrollFrame:SetScript("OnMouseWheel", ScrollFrame_OnMouseWheel)
+  ServerScrollFrame.Border = CreateFrame("Frame", "ServerBorder", ServerScrollFrame, "ThinBorderTemplate")
   
   Invite.Server = CreateFrame("Frame", Server, ServerScrollFrame)
   local Server = Invite.Server
   ServerScrollFrame:SetScrollChild(Server)
-  ServerScrollFrame.FS = ServerScrollFrame:CreateFontString(nil, "ARTWORK", "GameTooltipText")
-  ServerScrollFrame.FS:SetText("Server")
   
   Invite.Server.Btns = {}
   for i = 1, 100, 1 do
@@ -101,12 +100,11 @@ function GR:CreateInviteFriends()
   Invite.FriendsScrollFrame = CreateFrame("ScrollFrame", FriendsScrollFrame, Invite, "UIPanelScrollFrameTemplate")
   local FriendsScrollFrame = Invite.FriendsScrollFrame
   FriendsScrollFrame:SetScript("OnMouseWheel", ScrollFrame_OnMouseWheel)
+  FriendsScrollFrame.Border = CreateFrame("Frame", "FriendsBorder", FriendsScrollFrame, "ThinBorderTemplate")
   
   Invite.Friends = CreateFrame("Frame", Friends, FriendsScrollFrame)
   local Friends = Invite.Friends
   FriendsScrollFrame:SetScrollChild(Friends)
-  FriendsScrollFrame.FS = FriendsScrollFrame:CreateFontString(nil, "ARTWORK", "GameTooltipText")
-  FriendsScrollFrame.FS:SetText("Friends")
   
   Invite.Friends.Btns = {}
   for i = 1, 100, 1 do
@@ -125,12 +123,11 @@ function GR:CreateInviteParty()
   Invite.PartyScrollFrame = CreateFrame("ScrollFrame", PartyScrollFrame, Invite, "UIPanelScrollFrameTemplate")
   local PartyScrollFrame = Invite.PartyScrollFrame
   PartyScrollFrame:SetScript("OnMouseWheel", ScrollFrame_OnMouseWheel)
+  PartyScrollFrame.Border = CreateFrame("Frame", "PartyBorder", PartyScrollFrame, "ThinBorderTemplate")
   
   Invite.Party = CreateFrame("Frame", Party, PartyScrollFrame)
   local Party = Invite.Party
   PartyScrollFrame:SetScrollChild(Party)
-  PartyScrollFrame.FS = PartyScrollFrame:CreateFontString(nil, "ARTWORK", "GameTooltipText")
-  PartyScrollFrame.FS:SetText("Party & Guild")
   
   Invite.Party.Btns = {}
   for i = 1, 100, 1 do
@@ -167,12 +164,11 @@ function GR:CreateInviteZone()
   Invite.ZoneScrollFrame = CreateFrame("ScrollFrame", ZoneScrollFrame, Invite, "UIPanelScrollFrameTemplate")
   local ZoneScrollFrame = Invite.ZoneScrollFrame
   ZoneScrollFrame:SetScript("OnMouseWheel", ScrollFrame_OnMouseWheel)
+  ZoneScrollFrame.Border = CreateFrame("Frame", "ZoneBorder", ZoneScrollFrame, "ThinBorderTemplate")
   
   Invite.Zone = CreateFrame("Frame", Zone, ZoneScrollFrame)
   local Zone = Invite.Zone
   ZoneScrollFrame:SetScrollChild(Zone)
-  ZoneScrollFrame.FS = ZoneScrollFrame:CreateFontString(nil, "ARTWORK", "GameTooltipText")
-  ZoneScrollFrame.FS:SetText("Zone")
   
   Invite.Zone.Btns = {}
   for i = 1, 100, 1 do
@@ -197,111 +193,104 @@ end
 function GR:CreateInviteTab()
   local Main = GR_GUI.Main
   local Tab3 = Main.Tab3
+  local Invite = Tab3.Invite
 
-  Tab3.Invite.Tab = CreateFrame("Frame", Tab, Tab3.Invite)
-  local Tab = Tab3.Invite.Tab
+  Invite.Tab = CreateFrame("Frame", "InviteTabs", Invite)
+  local Tab = Invite.Tab
 
   -- Server
-  Tab.Server = CreateFrame("Button", FriendsBtn, Tab, "UIPanelButtonTemplate")
-  Tab.Server:SetPoint("TOPLEFT")
-  Tab.Server.FS = Tab.Server:CreateFontString(nil, "ARTWORK", "GameTooltipText")
-  Tab.Server.FS:SetPoint("CENTER")
-  Tab.Server.FS:SetTextColor(.8,.8,.8, 1)
-  Tab.Server.FS:SetText("Server")
+  Tab.Server = CreateFrame("Button", "ServerTab", Tab, "PanelTopTabButtonTemplate")
+  Tab.Server.LeftActive:Hide()
+  Tab.Server.MiddleActive:Hide()
+  Tab.Server.RightActive:Hide()
+  Tab.Server:SetText("Server")
+  
   -- Friends
-  Tab.Friends = CreateFrame("Button", FriendsBtn, Tab, "UIPanelButtonTemplate")
-  Tab.Friends:SetPoint("TOP", -35, 0)
-  Tab.Friends.FS = Tab.Friends:CreateFontString(nil, "ARTWORK", "GameTooltipText")
-  Tab.Friends.FS:SetPoint("CENTER")
-  Tab.Friends.FS:SetTextColor(.8,.8,.8, 1)
-  Tab.Friends.FS:SetText("Friends")
+  Tab.Friends = CreateFrame("Button", "FriendsTab", Tab, "PanelTopTabButtonTemplate")
+  Tab.Friends:SetPoint("TOPLEFT", -35, 0)
+  Tab.Friends.LeftActive:Hide()
+  Tab.Friends.MiddleActive:Hide()
+  Tab.Friends.RightActive:Hide()
+  Tab.Friends:SetText("Friends")
+  
   -- Party
-  Tab.Party = CreateFrame("Button", FriendsBtn, Tab, "UIPanelButtonTemplate")
-  Tab.Party:SetPoint("TOP", 35, 0)
-  Tab.Party.FS = Tab.Party:CreateFontString(nil, "ARTWORK", "GameTooltipText")
-  Tab.Party.FS:SetPoint("CENTER")
-  Tab.Party.FS:SetTextColor(.8,.8,.8, 1)
-  Tab.Party.FS:SetText("Party")
+  Tab.Party = CreateFrame("Button", "PartyTab", Tab, "PanelTopTabButtonTemplate")
+  Tab.Party:SetPoint("TOPLEFT", 35, 0)
+  Tab.Party.LeftActive:Hide()
+  Tab.Party.MiddleActive:Hide()
+  Tab.Party.RightActive:Hide()
+  Tab.Party:SetText("Party")
+  
   -- Zone
-  Tab.Zone = CreateFrame("Button", FriendsBtn, Tab, "UIPanelButtonTemplate")
-  Tab.Zone:SetPoint("TOPRIGHT")
-  Tab.Zone.FS = Tab.Zone:CreateFontString(nil, "ARTWORK", "GameTooltipText")
-  Tab.Zone.FS:SetPoint("CENTER")
-  Tab.Zone.FS:SetTextColor(.8,.8,.8, 1)
-  Tab.Zone.FS:SetText("Zone")
+  Tab.Zone = CreateFrame("Button", "ZoneTab", Tab, "PanelTopTabButtonTemplate")
+  Tab.Zone:SetPoint("TOPLEFT")
+  Tab.Zone.LeftActive:Hide()
+  Tab.Zone.MiddleActive:Hide()
+  Tab.Zone.RightActive:Hide()
+  Tab.Zone:SetText("Zone")
+
   
   Tab.Server:SetScript("OnClick", function(self, button, down) 
     if (button == "LeftButton" and down == false) then
       GR.Target = nil
-      Tab3.Invite.ServerScrollFrame:Show()
-      Tab3.Invite.FriendsScrollFrame:Hide()
-      Tab3.Invite.PartyScrollFrame:Hide()
-      Tab3.Invite.ZoneScrollFrame:Hide()
-      Tab3.Invite.SendBtn:Hide()
+      Invite.ServerScrollFrame:Show()
+      Invite.FriendsScrollFrame:Hide()
+      Invite.PartyScrollFrame:Hide()
+      Invite.ZoneScrollFrame:Hide()
+      Invite.ActiveTab = "server"
+      GR:ToggleInviteTab()
     end
   end)
 
   Tab.Friends:SetScript("OnClick", function(self, button, down) 
     if (button == "LeftButton" and down == false) then
       GR.Target = nil
-      Tab3.Invite.ServerScrollFrame:Hide()
-      Tab3.Invite.FriendsScrollFrame:Show()
-      Tab3.Invite.PartyScrollFrame:Hide()
-      Tab3.Invite.ZoneScrollFrame:Hide()
-      Tab3.Invite.SendBtn:Hide()
+      Invite.ServerScrollFrame:Hide()
+      Invite.FriendsScrollFrame:Show()
+      Invite.PartyScrollFrame:Hide()
+      Invite.ZoneScrollFrame:Hide()
+      Invite.ActiveTab = "friends"
+      GR:ToggleInviteTab()
     end
   end)
   
   Tab.Party:SetScript("OnClick", function(self, button, down) 
     if (button == "LeftButton" and down == false) then
       GR.Target = nil
-      Tab3.Invite.ServerScrollFrame:Hide()
-      Tab3.Invite.FriendsScrollFrame:Hide()
-      Tab3.Invite.PartyScrollFrame:Show()
-      Tab3.Invite.ZoneScrollFrame:Hide()
-      Tab3.Invite.SendBtn:Hide()
+      Invite.ServerScrollFrame:Hide()
+      Invite.FriendsScrollFrame:Hide()
+      Invite.PartyScrollFrame:Show()
+      Invite.ZoneScrollFrame:Hide()
+      Invite.ActiveTab = "party"
+      GR:ToggleInviteTab()
     end
   end)
   
   Tab.Zone:SetScript("OnClick", function(self, button, down) 
     if (button == "LeftButton" and down == false) then
       GR.Target = nil
-      Tab3.Invite.ServerScrollFrame:Hide()
-      Tab3.Invite.FriendsScrollFrame:Hide()
-      Tab3.Invite.PartyScrollFrame:Hide()
-      Tab3.Invite.ZoneScrollFrame:Show()
-      Tab3.Invite.SendBtn:Hide()
+      Invite.ServerScrollFrame:Hide()
+      Invite.FriendsScrollFrame:Hide()
+      Invite.PartyScrollFrame:Hide()
+      Invite.ZoneScrollFrame:Show()
+      Invite.ActiveTab = "zone"
+      GR:ToggleInviteTab()
 
       GR:InviteSearchZone()
     end
   end)
-
 end
 
 -- Resize
 function GR:SizeMultiGames()
   local Main = GR_GUI.Main
   local Tab3 = Main.Tab3
-  Tab3:SetPoint("TOP", 0, -50 * Main.YRatio)
-  Tab3:SetSize(250 * Main.XRatio, 200 * Main.YRatio)
+  Tab3:SetPoint("TOP", 0, -24 * Main.YRatio)
+  Tab3:SetSize(250 * Main.XRatio, 400 * Main.YRatio)
+  Tab3.InviteText:SetPoint("TOP", 0, -200 * Main.YRatio)
 
-  -- Game Buttons
-  local MultiGames = Tab3.MultiGames
-  MultiGames:SetPoint("TOP", 0 * Main.XRatio, -18 * Main.YRatio)
-  MultiGames:SetSize(250 * Main.XRatio, 100 * Main.YRatio)
-  local TicTacToeBtn = MultiGames.TicTacToeBtn
-  TicTacToeBtn:SetPoint("TOPLEFT", 5 * Main.XRatio, -5 * Main.YRatio)
-  TicTacToeBtn:SetSize(120 * Main.XRatio, 30 * Main.YRatio)
-  local TicTacToeFS = TicTacToeBtn.FS
-  TicTacToeFS:SetPoint("CENTER", 0, 0)
-  TicTacToeFS:SetTextScale(1.4 * Main.ScreenRatio)
-  local BattleshipsBtn = MultiGames.BattleshipsBtn
-  BattleshipsBtn:SetPoint("TOPRIGHT", -5 * Main.XRatio, -5 * Main.YRatio)
-  BattleshipsBtn:SetSize(120 * Main.XRatio, 30 * Main.YRatio)
-  local BattleshipsFS = BattleshipsBtn.FS
-  BattleshipsFS:SetPoint("CENTER", 0, 0)
-  BattleshipsFS:SetTextScale(1.4 * Main.ScreenRatio)
 
+  GR:SizeGameButtons()
   GR:SizeInviteTab()
   GR:SizeMultiInvite()
   GR:SizeInviteServer()
@@ -310,35 +299,50 @@ function GR:SizeMultiGames()
   GR:SizeInviteZone()
 end
 
+function GR:SizeGameButtons()
+  local Main = GR_GUI.Main
+  local GameButtons = Main.Tab3.GameButtons
+  
+  GameButtons:SetPoint("TOP", 0 * Main.XRatio, -200 * Main.YRatio)
+  GameButtons:SetSize(255 * Main.XRatio, 100 * Main.YRatio)
+  local TicTacToeBtn = GameButtons.TicTacToeBtn
+  TicTacToeBtn:SetPoint("TOPLEFT", 5 * Main.XRatio, -20 * Main.YRatio)
+  TicTacToeBtn:SetSize(120 * Main.XRatio, 30 * Main.YRatio)
+  local TicTacToeFS = TicTacToeBtn.FS
+  TicTacToeFS:SetPoint("CENTER", 0, 0)
+  TicTacToeFS:SetTextScale(1 * Main.ScreenRatio)
+  local BattleshipsBtn = GameButtons.BattleshipsBtn
+  BattleshipsBtn:SetPoint("TOPRIGHT", -5 * Main.XRatio, -20 * Main.YRatio)
+  BattleshipsBtn:SetSize(120 * Main.XRatio, 30 * Main.YRatio)
+  local BattleshipsFS = BattleshipsBtn.FS
+  BattleshipsFS:SetPoint("CENTER", 0, 0)
+  BattleshipsFS:SetTextScale(1 * Main.ScreenRatio)
+end
+
 function GR:SizeMultiInvite()
   local Main = GR_GUI.Main
   local Tab3 = Main.Tab3
-
   local Invite = Tab3.Invite
-  Invite:SetPoint("TOP", 0, -130 * Main.YRatio)
+
+  Invite:SetPoint("TOP", 0, -30 * Main.YRatio)
   Invite:SetSize(250 * Main.XRatio, 210 * Main.YRatio)
-
-  Invite.Header:SetPoint("TOP", 0, 0)
-  Invite.Header:SetTextScale(1.1 * Main.ScreenRatio)
-
-  Invite.SendBtn:SetPoint("BOTTOM")
-  Invite.SendBtn:SetSize(268 * Main.XRatio, 50 * Main.YRatio)
-  Invite.SendBtn.FS:SetTextScale(2 * Main.ScreenRatio)
 end
 
 function GR:SizeInviteServer()
   local Main = GR_GUI.Main
   local Invite = Main.Tab3.Invite
 
-  Invite.ServerScrollFrame:SetPoint("TOP", 0, -55 * Main.YRatio)
-  Invite.ServerScrollFrame:SetSize(200 * Main.XRatio, 100 * Main.YRatio)
-  Invite.Server:SetSize(200 * Main.XRatio, 700 * Main.YRatio)
-  Invite.ServerScrollFrame.FS:SetPoint("TOP", 0, 15 * Main.YRatio)
-  Invite.ServerScrollFrame.FS:SetTextScale(1 * Main.ScreenRatio)
+  Invite.ServerScrollFrame:SetPoint("TOP", -7 * Main.XRatio, -38 * Main.YRatio)
+  Invite.ServerScrollFrame:SetSize(247 * Main.XRatio, 100 * Main.YRatio)
+  Invite.Server:SetSize(247 * Main.XRatio, 700 * Main.YRatio)
+
+  local Border = Invite.ServerScrollFrame.Border
+  Border:SetPoint("TOPLEFT", Invite.ServerScrollFrame, "TOPLEFT", -8 * Main.XRatio, 2 * Main.YRatio)
+  Border:SetPoint("BOTTOMRIGHT", Invite.ServerScrollFrame, "BOTTOMRIGHT", 24 * Main.XRatio, -2 * Main.YRatio)
 
   for i = 1, #Invite.Server.Btns, 1 do
     Invite.Server.Btns[i]:SetPoint("TOPLEFT", 0, (i*-14) * Main.YRatio)
-    Invite.Server.Btns[i]:SetSize(200 * Main.XRatio, 14 * Main.YRatio)
+    Invite.Server.Btns[i]:SetSize(247 * Main.XRatio, 14 * Main.YRatio)
     Invite.Server.Btns[i].FS:SetTextScale(1 * ((Main.XRatio + Main.YRatio) / 2))
   end
 end
@@ -347,15 +351,17 @@ function GR:SizeInviteFriends()
   local Main = GR_GUI.Main
   local Invite = Main.Tab3.Invite
 
-  Invite.FriendsScrollFrame:SetPoint("TOP", 0, -55 * Main.YRatio)
-  Invite.FriendsScrollFrame:SetSize(200 * Main.XRatio, 100 * Main.YRatio)
-  Invite.Friends:SetSize(200 * Main.XRatio, 700 * Main.YRatio)
-  Invite.FriendsScrollFrame.FS:SetPoint("TOP", 0, 15 * Main.YRatio)
-  Invite.FriendsScrollFrame.FS:SetTextScale(1 * Main.ScreenRatio)
+  Invite.FriendsScrollFrame:SetPoint("TOP", -7 * Main.XRatio, -38 * Main.YRatio)
+  Invite.FriendsScrollFrame:SetSize(247 * Main.XRatio, 100 * Main.YRatio)
+  Invite.Friends:SetSize(247 * Main.XRatio, 700 * Main.YRatio)
+
+  local Border = Invite.FriendsScrollFrame.Border
+  Border:SetPoint("TOPLEFT", Invite.FriendsScrollFrame, "TOPLEFT", -8 * Main.XRatio, 2 * Main.YRatio)
+  Border:SetPoint("BOTTOMRIGHT", Invite.FriendsScrollFrame, "BOTTOMRIGHT", 24 * Main.XRatio, -2 * Main.YRatio)
 
   for i = 1, #Invite.Friends.Btns, 1 do
     Invite.Friends.Btns[i]:SetPoint("TOPLEFT", 0, (i*-14) * Main.YRatio)
-    Invite.Friends.Btns[i]:SetSize(200 * Main.XRatio, 14 * Main.YRatio)
+    Invite.Friends.Btns[i]:SetSize(247 * Main.XRatio, 14 * Main.YRatio)
     Invite.Friends.Btns[i].FS:SetTextScale(1 * ((Main.XRatio + Main.YRatio) / 2))
   end
 end
@@ -364,15 +370,17 @@ function GR:SizeInviteParty()
   local Main = GR_GUI.Main
   local Invite = Main.Tab3.Invite
 
-  Invite.PartyScrollFrame:SetPoint("TOP", 0, -55 * Main.YRatio)
-  Invite.PartyScrollFrame:SetSize(200 * Main.XRatio, 100 * Main.YRatio)
-  Invite.Party:SetSize(200 * Main.XRatio, 700 * Main.YRatio)
-  Invite.PartyScrollFrame.FS:SetPoint("TOP", 0, 15 * Main.YRatio)
-  Invite.PartyScrollFrame.FS:SetTextScale(1 * Main.ScreenRatio)
+  Invite.PartyScrollFrame:SetPoint("TOP", -7 * Main.XRatio, -38 * Main.YRatio)
+  Invite.PartyScrollFrame:SetSize(247 * Main.XRatio, 100 * Main.YRatio)
+  Invite.Party:SetSize(247 * Main.XRatio, 700 * Main.YRatio)
+
+  local Border = Invite.PartyScrollFrame.Border
+  Border:SetPoint("TOPLEFT", Invite.PartyScrollFrame, "TOPLEFT", -8 * Main.XRatio, 2 * Main.YRatio)
+  Border:SetPoint("BOTTOMRIGHT", Invite.PartyScrollFrame, "BOTTOMRIGHT", 24 * Main.XRatio, -2 * Main.YRatio)
   
   for i = 1, #Invite.Party.Btns, 1 do
     Invite.Party.Btns[i]:SetPoint("TOPLEFT", 0, (i*-14) * Main.YRatio)
-    Invite.Party.Btns[i]:SetSize(200 * Main.XRatio, 14 * Main.YRatio)
+    Invite.Party.Btns[i]:SetSize(247 * Main.XRatio, 14 * Main.YRatio)
     Invite.Party.Btns[i].FS:SetTextScale(1 * ((Main.XRatio + Main.YRatio) / 2))
   end
 end
@@ -381,15 +389,17 @@ function GR:SizeInviteZone()
   local Main = GR_GUI.Main
   local Invite = Main.Tab3.Invite
 
-  Invite.ZoneScrollFrame:SetPoint("TOP", 0, -55 * Main.YRatio)
-  Invite.ZoneScrollFrame:SetSize(200 * Main.XRatio, 100 * Main.YRatio)
-  Invite.Zone:SetSize(200 * Main.XRatio, 700 * Main.YRatio)
-  Invite.ZoneScrollFrame.FS:SetPoint("TOP", 0, 15 * Main.YRatio)
-  Invite.ZoneScrollFrame.FS:SetTextScale(1 * Main.ScreenRatio)
+  Invite.ZoneScrollFrame:SetPoint("TOP", -7 * Main.XRatio, -38 * Main.YRatio)
+  Invite.ZoneScrollFrame:SetSize(247 * Main.XRatio, 100 * Main.YRatio)
+  Invite.Zone:SetSize(247 * Main.XRatio, 700 * Main.YRatio)
+
+  local Border = Invite.ZoneScrollFrame.Border
+  Border:SetPoint("TOPLEFT", Invite.ZoneScrollFrame, "TOPLEFT", -8 * Main.XRatio, 2 * Main.YRatio)
+  Border:SetPoint("BOTTOMRIGHT", Invite.ZoneScrollFrame, "BOTTOMRIGHT", 24 * Main.XRatio, -2 * Main.YRatio)
 
   for i = 1, #Invite.Zone.Btns, 1 do
     Invite.Zone.Btns[i]:SetPoint("TOP", 0, (i*-14) * Main.YRatio)
-    Invite.Zone.Btns[i]:SetSize(200 * Main.XRatio, 14 * Main.YRatio)
+    Invite.Zone.Btns[i]:SetSize(247 * Main.XRatio, 14 * Main.YRatio)
     Invite.Zone.Btns[i].FS:SetTextScale(1 * ((Main.XRatio + Main.YRatio) / 2))
   end
 end
@@ -402,12 +412,84 @@ function GR:SizeInviteTab()
   Tab:SetPoint("TOP", 0, - 15 * Main.YRatio)
   Tab:SetSize(280 * Main.XRatio, 40 * Main.YRatio)
 
-  Tab.Server:SetSize(70 * Main.XRatio, 20 * Main.YRatio)
-  Tab.Server.FS:SetTextScale(1 * Main.ScreenRatio) 
-  Tab.Friends:SetSize(70 * Main.XRatio, 20 * Main.YRatio)
-  Tab.Friends.FS:SetTextScale(1 * Main.ScreenRatio) 
-  Tab.Party:SetSize(70 * Main.XRatio, 20 * Main.YRatio)
-  Tab.Party.FS:SetTextScale(1 * Main.ScreenRatio) 
-  Tab.Zone:SetSize(70 * Main.XRatio, 20 * Main.YRatio)
-  Tab.Zone.FS:SetTextScale(1 * Main.ScreenRatio) 
+  Tab.Server:SetPoint("TOPLEFT")
+  Tab.Friends:SetPoint("TOPLEFT", 70 * Main.XRatio, 0)
+  Tab.Party:SetPoint("TOPLEFT", 140 * Main.XRatio, 0)
+  Tab.Zone:SetPoint("TOPLEFT", 210 * Main.XRatio, 0)
+
+  Tab.Server:SetSize(65 * Main.XRatio, 20 * Main.YRatio)
+  Tab.Friends:SetSize(65 * Main.XRatio, 20 * Main.YRatio)
+  Tab.Party:SetSize(65 * Main.XRatio, 20 * Main.YRatio)
+  Tab.Zone:SetSize(65 * Main.XRatio, 20 * Main.YRatio)
+end
+
+function GR:ToggleInviteTab()
+  local Invite = GR_GUI.Main.Tab3.Invite
+  local tabIndex = Invite.ActiveTab
+
+  local function normal(tab)
+    tab.Left:Show()
+    tab.LeftActive:Hide()
+    tab.LeftHighlight:Hide()
+    tab.Middle:Show()
+    tab.MiddleActive:Hide()
+    tab.MiddleHighlight:Hide()
+    tab.Right:Show()
+    tab.RightActive:Hide()
+    tab.RightHighlight:Hide() 
+    tab.Text:SetPoint("CENTER", 0, 0)
+    tab.Text:SetTextColor(1,.82,0,1)
+  end
+
+  local function active(tab)
+    tab.Left:Hide()
+    tab.LeftActive:Show()
+    tab.LeftHighlight:Hide()
+    tab.Middle:Hide()
+    tab.MiddleActive:Show()
+    tab.MiddleHighlight:Hide()
+    tab.Right:Hide()
+    tab.RightActive:Show()
+    tab.RightHighlight:Hide() 
+    tab.Text:SetPoint("CENTER", 0, 0)
+    tab.Text:SetTextColor(1,1,1,1)
+  end
+
+  local function highlight(tab)
+    tab.Left:Hide()
+    tab.LeftActive:Hide()
+    tab.LeftHighlight:Show()
+    tab.Middle:Hide()
+    tab.MiddleActive:Hide()
+    tab.MiddleHighlight:Show()
+    tab.Right:Hide()
+    tab.RightActive:Hide()
+    tab.RightHighlight:Show() 
+  end
+
+  if (tabIndex == "server") then
+    active(Invite.Tab.Server)
+    normal(Invite.Tab.Friends)
+    normal(Invite.Tab.Party)
+    normal(Invite.Tab.Zone)
+  end
+  if (tabIndex == "friends") then
+    normal(Invite.Tab.Server)
+    active(Invite.Tab.Friends)
+    normal(Invite.Tab.Party)
+    normal(Invite.Tab.Zone)
+  end
+  if (tabIndex == "party") then
+    normal(Invite.Tab.Server)
+    normal(Invite.Tab.Friends)
+    active(Invite.Tab.Party)
+    normal(Invite.Tab.Zone)
+  end
+  if (tabIndex == "zone") then
+    normal(Invite.Tab.Server)
+    normal(Invite.Tab.Friends)
+    normal(Invite.Tab.Party)
+    active(Invite.Tab.Zone)
+  end
+
 end
