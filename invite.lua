@@ -146,7 +146,6 @@ function GR:IncomingInvite(text, distribution)
         -- hides invite (open and closed) after 15 seconds
         C_Timer.After(15, function()
           GR.IsChallenged = false
-          Main.DeclineBtn:Hide()
           Accept:Hide()
         end)
       

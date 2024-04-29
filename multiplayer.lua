@@ -207,7 +207,6 @@ function GR:CreateInviteTab()
   
   -- Friends
   Tab.Friends = CreateFrame("Button", "FriendsTab", Tab, "PanelTopTabButtonTemplate")
-  Tab.Friends:SetPoint("TOPLEFT", -35, 0)
   Tab.Friends.LeftActive:Hide()
   Tab.Friends.MiddleActive:Hide()
   Tab.Friends.RightActive:Hide()
@@ -215,7 +214,6 @@ function GR:CreateInviteTab()
   
   -- Party
   Tab.Party = CreateFrame("Button", "PartyTab", Tab, "PanelTopTabButtonTemplate")
-  Tab.Party:SetPoint("TOPLEFT", 35, 0)
   Tab.Party.LeftActive:Hide()
   Tab.Party.MiddleActive:Hide()
   Tab.Party.RightActive:Hide()
@@ -223,7 +221,6 @@ function GR:CreateInviteTab()
   
   -- Zone
   Tab.Zone = CreateFrame("Button", "ZoneTab", Tab, "PanelTopTabButtonTemplate")
-  Tab.Zone:SetPoint("TOPLEFT")
   Tab.Zone.LeftActive:Hide()
   Tab.Zone.MiddleActive:Hide()
   Tab.Zone.RightActive:Hide()
@@ -410,17 +407,18 @@ function GR:SizeInviteTab()
 
   local Tab = Tab3.Invite.Tab
   Tab:SetPoint("TOP", 0, - 15 * Main.YRatio)
-  Tab:SetSize(280 * Main.XRatio, 40 * Main.YRatio)
+  Tab:SetSize(280 * Main.XRatio, 20 * Main.YRatio)
 
-  Tab.Server:SetPoint("TOPLEFT")
-  Tab.Friends:SetPoint("TOPLEFT", 70 * Main.XRatio, 0)
-  Tab.Party:SetPoint("TOPLEFT", 140 * Main.XRatio, 0)
-  Tab.Zone:SetPoint("TOPLEFT", 210 * Main.XRatio, 0)
+  Tab.Server:SetPoint("BOTTOMLEFT")
+  Tab.Friends:SetPoint("BOTTOMLEFT", 70 * Main.XRatio, 0)
+  Tab.Party:SetPoint("BOTTOMLEFT", 140 * Main.XRatio, 0)
+  Tab.Zone:SetPoint("BOTTOMLEFT", 210 * Main.XRatio, 0)
 
-  Tab.Server:SetSize(65 * Main.XRatio, 20 * Main.YRatio)
-  Tab.Friends:SetSize(65 * Main.XRatio, 20 * Main.YRatio)
-  Tab.Party:SetSize(65 * Main.XRatio, 20 * Main.YRatio)
-  Tab.Zone:SetSize(65 * Main.XRatio, 20 * Main.YRatio)
+
+  Tab.Server:SetSize(65 * Main.XRatio, 20)
+  Tab.Friends:SetSize(65 * Main.XRatio, 20)
+  Tab.Party:SetSize(65 * Main.XRatio, 20)
+  Tab.Zone:SetSize(65 * Main.XRatio, 20)
 end
 
 function GR:ToggleInviteTab()

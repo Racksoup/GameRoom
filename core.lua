@@ -67,11 +67,6 @@ function GR:OnInitialize()
   GR.Win.Const.Tab3Height = 300
   GR.Win.Const.Tab4Width = 425
   GR.Win.Const.Tab4Height = 470
-
-  -- Window Varibales
-  GR.Win.XRatio = 1
-  GR.Win.YRatio = 1
-  GR.Win.ScreenRatio = 1
   GR.FirstOpen = true
 
   -- Game Varibales
@@ -919,20 +914,39 @@ function GR:OpenClose(input)
 end
 
 function GR:ShowMain()
-  GR_GUI.Main:Show() 
+  local Main = GR_GUI.Main
+  
+  Main:Show() 
 
-  if (GR:CheckOutOfBoundsRects(GR_GUI.Main, UIParent)) then
-    GR_GUI.Main:SetPoint("TOPLEFT", UIParent, "TOPLEFT", UIParent:GetWidth() / 2 - GR.Win.Const.Tab2Width / 2, -130)
+  if (GR:CheckOutOfBoundsRects(Main, UIParent)) then
+    Main:SetPoint("TOPLEFT", UIParent, "TOPLEFT", UIParent:GetWidth() / 2 - GR.Win.Const.Tab2Width / 2, -130)
   end
 
   -- if main is bigger than screen, reset main size
-  if (GR_GUI.Main:GetHeight() > UIParent:GetHeight() or GR_GUI.Main:GetWidth() > UIParent:GetWidth()) then
-      GR_GUI.Main:SetSize(GR.Tab2Width, GR.Tab2Width)
+  if (Main:GetHeight() > UIParent:GetHeight() or Main:GetWidth() > UIParent:GetWidth()) then
+      Main:SetSize(GR.Tab2Width, GR.Tab2Width)
   end
   
   GR:UpdateFriendsList()
 
-  GR:ResizeMain()
+  Main.ScreenRatio = 1
+  Main.XRatio = 1
+  Main.YRatio = 1
+
+  if (GR.db.realm.tab == 1) then 
+    Main:SetSize(GR.Win.Const.Tab1Width, GR.Win.Const.Tab1Height)
+  end
+  if (GR.db.realm.tab == 2) then 
+    Main:SetSize(GR.Win.Const.Tab2Width, GR.Win.Const.Tab2Height)
+  end
+  if (GR.db.realm.tab == 3) then 
+    Main:SetSize(GR.Win.Const.Tab3Width, GR.Win.Const.Tab3Height)
+  end
+  if (GR.db.realm.tab == 4) then 
+    Main:SetSize(GR.Win.Const.Tab4Width, GR.Win.Const.Tab4Height)
+  end
+
+  GR:ResizeMainNoRatioChange()
 end
 
 -- Extra
