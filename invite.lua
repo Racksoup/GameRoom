@@ -132,7 +132,6 @@ function GR:IncomingInvite(text, distribution)
           GR.GameType = "Battleships"
           GR.IncGameType = "Battleships"
           GameDisplayName = "Battleships"
-          Main.Accept.FS2:SetText(V.Sender .. " - " .. GameDisplayName)
           Accept.FS2:SetText(V.Sender .. " - " .. GameDisplayName)
           GR.Opponent = V.Sender
         end
@@ -140,7 +139,6 @@ function GR:IncomingInvite(text, distribution)
           GR.GameType = "Tictactoe"
           GR.IncGameType = "Tictactoe"
           GameDisplayName = "Tic-Tac-Toe"
-          Main.Accept.FS2:SetText(V.Sender .. " - " .. GameDisplayName)
           Accept.FS2:SetText(V.Sender .. " - " .. GameDisplayName)
           GR.Opponent = V.Sender
         end
@@ -148,7 +146,6 @@ function GR:IncomingInvite(text, distribution)
         -- hides invite (open and closed) after 15 seconds
         C_Timer.After(15, function()
           GR.IsChallenged = false
-          Main.Accept:Hide()
           Main.DeclineBtn:Hide()
           Accept:Hide()
         end)
@@ -157,21 +154,10 @@ function GR:IncomingInvite(text, distribution)
         if (not (GR.db.realm.HideInCombat and InCombatLockdown())) then
           if (GR.db.realm.showChallengeAsMsg == false) then
             -- show main open accept
-            if (Main:IsVisible() == true) then
-              Main.Accept:Show()
-              Main.DeclineBtn:Show()
-              -- show main closed accept
-            else
-              Accept:Show()
-            end
+            Accept:Show()
           else
             -- print invite message
             GR:Print(GR.Opponent .. " has challenged you to play " .. GameDisplayName .. "!")
-            -- show main open accept
-            if (Main:IsVisible() == true) then
-              Main.Accept:Show()
-              Main.DeclineBtn:Show()
-            end
           end
         end
       end

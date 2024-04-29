@@ -393,7 +393,6 @@ function GR:CreateAcceptDecline()
     DeclineFS:SetText("Decline")
     DeclineBtn:SetScript("OnClick", function(self, button, down)
         if (button == "LeftButton" and down == false) then 
-          GR_GUI.Main.Accept:Hide()
           GR_GUI.Accept:Hide()
           GR:DeclineGameClicked()
         end 
@@ -424,45 +423,6 @@ function GR:CreateAcceptDecline()
     AcceptMover:Hide()
   end
   CreateGRClosedAcceptBtns()
-
-  -- Accept Button when GameRoom is open
-  local function CreateGROpenAcceptBtns()
-    -- Accept Button
-    GR_GUI.Main.Accept = CreateFrame("Button", Accept, GR_GUI.Main, "UIPanelButtonTemplate")
-    local Accept = GR_GUI.Main.Accept
-    Accept.FS = Accept:CreateFontString(nil, "OVERLAY", "GameTooltipText")
-    local AcceptFS = Accept.FS
-    AcceptFS:SetTextColor(.8,1,0, 1)
-    AcceptFS:SetText("Incoming Challenge!")
-    Accept.FS2 = Accept:CreateFontString(nil, "OVERLAY", "GameTooltipText")
-    local AcceptFS2 = Accept.FS2
-    AcceptFS2:SetTextColor(.8,1,0, 1)
-    Accept:SetScript("OnClick", function(self, button, down) 
-      GR_GUI.Main.Accept:Hide()
-      GR_GUI.Main.DeclineBtn:Hide()
-      GR:AcceptGameClicked()
-    end)
-
-    -- Decline Button
-    GR_GUI.Main.DeclineBtn = CreateFrame("Button", DeclineBtn, GR_GUI.Main, "UIPanelButtonTemplate")
-    local DeclineBtn = GR_GUI.Main.DeclineBtn
-    DeclineBtn.FS = DeclineBtn:CreateFontString(nil, "OVERLAY", "GameTooltipText")
-    local DeclineFS = DeclineBtn.FS
-    DeclineFS:SetTextColor(.8,.8,.8, 1)
-    DeclineFS:SetText("Decline")
-    DeclineBtn:SetScript("OnClick", function(self, button, down)
-        if (button == "LeftButton" and down == false) then 
-          GR_GUI.Main.Accept:Hide()
-          GR_GUI.Main.DeclineBtn:Hide()
-          GR_GUI.Accept:Hide()
-          GR:DeclineGameClicked()
-        end
-    end)
-    
-    Accept:Hide()
-    DeclineBtn:Hide()
-  end
-  CreateGROpenAcceptBtns()
 end
 
 function GR:CreateSoloGames()
@@ -593,7 +553,6 @@ function GR:ResizeMainNoRatioChange()
   GR:ResizeSoloGames()
   GR:SizeMultiGames()
   GR:SizeSettings()
-  GR:SizeAcceptDecline()
 end
 
 function GR:ResizeHeaderInfo()
@@ -672,28 +631,6 @@ function GR:ResizeSoloGames()
   local SuikaFS = SuikaBtn.FS
   SuikaFS:SetPoint("CENTER", 0, 0)
   SuikaFS:SetTextScale(1 * Main.ScreenRatio)
-end
-
-function GR:SizeAcceptDecline()
-  -- Accept Button
-  local Main = GR_GUI.Main
-  local Accept = GR_GUI.Main.Accept
-  Accept:SetPoint("BOTTOMLEFT", 13 * Main.XRatio, 14 * Main.YRatio)
-  Accept:SetSize(210 * Main.XRatio, 55 * Main.YRatio)
-  local AcceptFS = Accept.FS
-  AcceptFS:SetPoint("TOP", 0, -11 * Main.YRatio)
-  AcceptFS:SetTextScale(1.5 * Main.ScreenRatio)
-  local AcceptFS2 = Accept.FS2
-  AcceptFS2:SetPoint("BOTTOM", 0, 10 * Main.YRatio)
-  AcceptFS2:SetTextScale(1.3 * Main.ScreenRatio)
-  
-  -- Decline Button
-  local DeclineBtn = GR_GUI.Main.DeclineBtn
-  DeclineBtn:SetPoint("BOTTOMRIGHT", -25 * Main.XRatio, 14 * Main.YRatio)
-  DeclineBtn:SetSize(50 * Main.XRatio, 25 * Main.YRatio)
-  local DeclineFS = DeclineBtn.FS
-  DeclineFS:SetPoint("CENTER", 0, 0)
-  DeclineFS:SetTextScale(1.1  * Main.ScreenRatio)
 end
 
 -- Functionality
