@@ -354,70 +354,65 @@ function GR:CreateHeaderInfo()
 end
 
 function GR:CreateAcceptDecline()
-  -- Accept Button when GameRoom is closed
-  local function CreateGRClosedAcceptBtns()
-    local PlayerName = UnitName("player")
-    GR_GUI.Accept = CreateFrame("Button", Accept, UIParent, "UIPanelButtonTemplate")
-    local Accept = GR_GUI.Accept
-    Accept:SetPoint(GR.db.realm.Point, GR.db.realm.Xpos, GR.db.realm.Ypos)
-    Accept:SetSize(214, 58)
-    local AcceptString = Accept:CreateFontString(nil, "OVERLAY", "GameTooltipText")
-    AcceptString:SetPoint("TOP", 0, -11)
-    AcceptString:SetTextScale(1.5)
-    AcceptString:SetTextColor(.8,1,0, 1)
-    AcceptString:SetText("Incoming Challenge!")
-    Accept.FS2 = Accept:CreateFontString(nil, "OVERLAY", "GameTooltipText")
-    local AcceptString2 = Accept.FS2
-    AcceptString2:SetPoint("BOTTOM", 0, 10)
-    AcceptString2:SetTextScale(1.3)
-    AcceptString2:SetTextColor(.8,1,0, 1)
-    Accept:SetScript("OnClick", function(self, button, down)
-      GR_GUI.Main:Show() 
-      GR:AcceptGameClicked()
-    end)
+  local PlayerName = UnitName("player")
+  GR_GUI.Accept = CreateFrame("Button", Accept, UIParent, "UIPanelButtonTemplate")
+  local Accept = GR_GUI.Accept
+  Accept:SetPoint(GR.db.realm.Point, GR.db.realm.Xpos, GR.db.realm.Ypos)
+  Accept:SetSize(214, 58)
+  local AcceptString = Accept:CreateFontString(nil, "OVERLAY", "GameTooltipText")
+  AcceptString:SetPoint("TOP", 0, -11)
+  AcceptString:SetTextScale(1.5)
+  AcceptString:SetTextColor(1,.82,0, 1)
+  AcceptString:SetText("Incoming Challenge!")
+  Accept.FS2 = Accept:CreateFontString(nil, "OVERLAY", "GameTooltipText")
+  local AcceptString2 = Accept.FS2
+  AcceptString2:SetPoint("BOTTOM", 0, 10)
+  AcceptString2:SetTextScale(1.3)
+  AcceptString2:SetTextColor(1,.82,0, 1)
+  Accept:SetScript("OnClick", function(self, button, down)
+    GR_GUI.Main:Show() 
+    GR:AcceptGameClicked()
+  end)
 
-    -- Decline Button while GameRoom is closed
-    Accept.DeclineBtn = CreateFrame("Button", DeclineBtn, Accept, "UIPanelButtonTemplate")
-    local DeclineBtn = Accept.DeclineBtn
-    DeclineBtn:SetPoint("RIGHT", 100, 0)
-    DeclineBtn:SetSize(70, 20)
-    local DeclineFS = DeclineBtn:CreateFontString(nil, "OVERLAY", "GameTooltipText")
-    DeclineFS:SetPoint("CENTER", 0, 0)
-    DeclineFS:SetTextScale(1.1)
-    DeclineFS:SetTextColor(.8,.8,.8, 1)
-    DeclineFS:SetText("Decline")
-    DeclineBtn:SetScript("OnClick", function(self, button, down)
-        if (button == "LeftButton" and down == false) then 
-          GR_GUI.Accept:Hide()
-          GR:DeclineGameClicked()
-        end 
-    end)
+  Accept.DeclineBtn = CreateFrame("Button", DeclineBtn, Accept, "UIPanelButtonTemplate")
+  local DeclineBtn = Accept.DeclineBtn
+  DeclineBtn:SetPoint("RIGHT", 100, 0)
+  DeclineBtn:SetSize(70, 20)
+  local DeclineFS = DeclineBtn:CreateFontString(nil, "OVERLAY", "GameTooltipText")
+  DeclineFS:SetPoint("CENTER", 0, 0)
+  DeclineFS:SetTextScale(1.1)
+  DeclineFS:SetTextColor(1,1,1, 1)
+  DeclineFS:SetText("Decline")
+  DeclineBtn:SetScript("OnClick", function(self, button, down)
+      if (button == "LeftButton" and down == false) then 
+        GR_GUI.Accept:Hide()
+        GR:DeclineGameClicked()
+      end 
+  end)
 
-    -- Mover for Accept Button when GameRoom is closed
-    GR_GUI.AcceptMover = CreateFrame("Frame", AcceptMover, UIParent)
-    local AcceptMover = GR_GUI.AcceptMover
-    AcceptMover:SetPoint(GR.db.realm.Point, GR.db.realm.Xpos, GR.db.realm.Ypos)
-    AcceptMover:SetSize(50, 50)
-    local AcceptMoverTex = AcceptMover:CreateTexture()
-    AcceptMoverTex:SetAllPoints(AcceptMover)
-    AcceptMoverTex:SetColorTexture(0,.4,1, 1)
-    AcceptMover:SetMovable(true)
-    AcceptMover:EnableMouse(true)
-    AcceptMover:RegisterForDrag("LeftButton")
-    AcceptMover:SetScript("OnDragStart", function(self, button) self:StartMoving() end)
-    AcceptMover:SetScript("OnDragStop", function(self) 
-        self:StopMovingOrSizing() 
-        local point, relativeTo, relativePoint, xOfs, yOfs = self:GetPoint()
-        GR.db.realm.Point = point
-        GR.db.realm.Xpos = xOfs
-        GR.db.realm.Ypos = yOfs
-        Accept:SetPoint(GR.db.realm.Point, GR.db.realm.Xpos, GR.db.realm.Ypos)
-    end)
+  -- Mover for Accept Button
+  GR_GUI.AcceptMover = CreateFrame("Frame", AcceptMover, UIParent)
+  local AcceptMover = GR_GUI.AcceptMover
+  AcceptMover:SetPoint(GR.db.realm.Point, GR.db.realm.Xpos, GR.db.realm.Ypos)
+  AcceptMover:SetSize(50, 50)
+  local AcceptMoverTex = AcceptMover:CreateTexture()
+  AcceptMoverTex:SetAllPoints(AcceptMover)
+  AcceptMoverTex:SetColorTexture(0,.4,1, 1)
+  AcceptMover:SetMovable(true)
+  AcceptMover:EnableMouse(true)
+  AcceptMover:RegisterForDrag("LeftButton")
+  AcceptMover:SetScript("OnDragStart", function(self, button) self:StartMoving() end)
+  AcceptMover:SetScript("OnDragStop", function(self) 
+      self:StopMovingOrSizing() 
+      local point, relativeTo, relativePoint, xOfs, yOfs = self:GetPoint()
+      GR.db.realm.Point = point
+      GR.db.realm.Xpos = xOfs
+      GR.db.realm.Ypos = yOfs
+      Accept:SetPoint(GR.db.realm.Point, GR.db.realm.Xpos, GR.db.realm.Ypos)
+  end)
 
-    Accept:Hide()
-    AcceptMover:Hide()
-  end
-  CreateGRClosedAcceptBtns()
+  Accept:Hide()
+  AcceptMover:Hide()
 end
 
 function GR:CreateSoloGames()
@@ -727,6 +722,7 @@ function GR:TabSelect()
 
     Main.Tab2:Show()
     Main.H2:SetText("Single Player Games")
+    Main.H2:Show()
   end
   -- Multiplayer Games
   if (tab == 3) then
@@ -750,6 +746,8 @@ function GR:TabSelect()
     Main.Tab3.InviteText:Hide()
     Main.Tab3.GameButtons:Hide()
     Main.H2:SetText("Multi Player Games")
+    Main.H2:Show()
+
   end
   -- Settings
   if (tab == 4) then
@@ -770,6 +768,7 @@ function GR:TabSelect()
 
     Main.Tab4:Show()
     Main.H2:SetText("Settings")
+    Main.H2:Show()
   end
 
   GR:ToggleTab()
@@ -915,6 +914,21 @@ end
 
 function GR:ShowMain()
   local Main = GR_GUI.Main
+
+  local function SizeMain()
+    if (GR.db.realm.tab == 1) then 
+      Main:SetSize(GR.Win.Const.Tab1Width, GR.Win.Const.Tab1Height)
+    end
+    if (GR.db.realm.tab == 2) then 
+      Main:SetSize(GR.Win.Const.Tab2Width, GR.Win.Const.Tab2Height)
+    end
+    if (GR.db.realm.tab == 3) then 
+      Main:SetSize(GR.Win.Const.Tab3Width, GR.Win.Const.Tab3Height)
+    end
+    if (GR.db.realm.tab == 4) then 
+      Main:SetSize(GR.Win.Const.Tab4Width, GR.Win.Const.Tab4Height)
+    end
+  end
   
   Main:Show() 
 
@@ -924,7 +938,7 @@ function GR:ShowMain()
 
   -- if main is bigger than screen, reset main size
   if (Main:GetHeight() > UIParent:GetHeight() or Main:GetWidth() > UIParent:GetWidth()) then
-      Main:SetSize(GR.Tab2Width, GR.Tab2Width)
+      SizeMain()
   end
   
   GR:UpdateFriendsList()
@@ -933,18 +947,8 @@ function GR:ShowMain()
   Main.XRatio = 1
   Main.YRatio = 1
 
-  if (GR.db.realm.tab == 1) then 
-    Main:SetSize(GR.Win.Const.Tab1Width, GR.Win.Const.Tab1Height)
-  end
-  if (GR.db.realm.tab == 2) then 
-    Main:SetSize(GR.Win.Const.Tab2Width, GR.Win.Const.Tab2Height)
-  end
-  if (GR.db.realm.tab == 3) then 
-    Main:SetSize(GR.Win.Const.Tab3Width, GR.Win.Const.Tab3Height)
-  end
-  if (GR.db.realm.tab == 4) then 
-    Main:SetSize(GR.Win.Const.Tab4Width, GR.Win.Const.Tab4Height)
-  end
+  SizeMain()
+
 
   GR:ResizeMainNoRatioChange()
 end

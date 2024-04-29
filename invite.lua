@@ -70,10 +70,11 @@ end
 function GR:IncomingInvite(text, distribution)
   local Main = GR_GUI.Main
   local Accept = GR_GUI.Accept
+  local PlayerName, PlayerServer = UnitFullName("player")
   local P, V = GR:Deserialize(text)
 
-  -- if raid/party we need to check that we are the receiver
-  if (V.Target == "" or V.Target == UnitName("player")) then
+  -- if raid/party we need to check that we are the correct receiver
+  if (V.Target == "" or V.Target == UnitName("player") or V.Target == PlayerName .. "-" .. PlayerServer) then
     -- if challenge recieved, all challenges not disabled, not in a game
     if ((string.match(V.Tag, "Battleships_Challenge") or string.match(V.Tag, "TicTacToe_Challenge")) and GR.IsChallenged == false and GR.db.realm.disableChallenges == false and GR.InGame == false and Main.Battleships:IsVisible() == false and Main.Tictactoe:IsVisible() == false) then
       -- Check if challenger is allowed to invite player
