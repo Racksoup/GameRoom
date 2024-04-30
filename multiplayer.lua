@@ -24,7 +24,7 @@ function GR:CreateGameButtons()
   local TicTacToeBtn = GameButtons.TicTacToeBtn
   TicTacToeBtn.FS = TicTacToeBtn:CreateFontString(nil, "OVERLAY", "GameTooltipText")
   local TicTacToeFS = TicTacToeBtn.FS
-  TicTacToeFS:SetTextColor(.8,.8,.8, 1)
+  TicTacToeFS:SetTextColor(1,1,1, 1)
   TicTacToeFS:SetText("TicTacToe")
   TicTacToeBtn:SetScript("OnClick", function(self, button, down) 
     if (button == "LeftButton" and down == false) then
@@ -39,7 +39,7 @@ function GR:CreateGameButtons()
   local BattleshipsBtn = GameButtons.BattleshipsBtn
   BattleshipsBtn.FS = BattleshipsBtn:CreateFontString(nil, "OVERLAY", "GameTooltipText")
   local BattleshipsFS = BattleshipsBtn.FS
-  BattleshipsFS:SetTextColor(.8,.8,.8, 1)
+  BattleshipsFS:SetTextColor(1,1,1, 1)
   BattleshipsFS:SetText("Battleships")
   BattleshipsBtn:SetScript("OnClick", function(self, button, down) 
     if (button == "LeftButton" and down == false) then

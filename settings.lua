@@ -9,16 +9,18 @@ function GR:CreateSettings()
   local Tab4 = Main.Tab4    
 
   -- Settings
-  Tab4.SettingsScroll = CreateFrame("ScrollFrame", SettingsScroll, Tab4, "UIPanelScrollFrameTemplate")
+  Tab4.SettingsScroll = CreateFrame("ScrollFrame", "SettingsScroll", Tab4, "UIPanelScrollFrameTemplate")
   local SettingsScroll = Tab4.SettingsScroll
   SettingsScroll:SetScript("OnMouseWheel", ScrollFrame_OnMouseWheel)
-  Tab4.Settings = CreateFrame("Frame", Settings, SettingsScroll)
+  Tab4.Settings = CreateFrame("Frame", "Settings", SettingsScroll)
   local Settings = Tab4.Settings
   Settings:SetClipsChildren(true)
   SettingsScroll:SetScrollChild(Settings)
 
   GR:CreateMainSettings()
   GR:CreateSettingsLists() 
+  GR:CreateSettingsTabs()
+  GR:CreateListControls()
 
   GR:SizeSettings()
 end
@@ -29,7 +31,7 @@ function GR:CreateMainSettings()
   -- Alpha Settings
   Settings.AlphaFS = Settings:CreateFontString(nil, "ARTWORK", "GameTooltipText")
   local AlphaFS = Settings.AlphaFS
-  AlphaFS:SetTextColor(.8,.8,.8,1)
+  AlphaFS:SetTextColor(1,1,1,1)
   AlphaFS:SetText("Alpha")
   Settings.AlphaSlider = CreateFrame("Slider", "AlphaSlider", Settings, "UISliderTemplate")
   local AlphaSlider = Settings.AlphaSlider
@@ -37,15 +39,15 @@ function GR:CreateMainSettings()
     GR.WinAlpha = value / 100
     GR_GUI.Main:SetAlpha(GR.WinAlpha)
   end)
-  AlphaSlider:SetValue(50)
-  AlphaSlider:SetMinMaxValues(20, 100)
+  AlphaSlider:SetMinMaxValues(30, 100)
   AlphaSlider:SetValueStep(10)
+  AlphaSlider:SetValue(100)
   AlphaSlider:SetObeyStepOnDrag(true)
   
   -- Disable Battle Net Friends
   Settings.BNString = Settings:CreateFontString(nil, "ARTWORK", "GameTooltipText")
   local BNString = Settings.BNString
-  BNString:SetTextColor(.8,.8,.8,1)
+  BNString:SetTextColor(1,1,1,1)
   BNString:SetText("Disable Battle.net Friends")
   Settings.BNBtn = CreateFrame("CheckButton", BNBtn, Settings, "UICheckButtonTemplate")
   local BNBtn = Settings.BNBtn
@@ -63,7 +65,7 @@ function GR:CreateMainSettings()
   -- Disable incoming Challenges
   Settings.IncString = Settings:CreateFontString(nil, "ARTWORK", "GameTooltipText")
   local IncString = Settings.IncString
-  IncString:SetTextColor(.8,.8,.8,1)
+  IncString:SetTextColor(1,1,1,1)
   IncString:SetText("Disable Incoming Challenges")
   Settings.IncBtn = CreateFrame("CheckButton", IncBtn, Settings, "UICheckButtonTemplate")
   local IncBtn = Settings.IncBtn
@@ -81,7 +83,7 @@ function GR:CreateMainSettings()
   -- Whitelist Checkbox
   Settings.WhitelistString = Settings:CreateFontString(nil, "ARTWORK", "GameTooltipText")
   local WhitelistString = Settings.WhitelistString
-  WhitelistString:SetTextColor(.8,.8,.8,1)
+  WhitelistString:SetTextColor(1,1,1,1)
   WhitelistString:SetText("Show Challenges Only From Whitelist")
   Settings.WhitelistBtn = CreateFrame("CheckButton", WhitelistBtn, Settings, "UICheckButtonTemplate")
   local WhitelistBtn = Settings.WhitelistBtn
@@ -95,7 +97,7 @@ function GR:CreateMainSettings()
   -- Show Challenges as Message 
   Settings.ShowChallengeString = Settings:CreateFontString(nil, "ARTWORK", "GameTooltipText")
   local ShowChallengeString = Settings.ShowChallengeString
-  ShowChallengeString:SetTextColor(.8,.8,.8,1)
+  ShowChallengeString:SetTextColor(1,1,1,1)
   ShowChallengeString:SetText("Show Challenges as Message")
   Settings.ShowChallengeBtn = CreateFrame("CheckButton", ShowChallengeBtn, Settings, "UICheckButtonTemplate")
   local ShowChallengeBtn = Settings.ShowChallengeBtn
@@ -103,23 +105,19 @@ function GR:CreateMainSettings()
   ShowChallengeBtn:SetScript("OnClick", function(self, button, down) 
     if (button == "LeftButton" and down == false) then
       GR.db.realm.showChallengeAsMsg = not GR.db.realm.showChallengeAsMsg
-      if (GR.db.realm.showChallengeAsMsg == true) then
-        GR_GUI.Main.Accept:Hide()
-        GR_GUI.Main.DeclineBtn:Hide()
-      end
     end
   end)
 
   -- Moveable Challenge Button
   Settings.MoveableChalString = Settings:CreateFontString(nil, "ARTWORK", "GameTooltipText")
   local MoveableChalString = Settings.MoveableChalString
-  MoveableChalString:SetTextColor(.8,.8,.8,1)
+  MoveableChalString:SetTextColor(1,1,1,1)
   MoveableChalString:SetText("Move Challenge Button")
   Settings.MoveableChalBtn = CreateFrame("Button", MoveableChalBtn, Settings, "UIPanelButtonTemplate")
   local MoveableChalBtn = Settings.MoveableChalBtn
   Settings.MoveableChalBtnString = MoveableChalBtn:CreateFontString(nil, "ARTWORK", "GameTooltipText")
   local MoveableChalBtnString = Settings.MoveableChalBtnString
-  MoveableChalBtnString:SetTextColor(.8,.8,.8,1)
+  MoveableChalBtnString:SetTextColor(1,1,1,1)
   MoveableChalBtnString:SetText("Show")
   MoveableChalBtn:SetScript("OnClick", function(self, button, down) 
     if (button == "LeftButton" and down == false) then
@@ -136,7 +134,7 @@ function GR:CreateMainSettings()
   -- Hide Challenge In Combat
   Settings.CombatString = Settings:CreateFontString(nil, "ARTWORK", "GameTooltipText")
   local CombatString = Settings.CombatString
-  CombatString:SetTextColor(.8,.8,.8,1)
+  CombatString:SetTextColor(1,1,1,1)
   CombatString:SetText("Hide Challenges in Combat")
   Settings.CombatBtn = CreateFrame("CheckButton", CombatBtn, Settings, "UICheckButtonTemplate")
   local CombatBtn = Settings.CombatBtn
@@ -150,7 +148,7 @@ function GR:CreateMainSettings()
   -- Whitelist Guild
   Settings.WhiteGuildString = Settings:CreateFontString(nil, "ARTWORK", "GameTooltipText")
   local WhiteGuildString = Settings.WhiteGuildString
-  WhiteGuildString:SetTextColor(.8,.8,.8, 1)
+  WhiteGuildString:SetTextColor(1,1,1, 1)
   WhiteGuildString:SetText("Whitelist Guild")
   Settings.WhiteGuildBtn = CreateFrame("CheckButton", WhiteGuildBtn, Settings, "UICheckButtonTemplate")
   local WhiteGuildBtn = Settings.WhiteGuildBtn
@@ -164,7 +162,7 @@ function GR:CreateMainSettings()
   -- Whitelist Party
   Settings.WhitePartyString = Settings:CreateFontString(nil, "ARTWORK", "GameTooltipText")
   local WhitePartyString = Settings.WhitePartyString
-  WhitePartyString:SetTextColor(.8,.8,.8, 1)
+  WhitePartyString:SetTextColor(1,1,1, 1)
   WhitePartyString:SetText("Whitelist Party")
   Settings.WhitePartyBtn = CreateFrame("CheckButton", WhitePartyBtn, Settings, "UICheckButtonTemplate")
   local WhitePartyBtn = Settings.WhitePartyBtn
@@ -178,7 +176,7 @@ function GR:CreateMainSettings()
   -- Whitelist Friends
   Settings.WhiteFriendsString = Settings:CreateFontString(nil, "ARTWORK", "GameTooltipText")
   local WhiteFriendsString = Settings.WhiteFriendsString
-  WhiteFriendsString:SetTextColor(.8,.8,.8, 1)
+  WhiteFriendsString:SetTextColor(1,1,1, 1)
   WhiteFriendsString:SetText("Whitelist Friends")
   Settings.WhiteFriendsBtn = CreateFrame("CheckButton", WhiteFriendsBtn, Settings, "UICheckButtonTemplate")
   local WhiteFriendsBtn = Settings.WhiteFriendsBtn
@@ -217,139 +215,8 @@ function GR:CreateSettingsLists()
   RivalsScroll.Border = CreateFrame("Frame", RivalsBorder, RivalsScroll, "ThinBorderTemplate")
   local RivalsBorder = RivalsScroll.Border
 
-  -- Add to list
-  Lists.AddInput = CreateFrame("Editbox", AddInput, Lists, "InputBoxInstructionsTemplate")
-  Lists.AddInput:SetFontObject("ChatFontNormal")
-  Lists.AddInput:SetMultiLine(false)
-  Lists.AddInput:SetAutoFocus(false)
-
-  Lists.AddInput.Btn = CreateFrame("Button", AddBtn, Lists.AddInput, "UIPanelButtonTemplate")
-  local AddBtn = Lists.AddInput.Btn
-  AddBtn:SetScript("OnClick", function(self, button, down)
-    if (button == "LeftButton" and down == false) then
-      if (GR.CurrList == "Blacklist") then 
-        table.insert(GR.db.realm.Blacklist, Lists.AddInput:GetText()) 
-        GR:ResetSettingsListScroll(GR.db.realm.Blacklist, Settings.Blacklist.Btns, Settings.Blacklist)
-      end
-      if (GR.CurrList == "Whitelist") then 
-        table.insert(GR.db.realm.Whitelist, Lists.AddInput:GetText()) 
-        GR:ResetSettingsListScroll(GR.db.realm.Whitelist, Settings.Whitelist.Btns, Settings.Whitelist)
-      end
-      if (GR.CurrList == "Rivals") then 
-        table.insert(GR.db.realm.Rivals, Lists.AddInput:GetText()) 
-        GR:ResetSettingsListScroll(GR.db.realm.Rivals, Settings.Rivals.Btns, Settings.Rivals)
-      end
-    end
-  end)
-  AddBtn.FS = AddBtn:CreateFontString(nil, "ARTWORK", "GameTooltipText")
-  local AddFS = AddBtn.FS
-  AddFS:SetPoint("CENTER")
-  AddFS:SetTextColor(.8,.8,.8, 1)
-  AddFS:SetText("Add To List")
-
-  -- Delete from list
-  Lists.AddInput.Delete = CreateFrame("Button", Delete, Lists.AddInput, "UIPanelButtonTemplate")
-  local Delete = Lists.AddInput.Delete
-  Delete.FS = Delete:CreateFontString(nil, "ARTWORK", "GameTooltipText")
-  local DeleteFS = Delete.FS
-  DeleteFS:SetPoint("CENTER")
-  DeleteFS:SetTextColor(.8,.8,.8, 1)
-  DeleteFS:SetText("Remove")
-  Delete:SetScript("OnClick", function(self, button, down) 
-    if (button == "LeftButton" and down == false) then
-      if (GR.CurrList == "Blacklist") then 
-        for i,v in ipairs (GR.db.realm.Blacklist) do
-          if (GR.TargetName == v) then
-            table.remove(GR.db.realm.Blacklist, i)
-            GR:ResetSettingsListScroll(GR.db.realm.Blacklist, Settings.Blacklist.Btns, Settings.Blacklist)
-          end
-        end
-      end
-      if (GR.CurrList == "Whitelist") then 
-        for i,v in ipairs (GR.db.realm.Whitelist) do
-          if (GR.TargetName == v) then
-            table.remove(GR.db.realm.Whitelist, i)
-            GR:ResetSettingsListScroll(GR.db.realm.Whitelist, Settings.Whitelist.Btns, Settings.Whitelist)
-          end
-        end
-      end
-      if (GR.CurrList == "Rivals") then 
-        for i,v in ipairs (GR.db.realm.Rivals) do
-          if (GR.TargetName == v) then
-            table.remove(GR.db.realm.Rivals, i)
-            GR:ResetSettingsListScroll(GR.db.realm.Rivals, Settings.Rivals.Btns, Settings.Rivals)
-          end
-        end
-      end
-    end
-  end)
-
-  -- Select List
-  Settings.Listtabs = CreateFrame("Frame", Listtabs, Lists)
-  local Listtabs = Settings.Listtabs
-  -- BlacklistBtn
-  Settings.Listtabs.BlacklistBtn = CreateFrame("Button", BlacklistBtn, Listtabs, "UIPanelButtonTemplate")
-  local BlacklistBtn = Settings.Listtabs.BlacklistBtn
-  BlacklistBtn:SetPoint("LEFT")
-  BlacklistBtn:SetScript("OnClick", function(self, button, down) 
-    if (button == "LeftButton" and down == false) then 
-      GR.CurrList = "Blacklist"
-      Settings.WhitelistScroll:Hide()
-      Settings.Whitelist:Hide()
-      Settings.RivalsScroll:Hide()
-      Settings.Rivals:Hide()
-      Settings.BlacklistScroll:Show()
-      Settings.Blacklist:Show()
-    end
-  end)
-  BlacklistBtn.FS = BlacklistBtn:CreateFontString(nil, "ARTWORK", "GameTooltipText")
-  local BlacklistBtnFS = BlacklistBtn.FS
-  BlacklistBtnFS:SetPoint("CENTER")
-  BlacklistBtnFS:SetTextColor(.8,.8,.8, 1)
-  BlacklistBtnFS:SetText("Blacklist")
-  -- WhitelistBtn
-  Settings.Listtabs.WhitelistBtn = CreateFrame("Button", WhitelistBtn, Listtabs, "UIPanelButtonTemplate")
-  local WhitelistBtn = Settings.Listtabs.WhitelistBtn
-  WhitelistBtn:SetPoint("CENTER")
-  WhitelistBtn:SetScript("OnClick", function(self, button, down) 
-    if (button == "LeftButton" and down == false) then 
-      GR.CurrList = "Whitelist"
-      Settings.BlacklistScroll:Hide()
-      Settings.Blacklist:Hide()
-      Settings.RivalsScroll:Hide()
-      Settings.Rivals:Hide()
-      Settings.WhitelistScroll:Show()
-      Settings.Whitelist:Show()
-    end
-  end)
-  WhitelistBtn.FS = WhitelistBtn:CreateFontString(nil, "ARTWORK", "GameTooltipText")
-  local WhitelistBtnFS = WhitelistBtn.FS
-  WhitelistBtnFS:SetPoint("CENTER")
-  WhitelistBtnFS:SetTextColor(.8,.8,.8, 1)
-  WhitelistBtnFS:SetText("Whitelist")
-  -- RivalBtn
-  Settings.Listtabs.RivalsBtn = CreateFrame("Button", RivalsBtn, Listtabs, "UIPanelButtonTemplate")
-  local RivalsBtn = Settings.Listtabs.RivalsBtn
-  RivalsBtn:SetPoint("RIGHT")
-  RivalsBtn:SetScript("OnClick", function(self, button, down) 
-    if (button == "LeftButton" and down == false) then 
-      GR.CurrList = "Rivals"
-      Settings.WhitelistScroll:Hide()
-      Settings.Whitelist:Hide()
-      Settings.BlacklistScroll:Hide()
-      Settings.Blacklist:Hide()
-      Settings.RivalsScroll:Show()
-      Settings.Rivals:Show()
-    end
-  end)
-  RivalsBtn.FS = RivalsBtn:CreateFontString(nil, "ARTWORK", "GameTooltipText")
-  local RivalsBtnFS = RivalsBtn.FS
-  RivalsBtnFS:SetPoint("CENTER")
-  RivalsBtnFS:SetTextColor(.8,.8,.8, 1)
-  RivalsBtnFS:SetText("Rivals")
-
   -- Blacklist
-  Settings.Blacklist = CreateFrame("Frame", Blacklist, BlacklistScroll)
+  Settings.Blacklist = CreateFrame("Frame", "Blacklist", BlacklistScroll)
   local Blacklist = Settings.Blacklist
   BlacklistScroll:SetScrollChild(Blacklist)
   Settings.Blacklist.Btns = {}
@@ -438,6 +305,140 @@ function GR:CreateSettingsLists()
   Settings.Whitelist:Hide()
 end
 
+function GR:CreateSettingsTabs()
+  local Settings = GR_GUI.Main.Tab4.Settings
+  -- Select List
+  Settings.Listtabs = CreateFrame("Frame", "Listtabs", Settings.Lists)
+  local Listtabs = Settings.Listtabs
+  
+  -- BlacklistBtn
+  Settings.Listtabs.BlacklistBtn = CreateFrame("Button", "BlacklistBtn", Listtabs, "PanelTopTabButtonTemplate")
+  local BlacklistBtn = Settings.Listtabs.BlacklistBtn
+  BlacklistBtn.LeftActive:Hide()
+  BlacklistBtn.MiddleActive:Hide()
+  BlacklistBtn.RightActive:Hide()
+  BlacklistBtn:SetText("Blacklist")
+  BlacklistBtn:SetPoint("BOTTOMLEFT")
+  BlacklistBtn:SetScript("OnClick", function(self, button, down) 
+    if (button == "LeftButton" and down == false) then 
+      GR.CurrList = "Blacklist"
+      GR:ToggleSettingsListTab()
+      Settings.WhitelistScroll:Hide()
+      Settings.Whitelist:Hide()
+      Settings.RivalsScroll:Hide()
+      Settings.Rivals:Hide()
+      Settings.BlacklistScroll:Show()
+      Settings.Blacklist:Show()
+    end
+  end)
+
+  -- WhitelistBtn
+  Settings.Listtabs.WhitelistBtn = CreateFrame("Button", "WhitelistBtn", Listtabs, "PanelTopTabButtonTemplate")
+  local WhitelistBtn = Settings.Listtabs.WhitelistBtn
+  WhitelistBtn.LeftActive:Hide()
+  WhitelistBtn.MiddleActive:Hide()
+  WhitelistBtn.RightActive:Hide()
+  WhitelistBtn:SetText("Whitelist")
+  WhitelistBtn:SetPoint("BOTTOM")
+  WhitelistBtn:SetScript("OnClick", function(self, button, down) 
+    if (button == "LeftButton" and down == false) then 
+      GR.CurrList = "Whitelist"
+      GR:ToggleSettingsListTab()
+      Settings.BlacklistScroll:Hide()
+      Settings.Blacklist:Hide()
+      Settings.RivalsScroll:Hide()
+      Settings.Rivals:Hide()
+      Settings.WhitelistScroll:Show()
+      Settings.Whitelist:Show()
+    end
+  end)
+  
+  -- RivalBtn
+  Settings.Listtabs.RivalsBtn = CreateFrame("Button", "RivalsBtn", Listtabs, "PanelTopTabButtonTemplate")
+  local RivalsBtn = Settings.Listtabs.RivalsBtn
+  RivalsBtn.LeftActive:Hide()
+  RivalsBtn.MiddleActive:Hide()
+  RivalsBtn.RightActive:Hide()
+  RivalsBtn:SetText("Rivals")
+  RivalsBtn:SetPoint("BOTTOMRIGHT")
+  RivalsBtn:SetScript("OnClick", function(self, button, down) 
+    if (button == "LeftButton" and down == false) then 
+      GR.CurrList = "Rivals"
+      GR:ToggleSettingsListTab()
+      Settings.WhitelistScroll:Hide()
+      Settings.Whitelist:Hide()
+      Settings.BlacklistScroll:Hide()
+      Settings.Blacklist:Hide()
+      Settings.RivalsScroll:Show()
+      Settings.Rivals:Show()
+    end
+  end)
+end
+
+function GR:CreateListControls()
+  local Settings = GR_GUI.Main.Tab4.Settings
+  local Lists = Settings.Lists
+  
+  -- Add to list
+  Lists.AddInput = CreateFrame("Editbox", AddInput, Lists, "InputBoxInstructionsTemplate")
+  Lists.AddInput:SetFontObject("ChatFontNormal")
+  Lists.AddInput:SetMultiLine(false)
+  Lists.AddInput:SetAutoFocus(false)
+
+  Lists.AddInput.Btn = CreateFrame("Button", AddBtn, Lists.AddInput, "UIPanelButtonTemplate")
+  local AddBtn = Lists.AddInput.Btn
+  AddBtn:SetText("Add")
+  AddBtn:SetScript("OnClick", function(self, button, down)
+    if (button == "LeftButton" and down == false) then
+      if (GR.CurrList == "Blacklist") then 
+        table.insert(GR.db.realm.Blacklist, Lists.AddInput:GetText()) 
+        GR:ResetSettingsListScroll(GR.db.realm.Blacklist, Settings.Blacklist.Btns, Settings.Blacklist)
+      end
+      if (GR.CurrList == "Whitelist") then 
+        table.insert(GR.db.realm.Whitelist, Lists.AddInput:GetText()) 
+        GR:ResetSettingsListScroll(GR.db.realm.Whitelist, Settings.Whitelist.Btns, Settings.Whitelist)
+      end
+      if (GR.CurrList == "Rivals") then 
+        table.insert(GR.db.realm.Rivals, Lists.AddInput:GetText()) 
+        GR:ResetSettingsListScroll(GR.db.realm.Rivals, Settings.Rivals.Btns, Settings.Rivals)
+      end
+    end
+  end)
+
+  -- Delete from list
+  Lists.AddInput.Delete = CreateFrame("Button", Delete, Lists.AddInput, "UIPanelButtonTemplate")
+  local Delete = Lists.AddInput.Delete
+  Delete:SetText("Delete")
+  Delete:SetScript("OnClick", function(self, button, down) 
+    if (button == "LeftButton" and down == false) then
+      if (GR.CurrList == "Blacklist") then 
+        for i,v in ipairs (GR.db.realm.Blacklist) do
+          if (GR.TargetName == v) then
+            table.remove(GR.db.realm.Blacklist, i)
+            GR:ResetSettingsListScroll(GR.db.realm.Blacklist, Settings.Blacklist.Btns, Settings.Blacklist)
+          end
+        end
+      end
+      if (GR.CurrList == "Whitelist") then 
+        for i,v in ipairs (GR.db.realm.Whitelist) do
+          if (GR.TargetName == v) then
+            table.remove(GR.db.realm.Whitelist, i)
+            GR:ResetSettingsListScroll(GR.db.realm.Whitelist, Settings.Whitelist.Btns, Settings.Whitelist)
+          end
+        end
+      end
+      if (GR.CurrList == "Rivals") then 
+        for i,v in ipairs (GR.db.realm.Rivals) do
+          if (GR.TargetName == v) then
+            table.remove(GR.db.realm.Rivals, i)
+            GR:ResetSettingsListScroll(GR.db.realm.Rivals, Settings.Rivals.Btns, Settings.Rivals)
+          end
+        end
+      end
+    end
+  end)
+end
+
 -- Resize
 function GR:SizeSettings()
   local Main = GR_GUI.Main
@@ -446,130 +447,100 @@ function GR:SizeSettings()
   -- Main Settings Window & Scroll
   Tab4:SetPoint("TOP", 0, -50 * Main.YRatio)
   Tab4:SetSize(250 * Main.XRatio, 200 * Main.YRatio)
-  Tab4.SettingsScroll:SetPoint("TOP", 0, -18 * Main.YRatio)
-  Tab4.SettingsScroll:SetSize(360 * Main.XRatio, 375 * Main.YRatio)
+  Tab4.SettingsScroll:SetPoint("TOP", -9 * Main.XRatio, -20 * Main.YRatio)
+  Tab4.SettingsScroll:SetSize(295 * Main.XRatio, 375 * Main.YRatio)
   local Settings = Tab4.Settings
-  Settings:SetPoint("TOPLEFT", 0, 0 * Main.XRatio)
-  Settings:SetSize(350 * Main.XRatio, 590 * Main.YRatio)
+  Settings:SetPoint("TOPLEFT", 0 * Main.XRatio, 0 * Main.YRatio)
+  Settings:SetSize(290 * Main.XRatio, 520 * Main.YRatio)
 
   -- Settings
   -- Alpha SLider
-  Settings.AlphaFS:SetPoint("TOPLEFT", 0, -20 * Main.YRatio)
+  Settings.AlphaFS:SetPoint("TOPLEFT", 10, -0 * Main.YRatio)
   Settings.AlphaFS:SetTextScale(1 * Main.ScreenRatio)
-  Settings.AlphaSlider:SetPoint("TOPRIGHT", 0, -20 * Main.YRatio)
-  Settings.AlphaSlider:SetSize(250 * Main.XRatio, 15 * Main.YRatio)
-  -- Hide Challenge In Combat
-  Settings.CombatString:SetPoint("TOPLEFT", 0, -45 * Main.YRatio)
-  Settings.CombatString:SetTextScale(1 * Main.ScreenRatio)
-  Settings.CombatBtn:SetPoint("TOPRIGHT", 0, -40 * Main.YRatio)
-  Settings.CombatBtn:SetSize(25 * Main.XRatio, 25 * Main.YRatio)
+  Settings.AlphaSlider:SetPoint("TOPRIGHT", 0, -0 * Main.YRatio)
+  Settings.AlphaSlider:SetSize(226 * Main.XRatio, 15 * Main.YRatio)
+  -- Battle Net Friends
+  Settings.BNString:SetPoint("TOPLEFT", 40, -25 * Main.YRatio)
+  Settings.BNString:SetTextScale(1 * Main.ScreenRatio)
+  Settings.BNBtn:SetPoint("TOPLEFT", 10, -20 * Main.YRatio)
+  Settings.BNBtn:SetSize(25 * Main.XRatio, 25 * Main.YRatio)
   -- Moveable Challenge Button
-  Settings.MoveableChalString:SetPoint("TOPLEFT", 0, -70 * Main.YRatio)
+  Settings.MoveableChalString:SetPoint("TOPLEFT", 66, -50 * Main.YRatio)
   Settings.MoveableChalString:SetTextScale(1 * Main.ScreenRatio)
-  Settings.MoveableChalBtn:SetPoint("TOPRIGHT", 0, -65 * Main.YRatio)
+  Settings.MoveableChalBtn:SetPoint("TOPLEFT", 10, -45 * Main.YRatio)
   Settings.MoveableChalBtn:SetSize(50 * Main.XRatio, 25 * Main.YRatio)
   Settings.MoveableChalBtnString:SetPoint("CENTER")
   Settings.MoveableChalBtnString:SetTextScale(1 * Main.ScreenRatio)
-  -- Battle Net Friends
-  Settings.BNString:SetPoint("TOPLEFT", 0, -95 * Main.YRatio)
-  Settings.BNString:SetTextScale(1 * Main.ScreenRatio)
-  Settings.BNBtn:SetPoint("TOPRIGHT", 0, -90 * Main.YRatio)
-  Settings.BNBtn:SetSize(25 * Main.XRatio, 25 * Main.YRatio)
+  -- Hide Challenge In Combat
+  Settings.CombatString:SetPoint("TOPLEFT", 40, -75 * Main.YRatio)
+  Settings.CombatString:SetTextScale(1 * Main.ScreenRatio)
+  Settings.CombatBtn:SetPoint("TOPLEFT", 10, -70 * Main.YRatio)
+  Settings.CombatBtn:SetSize(25 * Main.XRatio, 25 * Main.YRatio)
   -- Show Challenge As Message
-  Settings.ShowChallengeString:SetPoint("TOPLEFT", 0, -120 * Main.YRatio)
+  Settings.ShowChallengeString:SetPoint("TOPLEFT", 40, -100 * Main.YRatio)
   Settings.ShowChallengeString:SetTextScale(1 * Main.ScreenRatio)
-  Settings.ShowChallengeBtn:SetPoint("TOPRIGHT", 0, -115 * Main.YRatio)
+  Settings.ShowChallengeBtn:SetPoint("TOPLEFT", 10, -95 * Main.YRatio)
   Settings.ShowChallengeBtn:SetSize(25 * Main.XRatio, 25 * Main.YRatio)
   -- Disable Incoming Challenge
-  Settings.IncString:SetPoint("TOPLEFT", 0, -165 * Main.YRatio)
+  Settings.IncString:SetPoint("TOPLEFT", 40, -125 * Main.YRatio)
   Settings.IncString:SetTextScale(1 * Main.ScreenRatio)
-  Settings.IncBtn:SetPoint("TOPRIGHT", 0, -160 * Main.YRatio)
+  Settings.IncBtn:SetPoint("TOPLEFT", 10, -120 * Main.YRatio)
   Settings.IncBtn:SetSize(25 * Main.XRatio, 25 * Main.YRatio)
   -- Whitelist Checkbox
-  Settings.WhitelistString:SetPoint("TOPLEFT", 0, -190 * Main.YRatio)
+  Settings.WhitelistString:SetPoint("TOPLEFT", 40, -150 * Main.YRatio)
   Settings.WhitelistString:SetTextScale(1 * Main.ScreenRatio)
-  Settings.WhitelistBtn:SetPoint("TOPRIGHT", 0, -185 * Main.YRatio)
+  Settings.WhitelistBtn:SetPoint("TOPLEFT", 10, -145 * Main.YRatio)
   Settings.WhitelistBtn:SetSize(25 * Main.XRatio, 25 * Main.YRatio)
   -- Whitelist Guild
-  Settings.WhiteGuildString:SetPoint("TOPLEFT", 0, -215 * Main.YRatio)
+  Settings.WhiteGuildString:SetPoint("TOPLEFT", 40, -175 * Main.YRatio)
   Settings.WhiteGuildString:SetTextScale(1 * Main.ScreenRatio)
-  Settings.WhiteGuildBtn:SetPoint("TOPRIGHT", 0, -210 * Main.YRatio)
+  Settings.WhiteGuildBtn:SetPoint("TOPLEFT", 10, -170 * Main.YRatio)
   Settings.WhiteGuildBtn:SetSize(25 * Main.XRatio, 25 * Main.YRatio)
   -- Whitelist Party
-  Settings.WhitePartyString:SetPoint("TOPLEFT", 0, -240 * Main.YRatio)
+  Settings.WhitePartyString:SetPoint("TOPLEFT", 40, -200 * Main.YRatio)
   Settings.WhitePartyString:SetTextScale(1 * Main.ScreenRatio)
-  Settings.WhitePartyBtn:SetPoint("TOPRIGHT", 0, -235 * Main.YRatio)
+  Settings.WhitePartyBtn:SetPoint("TOPLEFT", 10, -195 * Main.YRatio)
   Settings.WhitePartyBtn:SetSize(25 * Main.XRatio, 25 * Main.YRatio)
   --
-  Settings.WhiteFriendsString:SetPoint("TOPLEFT", 0, -265 * Main.YRatio)
+  Settings.WhiteFriendsString:SetPoint("TOPLEFT", 40, -225 * Main.YRatio)
   Settings.WhiteFriendsString:SetTextScale(1 * Main.ScreenRatio)
-  Settings.WhiteFriendsBtn:SetPoint("TOPRIGHT", 0, -260 * Main.YRatio)
+  Settings.WhiteFriendsBtn:SetPoint("TOPLEFT", 10, -220 * Main.YRatio)
   Settings.WhiteFriendsBtn:SetSize(25 * Main.XRatio, 25 * Main.YRatio)
 
   GR:SizeSettingsList()
+  GR:SizeSettingsTabs()
+  GR:SizeListControls()
 end
 
 function GR:SizeSettingsList()
   local Main = GR_GUI.Main
   local Settings = Main.Tab4.Settings
   local Lists = Settings.Lists
-  Lists:SetPoint("TOP", 0, -390 * Main.YRatio)
-  Lists:SetSize(220 * Main.XRatio, 180 * Main.YRatio)
+  Lists:SetPoint("TOP", 0, -330 * Main.YRatio)
+  Lists:SetSize(244 * Main.XRatio, 180 * Main.YRatio)
 
   -- BlacklistScroll
   local BlacklistScroll = Settings.BlacklistScroll
-  BlacklistScroll:SetSize(220 * Main.XRatio, 180 * Main.YRatio)
+  BlacklistScroll:SetSize(244 * Main.XRatio, 180 * Main.YRatio)
   local BlacklistBorder = BlacklistScroll.Border
   BlacklistBorder:SetPoint("TOPLEFT", BlacklistScroll, "TOPLEFT", -8 * Main.XRatio, 2 * Main.YRatio)
   BlacklistBorder:SetPoint("BOTTOMRIGHT", BlacklistScroll, "BOTTOMRIGHT", 24 * Main.XRatio, -2 * Main.YRatio)
   -- WhitelistScroll
   local WhitelistScroll = Settings.WhitelistScroll
-  WhitelistScroll:SetSize(220 * Main.XRatio, 180 * Main.YRatio)
+  WhitelistScroll:SetSize(244 * Main.XRatio, 180 * Main.YRatio)
   local WhitelistBorder = WhitelistScroll.Border 
   WhitelistBorder:SetPoint("TOPLEFT", WhitelistScroll, "TOPLEFT", -8 * Main.XRatio, 2 * Main.YRatio)
   WhitelistBorder:SetPoint("BOTTOMRIGHT", WhitelistScroll, "BOTTOMRIGHT", 24 * Main.XRatio, -2 * Main.YRatio)
   -- RivalsScroll
   local RivalsScroll = Settings.RivalsScroll
-  RivalsScroll:SetSize(220 * Main.XRatio, 180 * Main.YRatio)
+  RivalsScroll:SetSize(244 * Main.XRatio, 180 * Main.YRatio)
   local RivalsBorder = RivalsScroll.Border
   RivalsBorder:SetPoint("TOPLEFT", RivalsScroll, "TOPLEFT", -8 * Main.XRatio, 2 * Main.YRatio)
   RivalsBorder:SetPoint("BOTTOMRIGHT", RivalsScroll, "BOTTOMRIGHT", 24 * Main.XRatio, -2 * Main.YRatio)
 
-  -- Add to list
-  Lists.AddInput:SetPoint("TOP", 0, 60 * Main.YRatio)
-  Lists.AddInput:SetWidth(150 * Main.XRatio)
-  Lists.AddInput:SetHeight(30 * Main.YRatio)
-  local AddBtn = Lists.AddInput.Btn
-  AddBtn:SetPoint("BOTTOM", 0, -25 * Main.YRatio)
-  AddBtn:SetSize(100 * Main.XRatio, 25 * Main.YRatio)
-  AddBtn.FS:SetTextScale(1.1 * Main.ScreenRatio)
-
-  -- Delete from list
-  local Delete = Lists.AddInput.Delete
-  Delete:SetPoint("BOTTOMRIGHT", 85 * Main.XRatio, -25 * Main.YRatio)
-  Delete:SetSize(100 * Main.XRatio, 25 * Main.YRatio)
-  Delete.FS:SetTextScale(1.1 * Main.ScreenRatio)
-
-  -- Select List
-  local Listtabs = Settings.Listtabs
-  Listtabs:SetPoint("TOP", 0, 87 * Main.YRatio)
-  Listtabs:SetSize(250 * Main.XRatio, 25 * Main.YRatio)
-  -- BlacklistBtn
-  local BlacklistBtn = Settings.Listtabs.BlacklistBtn
-  BlacklistBtn:SetSize(80 * Main.XRatio, 25 * Main.YRatio)
-  BlacklistBtn.FS:SetTextScale(1 * Main.ScreenRatio)
-  -- WhitelistBtn
-  local WhitelistBtn = Settings.Listtabs.WhitelistBtn
-  WhitelistBtn:SetSize(80 * Main.XRatio, 25 * Main.YRatio)
-  WhitelistBtn.FS:SetTextScale(1 * Main.ScreenRatio)
-  -- RivalBtn
-  local RivalsBtn = Settings.Listtabs.RivalsBtn
-  RivalsBtn:SetSize(80 * Main.XRatio, 25 * Main.YRatio)
-  RivalsBtn.FS:SetTextScale(1 * Main.ScreenRatio)
-
   -- Blacklist
   local Blacklist = Settings.Blacklist
-  Blacklist:SetSize(210 * Main.XRatio, 600 * Main.YRatio)
+  Blacklist:SetSize(234 * Main.XRatio, 600 * Main.YRatio)
   for i,v in ipairs(Blacklist.Btns) do
     v:SetPoint("TOPLEFT", 0, i*-14)
     v:SetSize(300, 14)
@@ -577,7 +548,7 @@ function GR:SizeSettingsList()
 
   -- Whitelist
   local Whitelist = Settings.Whitelist
-  Whitelist:SetSize(210 * Main.XRatio, 600 * Main.YRatio)
+  Whitelist:SetSize(234 * Main.XRatio, 600 * Main.YRatio)
   for i,v in ipairs(Whitelist.Btns) do
     v:SetPoint("TOPLEFT", 0, i*-14)
     v:SetSize(300, 14)
@@ -585,11 +556,42 @@ function GR:SizeSettingsList()
 
   -- Rivals
   local Rivals = Settings.Rivals
-  Rivals:SetSize(210 * Main.XRatio, 600 * Main.YRatio)
+  Rivals:SetSize(234 * Main.XRatio, 600 * Main.YRatio)
   for i,v in ipairs(Rivals.Btns) do
     v:SetPoint("TOPLEFT", 0, i*-14)
     v:SetSize(300, 14)
   end
+end
+
+function GR:SizeSettingsTabs()
+  local Main = GR_GUI.Main
+  local Listtabs = Main.Tab4.Settings.Listtabs
+  Listtabs:SetPoint("TOP", 0, 28 * Main.YRatio)
+  Listtabs:SetSize(250 * Main.XRatio, 25 * Main.YRatio)
+  -- BlacklistBtn
+  local BlacklistBtn = Listtabs.BlacklistBtn
+  BlacklistBtn:SetSize(66 * Main.XRatio, 18)
+  -- WhitelistBtn
+  local WhitelistBtn = Listtabs.WhitelistBtn
+  WhitelistBtn:SetSize(66 * Main.XRatio, 18)
+  -- RivalBtn
+  local RivalsBtn = Listtabs.RivalsBtn
+  RivalsBtn:SetSize(66 * Main.XRatio, 18)
+end
+
+function GR:SizeListControls()
+  local Main = GR_GUI.Main
+  local Lists = Main.Tab4.Settings.Lists
+  
+  Lists.AddInput:SetPoint("TOPLEFT", -4 * Main.XRatio, 62 * Main.YRatio)
+  Lists.AddInput:SetSize(150 * Main.XRatio, 30 * Main.YRatio)
+  local AddBtn = Lists.AddInput.Btn
+  AddBtn:SetPoint("CENTER", 108 * Main.XRatio, 0 * Main.YRatio)
+  AddBtn:SetSize(60 * Main.XRatio, 25 * Main.YRatio)
+
+  local Delete = Lists.AddInput.Delete
+  Delete:SetPoint("CENTER", 170 * Main.XRatio, 0 * Main.YRatio)
+  Delete:SetSize(60 * Main.XRatio, 25 * Main.YRatio)
 end
 
 -- functionality
@@ -654,4 +656,63 @@ function GR:ResetSettingsListScroll(DB, Btns, Listx)
   end
 end
 
--- Alpha slidder not working
+function GR:ToggleSettingsListTab()
+  local tabIndex = GR.CurrList
+  local tabs = GR_GUI.Main.Tab4.Settings.Listtabs
+  
+  local function normal(tab)
+    tab.Left:Show()
+    tab.LeftActive:Hide()
+    tab.LeftHighlight:Hide()
+    tab.Middle:Show()
+    tab.MiddleActive:Hide()
+    tab.MiddleHighlight:Hide()
+    tab.Right:Show()
+    tab.RightActive:Hide()
+    tab.RightHighlight:Hide() 
+    tab.Text:SetPoint("CENTER", 0, 0)
+    tab.Text:SetTextColor(1,.82,0,1)
+  end
+
+  local function active(tab)
+    tab.Left:Hide()
+    tab.LeftActive:Show()
+    tab.LeftHighlight:Hide()
+    tab.Middle:Hide()
+    tab.MiddleActive:Show()
+    tab.MiddleHighlight:Hide()
+    tab.Right:Hide()
+    tab.RightActive:Show()
+    tab.RightHighlight:Hide() 
+    tab.Text:SetPoint("CENTER", 0, 0)
+    tab.Text:SetTextColor(1,1,1,1)
+  end
+
+  local function highlight(tab)
+    tab.Left:Hide()
+    tab.LeftActive:Hide()
+    tab.LeftHighlight:Show()
+    tab.Middle:Hide()
+    tab.MiddleActive:Hide()
+    tab.MiddleHighlight:Show()
+    tab.Right:Hide()
+    tab.RightActive:Hide()
+    tab.RightHighlight:Show() 
+  end
+
+  if (tabIndex == "Blacklist") then
+    active(tabs.BlacklistBtn)
+    normal(tabs.WhitelistBtn)
+    normal(tabs.RivalsBtn)
+  end
+  if (tabIndex == "Whitelist") then
+    normal(tabs.BlacklistBtn)
+    active(tabs.WhitelistBtn)
+    normal(tabs.RivalsBtn)
+  end
+  if (tabIndex == "Rivals") then
+    normal(tabs.BlacklistBtn)
+    normal(tabs.WhitelistBtn)
+    active(tabs.RivalsBtn)
+  end
+end

@@ -13,17 +13,13 @@ local GR_LDB = LibStub("LibDataBroker-1.1"):NewDataObject("GR", {
     if (GR_GUI.Main:IsVisible()) then 
       GR_GUI.Main:Hide()
     else 
-      if (GR.FirstOpen) then
-        GR.FirstOpen = false
-        GR:UpdateFriendsList() 
-        GR_GUI.Main:Show()
-      else
-        GR:ShowMain()
-      end
+      GR:UpdateFriendsList() 
+      GR:ShowMain()
     end
   end,
   OnTooltipShow = function(tooltip)
-    tooltip:SetText("Game Room")
+    tooltip:AddLine("Game Room")
+    tooltip:AddLine("|cFFCFCFCFShift-Click|r: Move Window")
   end,
 })
 
@@ -65,9 +61,8 @@ function GR:OnInitialize()
   GR.Win.Const.Tab2Height = 156
   GR.Win.Const.Tab3Width = 330
   GR.Win.Const.Tab3Height = 300
-  GR.Win.Const.Tab4Width = 425
+  GR.Win.Const.Tab4Width = 330
   GR.Win.Const.Tab4Height = 470
-  GR.FirstOpen = true
 
   -- Game Varibales
   GR.PlayerPos = nil
@@ -85,8 +80,6 @@ function GR:OnInitialize()
     GR.Retail = false
   end
 
-
-  
 
   
   GR:CreateMainWindow()
@@ -243,14 +236,14 @@ function GR:CreateMainWindow()
   -- Header 2
   Main.H2 = Main:CreateFontString(nil, "OVERLAY", "GameTooltipText")
   local H2 = Main.H2
-  H2:SetTextColor(.8,.8,.8,1)
+  H2:SetTextColor(1,1,1,1)
 
   -- Exit Button
   Main.ExitBtn = CreateFrame("Button", ExitBtn, Main, "UIPanelButtonTemplate")
   local ExitBtn = Main.ExitBtn
   ExitBtn.FS = ExitBtn:CreateFontString(nil, "OVERLAY", "GameTooltipText")
   local ExitFS = ExitBtn.FS 
-  ExitFS:SetTextColor(.8,.8,.8, 1)
+  ExitFS:SetTextColor(1,1,1, 1)
   ExitFS:SetText("Exit Game")
   ExitBtn:SetScript("OnClick", function(self, button, down)
     if (button == "LeftButton" and down == false) then 
@@ -279,13 +272,13 @@ function GR:CreateHeaderInfo()
   -- Opponet String
   HeaderInfo.OpponentString = HeaderInfo:CreateFontString(nil, "OVERLAY", "GameTooltipText")
   local Opp = HeaderInfo.OpponentString
-  Opp:SetTextColor(.8,.8,.8, 1)
+  Opp:SetTextColor(1,1,1, 1)
 
   -- Reinvite Button
   HeaderInfo.ReInvite = CreateFrame("Button", ReInvite, HeaderInfo, "UIPanelButtonTemplate")
   local ReInvite = HeaderInfo.ReInvite
   ReInvite.FS = ReInvite:CreateFontString(nil, "OVERLAY", "GameTooltipText")
-  ReInvite.FS:SetTextColor(.8,.8,.8, 1)
+  ReInvite.FS:SetTextColor(1,1,1, 1)
   ReInvite.FS:SetText("Rematch?")
   ReInvite:SetScript("OnClick", function(self, button, down)
       if (button == "LeftButton" and down == false) then
@@ -309,7 +302,7 @@ function GR:CreateHeaderInfo()
   local ReMatch = HeaderInfo.ReMatch
   ReMatch.FS = ReMatch:CreateFontString(nil, "OVERLAY", "GameTooltipText")
   local ReMatchFS = ReMatch.FS
-  ReMatchFS:SetTextColor(.8,.8,.8, 1)
+  ReMatchFS:SetTextColor(1,1,1, 1)
   ReMatchFS:SetText("Accept")
   ReMatch:SetScript("OnClick", function(self, button, down)
       if (button == "LeftButton" and down == false) then 
@@ -341,7 +334,7 @@ function GR:CreateHeaderInfo()
   local Rival = HeaderInfo.Rival
   Rival.FS = Rival:CreateFontString(nil, "OVERLAY", "GameTooltipText")
   local RivalFS = Rival.FS
-  RivalFS:SetTextColor(.8,.8,.8, 1)
+  RivalFS:SetTextColor(1,1,1, 1)
   RivalFS:SetText("Add Rival")
   Rival:SetScript("OnClick", function(self, button, down)
       if (button == "LeftButton" and down == false) then 
@@ -428,7 +421,7 @@ function GR:CreateSoloGames()
   local AsteroidsBtn = SoloGames.AsteroidsBtn
   AsteroidsBtn.FS = AsteroidsBtn:CreateFontString(nil, "OVERLAY", "GameTooltipText")
   local AsteroidsFS = AsteroidsBtn.FS
-  AsteroidsFS:SetTextColor(.8,.8,.8, 1)
+  AsteroidsFS:SetTextColor(1,1,1, 1)
   AsteroidsFS:SetText("Asteroids")
   AsteroidsBtn:SetScript("OnClick", function(self, button, down) 
     if (button == "LeftButton" and down == false) then
@@ -440,7 +433,7 @@ function GR:CreateSoloGames()
   local SnakeBtn = SoloGames.SnakeBtn
   SnakeBtn.FS = SnakeBtn:CreateFontString(nil, "OVERLAY", "GameTooltipText")
   local SnakeFS = SnakeBtn.FS
-  SnakeFS:SetTextColor(.8,.8,.8, 1)
+  SnakeFS:SetTextColor(1,1,1, 1)
   SnakeFS:SetText("Snake")
   SnakeBtn:SetScript("OnClick", function(self, button, down) 
     if (button == "LeftButton" and down == false) then
@@ -453,7 +446,7 @@ function GR:CreateSoloGames()
   local BCBtn = SoloGames.BCBtn
   BCBtn.FS = BCBtn:CreateFontString(nil, "OVERLAY", "GameTooltipText")
   local BCFS = BCBtn.FS
-  BCFS:SetTextColor(.8,.8,.8, 1)
+  BCFS:SetTextColor(1,1,1, 1)
   BCFS:SetText("Bouncy Chicken")
   BCBtn:SetScript("OnClick", function(self, button, down) 
     if (button == "LeftButton" and down == false) then
@@ -466,7 +459,7 @@ function GR:CreateSoloGames()
   local SuikaBtn = SoloGames.SuikaBtn
   SuikaBtn.FS = SuikaBtn:CreateFontString(nil, "OVERLAY", "GameTooltipText")
   local BCFS = SuikaBtn.FS
-  BCFS:SetTextColor(.8,.8,.8, 1)
+  BCFS:SetTextColor(1,1,1, 1)
   BCFS:SetText("Suika")
   SuikaBtn:SetScript("OnClick", function(self, button, down) 
     if (button == "LeftButton" and down == false) then
@@ -949,7 +942,6 @@ function GR:ShowMain()
 
   SizeMain()
 
-
   GR:ResizeMainNoRatioChange()
 end
 
@@ -978,8 +970,7 @@ end
 
 -- BUGS
 -- guild needs to unregister offline players
--- resize shows wrong elements
--- game stuff shows in settings
+-- show challenge as msg doesn't allow players to accept challenges
 
 -- GAMES
 -- chess
