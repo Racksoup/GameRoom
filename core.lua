@@ -84,8 +84,6 @@ function GR:OnInitialize()
     GR.Retail = false
   end
 
-
-  
   GR:CreateMainWindow()
   GR:CreateRegister()
   GR:CreateTicTacToe()
@@ -682,6 +680,9 @@ function GR:TabSelect()
     GR:ResizeMainNoRatioChange()
 
     Main.Tab3:Show()
+    Main.Tab3.Invite.ServerScrollFrame:Show()
+    Main.Tab3.Invite.ActiveTab = "server"
+    GR:ToggleInviteTab()
     GR:DisableMultiGameButtons()
     Main.H2:SetText("Multi Player Games")
     Main.H2:Show()
