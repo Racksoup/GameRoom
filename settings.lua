@@ -448,7 +448,7 @@ function GR:SizeSettings()
   Tab4:SetPoint("TOP", 0, -50 * Main.YRatio)
   Tab4:SetSize(250 * Main.XRatio, 200 * Main.YRatio)
   Tab4.SettingsScroll:SetPoint("TOP", -9 * Main.XRatio, -20 * Main.YRatio)
-  Tab4.SettingsScroll:SetSize(305 * Main.XRatio, 375 * Main.YRatio)
+  Tab4.SettingsScroll:SetSize(305 * Main.XRatio, 305 * Main.YRatio)
   local Settings = Tab4.Settings
   Settings:SetPoint("TOPLEFT", 0 * Main.XRatio, 0 * Main.YRatio)
   Settings:SetSize(300 * Main.XRatio, 520 * Main.YRatio)

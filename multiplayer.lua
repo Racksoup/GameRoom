@@ -300,7 +300,7 @@ function GR:SizeMultiGames()
   local Tab3 = Main.Tab3
   Tab3:SetPoint("TOP", 0, -24 * Main.YRatio)
   Tab3:SetSize(250 * Main.XRatio, 400 * Main.YRatio)
-  Tab3.InviteText:SetPoint("TOP", 0, -200 * Main.YRatio)
+  Tab3.InviteText:SetPoint("TOP", 0, -300 * Main.YRatio)
 
 
   GR:SizeGameButtons()
@@ -316,7 +316,7 @@ function GR:SizeGameButtons()
   local Main = GR_GUI.Main
   local GameButtons = Main.Tab3.GameButtons
   
-  GameButtons:SetPoint("TOP", 0 * Main.XRatio, -200 * Main.YRatio)
+  GameButtons:SetPoint("TOP", 0 * Main.XRatio, -300 * Main.YRatio)
   GameButtons:SetSize(255 * Main.XRatio, 100 * Main.YRatio)
   local TicTacToeBtn = GameButtons.TicTacToeBtn
   TicTacToeBtn:SetPoint("TOPLEFT", 5 * Main.XRatio, -20 * Main.YRatio)
@@ -338,7 +338,7 @@ function GR:SizeMultiInvite()
   local Invite = Tab3.Invite
 
   Invite:SetPoint("TOP", 0, -30 * Main.YRatio)
-  Invite:SetSize(250 * Main.XRatio, 210 * Main.YRatio)
+  Invite:SetSize(250 * Main.XRatio, 310 * Main.YRatio)
 end
 
 function GR:SizeInviteServer()
@@ -346,7 +346,7 @@ function GR:SizeInviteServer()
   local Invite = Main.Tab3.Invite
 
   Invite.ServerScrollFrame:SetPoint("TOP", -7 * Main.XRatio, -38 * Main.YRatio)
-  Invite.ServerScrollFrame:SetSize(247 * Main.XRatio, 100 * Main.YRatio)
+  Invite.ServerScrollFrame:SetSize(247 * Main.XRatio, 200 * Main.YRatio)
   Invite.Server:SetSize(247 * Main.XRatio, 700 * Main.YRatio)
 
   local Border = Invite.ServerScrollFrame.Border
@@ -365,7 +365,7 @@ function GR:SizeInviteFriends()
   local Invite = Main.Tab3.Invite
 
   Invite.FriendsScrollFrame:SetPoint("TOP", -7 * Main.XRatio, -38 * Main.YRatio)
-  Invite.FriendsScrollFrame:SetSize(247 * Main.XRatio, 100 * Main.YRatio)
+  Invite.FriendsScrollFrame:SetSize(247 * Main.XRatio, 200 * Main.YRatio)
   Invite.Friends:SetSize(247 * Main.XRatio, 700 * Main.YRatio)
 
   local Border = Invite.FriendsScrollFrame.Border
@@ -384,7 +384,7 @@ function GR:SizeInviteParty()
   local Invite = Main.Tab3.Invite
 
   Invite.PartyScrollFrame:SetPoint("TOP", -7 * Main.XRatio, -38 * Main.YRatio)
-  Invite.PartyScrollFrame:SetSize(247 * Main.XRatio, 100 * Main.YRatio)
+  Invite.PartyScrollFrame:SetSize(247 * Main.XRatio, 200 * Main.YRatio)
   Invite.Party:SetSize(247 * Main.XRatio, 700 * Main.YRatio)
 
   local Border = Invite.PartyScrollFrame.Border
@@ -403,7 +403,7 @@ function GR:SizeInviteZone()
   local Invite = Main.Tab3.Invite
 
   Invite.ZoneScrollFrame:SetPoint("TOP", -7 * Main.XRatio, -38 * Main.YRatio)
-  Invite.ZoneScrollFrame:SetSize(247 * Main.XRatio, 100 * Main.YRatio)
+  Invite.ZoneScrollFrame:SetSize(247 * Main.XRatio, 200 * Main.YRatio)
   Invite.Zone:SetSize(247 * Main.XRatio, 700 * Main.YRatio)
 
   local Border = Invite.ZoneScrollFrame.Border

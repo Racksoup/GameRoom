@@ -64,9 +64,9 @@ function GR:OnInitialize()
   GR.Win.Const.Tab2Width = 310
   GR.Win.Const.Tab2Height = 156
   GR.Win.Const.Tab3Width = 340
-  GR.Win.Const.Tab3Height = 300
+  GR.Win.Const.Tab3Height = 400
   GR.Win.Const.Tab4Width = 340
-  GR.Win.Const.Tab4Height = 470
+  GR.Win.Const.Tab4Height = 400
 
   -- Game Varibales
   GR.PlayerPos = nil
