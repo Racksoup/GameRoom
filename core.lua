@@ -76,15 +76,20 @@ function GR:OnInitialize()
   GR.PlayerName = UnitName("player")
   GR.ChannelNumber = nil
 
-  -- Retail or Classic/Wrath
+  -- Retail or Classic
   version, build, datex, tocversion = GetBuildInfo()
-  if (tocversion > 40000) then 
+  if (tocversion > 90000) then 
     GR.Retail = true
   else
     GR.Retail = false
   end
 
   GR:CreateMainWindow()
+  GR:CreateAcceptDecline()
+  GR:CreateHeaderInfo()
+  GR:CreateTabSoloGames()
+  GR:CreateTabMultiGames()
+  GR:CreateTabSettings()
   GR:CreateRegister()
   GR:CreateTicTacToe()
   GR:CreateBattleships()
@@ -92,6 +97,10 @@ function GR:OnInitialize()
   GR:CreateSnake()
   GR:CreateBouncyChicken()
   GR:SuikaCreate()
+  GR:CreateMinesweepers()
+
+  GR:ResizeMain()
+  GR:ResizeAllGames()
   
   GR.db.realm.tab = 2
   GR:TabSelect()
@@ -106,9 +115,9 @@ end
 
 function GR:CreateMainWindow()
   -- Main Window
+  GR_GUI.Main = CreateFrame("Frame", "GameRoom", UIParent, "DefaultPanelFlatTemplate")
   -- GR_GUI.Main = CreateFrame("Frame", GameRoom, UIParent, "SimplePanelTemplate")
   -- GR_GUI.Main = CreateFrame("Frame", GameRoom, UIParent, "DefaultPanelTemplate")
-  GR_GUI.Main = CreateFrame("Frame", "GameRoom", UIParent, "DefaultPanelFlatTemplate")
   -- GR_GUI.Main = CreateFrame("Frame", GameRoom, UIParent, "PortraitFrameFlatBaseTemplate")
   -- GR_GUI.Main = CreateFrame("Frame", GameRoom, UIParent, "PortraitFrameTemplate")
   local Main = GR_GUI.Main
@@ -133,6 +142,7 @@ function GR:CreateMainWindow()
   end)
   Main:Show()
   Main:SetAlpha(1)
+
   Main.XRatio = 1
   Main.YRatio = 1
   Main.ScreenRatio = 1
@@ -157,12 +167,7 @@ function GR:CreateMainWindow()
   ResizeBtn:SetScript("OnMouseUp", function()
     Main:StopMovingOrSizing("BOTTOMRIGHT")
     GR:ResizeMain()
-    GR:SizeTictactoe()
-    GR:ResizeBattleships()
-    GR:SizeAsteroids()
-    GR:SnakeSize()
-    GR:SizeBC()
-    GR:SuikaSize()
+    GR:ResizeAllGames()
   end)
   
   -- Game Room Title
@@ -175,7 +180,6 @@ function GR:CreateMainWindow()
   local H1 = Main.H1
   H1:SetText("Game Room")
   H1:SetPoint("TOP")
-  H1:SetTextScale(1)
 
   -- tabs
   Main.TabButton1 = CreateFrame("Button", "TabButton1", Main, "PanelTabButtonTemplate")
@@ -211,25 +215,19 @@ function GR:CreateMainWindow()
   H2:SetTextColor(1,1,1,1)
 
   -- Exit Button
-  Main.ExitBtn = CreateFrame("Button", ExitBtn, Main, "UIPanelButtonTemplate")
+  Main.ExitBtn = CreateFrame("Button", "ExitBtn", Main, "UIPanelButtonTemplate")
   local ExitBtn = Main.ExitBtn
   ExitBtn.FS = ExitBtn:CreateFontString(nil, "OVERLAY", "GameTooltipText")
   local ExitFS = ExitBtn.FS 
   ExitFS:SetTextColor(1,1,1, 1)
   ExitFS:SetText("Exit Game")
+  ExitBtn:SetFontString(ExitFS)
   ExitBtn:SetScript("OnClick", function(self, button, down)
     if (button == "LeftButton" and down == false) then 
       GR:ExitGameClicked()
     end
   end)
   Main.ExitBtn:Hide()
-  
-  GR:CreateAcceptDecline()
-  GR:CreateHeaderInfo()
-  GR:CreateSoloGames()
-  GR:CreateMultiGames()
-  GR:CreateSettings()
-  GR:ResizeMainNoRatioChange()
 end
 
 function GR:CreateHeaderInfo()
@@ -380,82 +378,6 @@ function GR:CreateAcceptDecline()
   AcceptMover:Hide()
 end
 
-function GR:CreateSoloGames()
-  local Main = GR_GUI.Main
-  Main.Tab2 = CreateFrame("Frame", Tab2, Main)
-  local Tab2 = Main.Tab2
-  
-  -- Game Buttons
-  Tab2.SoloGames = CreateFrame("Frame", SoloGames, Tab2)
-  local SoloGames = Tab2.SoloGames
-
-  SoloGames.AsteroidsBtn = CreateFrame("Button", AsteroidsBtn, SoloGames, "UIPanelButtonTemplate")
-  local AsteroidsBtn = SoloGames.AsteroidsBtn
-  AsteroidsBtn.FS = AsteroidsBtn:CreateFontString(nil, "OVERLAY", "GameTooltipText")
-  local AsteroidsFS = AsteroidsBtn.FS
-  AsteroidsFS:SetTextColor(1,1,1, 1)
-  AsteroidsFS:SetText("Asteroids")
-  AsteroidsBtn:SetScript("OnClick", function(self, button, down) 
-    if (button == "LeftButton" and down == false) then
-      GR:AsteroidsShow()
-    end
-  end)
-
-  SoloGames.SnakeBtn = CreateFrame("Button", "SnakeBtn", SoloGames, "UIPanelButtonTemplate")
-  local SnakeBtn = SoloGames.SnakeBtn
-  SnakeBtn.FS = SnakeBtn:CreateFontString(nil, "OVERLAY", "GameTooltipText")
-  local SnakeFS = SnakeBtn.FS
-  SnakeFS:SetTextColor(1,1,1, 1)
-  SnakeFS:SetText("Snake")
-  SnakeBtn:SetScript("OnClick", function(self, button, down) 
-    if (button == "LeftButton" and down == false) then
-      GR.GameType = "Snake"
-      GR:ShowSoloGame()
-    end
-  end)
-
-  SoloGames.BCBtn = CreateFrame("Button", "BCBtn", SoloGames, "UIPanelButtonTemplate")
-  local BCBtn = SoloGames.BCBtn
-  BCBtn.FS = BCBtn:CreateFontString(nil, "OVERLAY", "GameTooltipText")
-  local BCFS = BCBtn.FS
-  BCFS:SetTextColor(1,1,1, 1)
-  BCFS:SetText("Bouncy Chicken")
-  BCBtn:SetScript("OnClick", function(self, button, down) 
-    if (button == "LeftButton" and down == false) then
-      GR.GameType = "Bouncy Chicken"
-      GR:ShowSoloGame()
-    end
-  end)
-
-  SoloGames.SuikaBtn = CreateFrame("Button", "SuikaBtn", SoloGames, "UIPanelButtonTemplate")
-  local SuikaBtn = SoloGames.SuikaBtn
-  SuikaBtn.FS = SuikaBtn:CreateFontString(nil, "OVERLAY", "GameTooltipText")
-  local SuikaFS = SuikaBtn.FS
-  SuikaFS:SetTextColor(1,1,1, 1)
-  SuikaFS:SetText("Suika")
-  SuikaBtn:SetScript("OnClick", function(self, button, down) 
-    if (button == "LeftButton" and down == false) then
-      GR.GameType = "Suika"
-      GR:ShowSoloGame()
-    end
-  end)
-
-  SoloGames.MinesweepersBtn = CreateFrame("Button", "MinesweepersBtn", SoloGames, "UIPanelButtonTemplate")
-  local MinesweepersBtn = SoloGames.MinesweepersBtn
-  MinesweepersBtn.FS = MinesweepersBtn:CreateFontString(nil, "OVERLAY", "GameTooltipText")
-  local MinesweepersFS = MinesweepersBtn.FS
-  MinesweepersFS:SetTextColor(1,1,1, 1)
-  MinesweepersFS:SetText("Minesweepers")
-  MinesweepersBtn:SetScript("OnClick", function(self, button, down) 
-    if (button == "LeftButton" and down == false) then
-      GR.GameType = "Minesweepers"
-      GR:ShowSoloGame()
-    end
-  end)
-
-  Tab2:Hide()
-end
-
 -- Resize
 function GR:ResizeMain()
   local Main = GR_GUI.Main
@@ -529,8 +451,6 @@ function GR:ResizeMainNoRatioChange()
     Main.ExitBtn:SetPoint("TOPRIGHT", -40 * Main.XRatio, -56 * Main.YRatio)
   end
   Main.ExitBtn:SetSize(100 * Main.XRatio, 30 * Main.YRatio)
-  Main.ExitBtn.FS:SetPoint("CENTER", 0, 0)
-  Main.ExitBtn.FS:SetTextScale(1.1 * Main.ScreenRatio)
   
   GR:ResizeHeaderInfo()
   GR:ResizeSoloGames()
@@ -580,46 +500,14 @@ function GR:ResizeHeaderInfo()
   RivalFS:SetTextScale(1.1 * Main.ScreenRatio)
 end
 
-function GR:ResizeSoloGames()
-  local Main = GR_GUI.Main
-  local Tab2 = Main.Tab2
-  Tab2:SetPoint("TOP", 0, -50 * Main.YRatio)
-  Tab2:SetSize(250 * Main.XRatio, 200 * Main.YRatio)
-
-  -- Game Buttons
-  local SoloGames = Tab2.SoloGames
-  SoloGames:SetPoint("TOP", 0 * Main.XRatio, -12 * Main.YRatio)
-  SoloGames:SetSize(255 * Main.XRatio, 100 * Main.YRatio)
-  local AsteroidsBtn = SoloGames.AsteroidsBtn
-  AsteroidsBtn:SetPoint("TOPLEFT", 5 * Main.XRatio, -5 * Main.YRatio)
-  AsteroidsBtn:SetSize(120 * Main.XRatio, 30 * Main.YRatio)
-  local AsteroidsFS = AsteroidsBtn.FS
-  AsteroidsFS:SetPoint("CENTER", 0, 0)
-  AsteroidsFS:SetTextScale(1 * Main.ScreenRatio)
-  local SnakeBtn = SoloGames.SnakeBtn
-  SnakeBtn:SetPoint("TOPRIGHT", -5 * Main.XRatio, -5 * Main.YRatio)
-  SnakeBtn:SetSize(120 * Main.XRatio, 30 * Main.YRatio)
-  local SnakeFS = SnakeBtn.FS
-  SnakeFS:SetPoint("CENTER", 0, 0)
-  SnakeFS:SetTextScale(1 * Main.ScreenRatio)
-  local BCBtn = SoloGames.BCBtn
-  BCBtn:SetPoint("TOPLEFT", 5 * Main.XRatio, -40 * Main.YRatio)
-  BCBtn:SetSize(120 * Main.XRatio, 30 * Main.YRatio)
-  local BCFS = BCBtn.FS
-  BCFS:SetPoint("CENTER", 0, 0)
-  BCFS:SetTextScale(1 * Main.ScreenRatio)
-  local SuikaBtn = SoloGames.SuikaBtn
-  SuikaBtn:SetPoint("TOPRIGHT", -5 * Main.XRatio, -40 * Main.YRatio)
-  SuikaBtn:SetSize(120 * Main.XRatio, 30 * Main.YRatio)
-  local SuikaFS = SuikaBtn.FS
-  SuikaFS:SetPoint("CENTER", 0, 0)
-  SuikaFS:SetTextScale(1 * Main.ScreenRatio)
-  local MinesweepersBtn = SoloGames.MinesweepersBtn
-  MinesweepersBtn:SetPoint("TOPLEFT", 5 * Main.XRatio, -75 * Main.YRatio)
-  MinesweepersBtn:SetSize(120 * Main.XRatio, 30 * Main.YRatio)
-  local MinesweepersFS = MinesweepersBtn.FS
-  MinesweepersFS:SetPoint("CENTER", 0, 0)
-  MinesweepersFS:SetTextScale(1 * Main.ScreenRatio)
+function GR:ResizeAllGames()
+  GR:SizeTictactoe()
+  GR:ResizeBattleships()
+  GR:SizeAsteroids()
+  GR:SnakeSize()
+  GR:SizeBC()
+  GR:SuikaSize()
+  GR:SizeMinesweepers()
 end
 
 -- Functionality
@@ -634,23 +522,19 @@ function GR:TabSelect()
   Main.Tab2:Hide()
   Main.Tab3:Hide()
   Main.Tab4:Hide() 
-  Main.HeaderInfo:Hide() 
-  Main.Asteroids:Hide() 
-  Main.Tictactoe:Hide() 
-  Main.Battleships:Hide()
   
   -- In Game
   if (tab == 1) then
     local Width, Height, BoundX, BoundY
-
-    if (GR.GameType == 'Suika') then 
-      Width = GR.Win.Const.SuikaScreenWidth
-      Height = GR.Win.Const.SuikaScreenHeight
+    
+    if (GR.GameType == "Suika") then
+      Width = GR.Win.Const.Tab1WidthSuika
+      Height = GR.Win.Const.Tab1WidthSuika
       BoundX = GR.Win.Const.Tab1WidthSuika /2
       BoundY = GR.Win.Const.Tab1HeightSuika /2
     else
-      Width = GR.Win.Const.GameScreenWidth
-      Height = GR.Win.Const.GameScreenHeight
+      Width = GR.Win.Const.Tab1Width
+      Height = GR.Win.Const.Tab1Height
       BoundX = GR.Win.Const.Tab1Width /2
       BoundY = GR.Win.Const.Tab1Height /2
     end

@@ -10,7 +10,9 @@ embeds.xml
 
 enUS.lua
 core.lua
-settings.lua
+tabSoloGames.lua
+tabMultiGames.lua
+tabSettings.lua
 register.lua
 invite.lua
 tictactoe.lua
@@ -20,4 +22,3 @@ snake.lua
 bouncyChicken.lua
 suika.lua
 minesweepers.lua
-multiplayer.lua

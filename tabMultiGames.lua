@@ -1,4 +1,4 @@
-function GR:CreateMultiGames()
+function GR:CreateTabMultiGames()
   local Main = GR_GUI.Main
   Main.Tab3 = CreateFrame("Frame", Tab3, Main)
   local Tab3 = Main.Tab3

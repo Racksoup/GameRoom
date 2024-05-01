@@ -369,6 +369,11 @@ function GR:ExitGameClicked()
   if (GR.GameType == "Suika") then
     GR:SuikaHide()    
   end
+  
+  -- Minesweepers
+  if (GR.GameType == "Minesweepers") then
+    GR:MinesweepersHide()    
+  end
 
   GR_GUI.Main.ExitBtn:Hide()
   GR.GameType = nil

@@ -1,4 +1,4 @@
-function GR:CreateSettings()
+function GR:CreateTabSettings()
   local Main = GR_GUI.Main
 
   GR.TargetName = ""      
