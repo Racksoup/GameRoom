@@ -10,6 +10,7 @@ embeds.xml
 
 enUS.lua
 core.lua
+headerInfo.lua
 tabSoloGames.lua
 tabMultiGames.lua
 tabSettings.lua

@@ -440,8 +440,6 @@ function GR:AsteroidsHide()
   GR.CanSendInvite = true
   GR.IsChallenged = false
   GR.Opponent = nil
-  GR_GUI.Main.HeaderInfo:Hide()
-  GR_GUI.Main.HeaderInfo.ExitBtn:Hide()
   Asteroids:Hide()
 end
 
