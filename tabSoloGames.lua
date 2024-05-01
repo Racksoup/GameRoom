@@ -74,7 +74,7 @@ function GR:CreateTabSoloGames()
   Tab2:Hide()
 end
 
-function GR:ResizeSoloGames()
+function GR:ResizeTabSoloGames()
   local Main = GR_GUI.Main
   local Tab2 = Main.Tab2
   Tab2:SetPoint("TOP", 0, -50 * Main.YRatio)

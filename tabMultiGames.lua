@@ -85,7 +85,7 @@ function GR:CreateMultiInvite()
   GR:CreateInviteParty()
   GR:CreateInviteZone()
 
-  GR:SizeMultiGames()
+  GR:SizeTabMultiGames()
 end
 
 function GR:CreateInviteServer()
@@ -317,7 +317,7 @@ function GR:CreateInviteTab()
 end
 
 -- Resize
-function GR:SizeMultiGames()
+function GR:SizeTabMultiGames()
   local Main = GR_GUI.Main
   local Tab3 = Main.Tab3
   Tab3:SetPoint("TOP", 0, -24 * Main.YRatio)

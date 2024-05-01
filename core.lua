@@ -426,9 +426,9 @@ function GR:ResizeMain()
   end
   
   GR:ResizeHeaderInfo()
-  GR:ResizeSoloGames()
-  GR:SizeMultiGames()
-  GR:SizeSettings()
+  GR:ResizeTabSoloGames()
+  GR:SizeTabMultiGames()
+  GR:SizeTabSettings()
 end
 
 function GR:ResizeHeaderInfo()

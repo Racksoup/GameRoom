@@ -22,7 +22,7 @@ function GR:CreateTabSettings()
   GR:CreateSettingsTabs()
   GR:CreateListControls()
 
-  GR:SizeSettings()
+  GR:SizeTabSettings()
 end
 
 function GR:CreateMainSettings()
@@ -440,7 +440,7 @@ function GR:CreateListControls()
 end
 
 -- Resize
-function GR:SizeSettings()
+function GR:SizeTabSettings()
   local Main = GR_GUI.Main
   local Tab4 = Main.Tab4
 
