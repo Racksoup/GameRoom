@@ -151,7 +151,7 @@ function GR:TictactoeShow()
     GR_GUI.Main.Tictactoe:Show()
     GR_GUI.Main.H2:Hide()
     GR.GameType = "Tictactoe"
-    GR:ShowGame()            
+    GR:ShowMultiGame()            
 end
 
 -- functions

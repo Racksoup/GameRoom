@@ -324,6 +324,8 @@ function GR:CreateHeaderMultiGames()
       Rival:Hide()
     end
   end)
+
+  Multi:Hide()
 end
 
 function GR:CreateAcceptDecline()
@@ -696,42 +698,42 @@ function GR:ToggleTab()
 end
 
 function GR:SetTurnString()
-    local TurnString = GR_GUI.Main.HeaderInfo.Multi.TurnString
-    if (GR.GameOver == false) then
-        if (GR.IsPlayerTurn) then
-            TurnString:SetTextColor(0,1,0,1)
-            TurnString:SetText(UnitName("player"))
-        else
-            TurnString:SetTextColor(1,0,0,1)
-            TurnString:SetText(GR.Opponent)
-        end
+  local TurnString = GR_GUI.Main.HeaderInfo.Multi.TurnString
+  if (GR.GameOver == false) then
+    if (GR.IsPlayerTurn) then
+      TurnString:SetTextColor(0,1,0,1)
+      TurnString:SetText(UnitName("player"))
+    else
+      TurnString:SetTextColor(1,0,0,1)
+      TurnString:SetText(GR.Opponent)
     end
+  end
 end
 
 function GR:ShowRivalsBtn() 
-    local InRivals = false
-    for i,v in ipairs(GR.db.realm.Rivals) do
-        if (string.match(v, GR.Opponent)) then
-            InRivals = true
-        end
+  local InRivals = false
+  for i,v in ipairs(GR.db.realm.Rivals) do
+    if (string.match(v, GR.Opponent)) then
+      InRivals = true
     end
-    if (InRivals == false) then
-        GR_GUI.Main.HeaderInfo.Multi.Rival:Show()
-    end
+  end
+  if (InRivals == false) then
+    GR_GUI.Main.HeaderInfo.Multi.Rival:Show()
+  end
 end
 
 -- Show/Hide Game
-function GR:ShowGame()
+function GR:ShowMultiGame()
   local Main = GR_GUI.Main
   
   GR.InGame = true
+  GR_GUI.Accept:Hide()
 
   Main.HeaderInfo:Show()
   Main.HeaderInfo.Multi.OpponentString:Show()
   Main.HeaderInfo.Multi.TurnString:Show()
   Main.HeaderInfo.ExitBtn:Show()
   
-  GR_GUI.Accept:Hide()
   Main.HeaderInfo.Multi.ReInvite:Hide()
   Main.HeaderInfo.Multi.ReMatch:Hide()
   Main.HeaderInfo.Multi.Rival:Hide()
@@ -853,7 +855,7 @@ end
 
 
 
-
--- fix resize
+-- standard solo game header
+-- fix resize for games
 -- fix show / hide
 -- standardize game header bar
