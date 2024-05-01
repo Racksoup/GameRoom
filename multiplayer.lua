@@ -487,26 +487,33 @@ function GR:ToggleInviteTab()
     normal(Invite.Tab.Friends)
     normal(Invite.Tab.Party)
     normal(Invite.Tab.Zone)
+    GR:HideSelectedButtons(Invite.Server.Btns)
   end
   if (tabIndex == "friends") then
     normal(Invite.Tab.Server)
     active(Invite.Tab.Friends)
     normal(Invite.Tab.Party)
     normal(Invite.Tab.Zone)
+    GR:HideSelectedButtons(Invite.Friends.Btns)
   end
   if (tabIndex == "party") then
     normal(Invite.Tab.Server)
     normal(Invite.Tab.Friends)
     active(Invite.Tab.Party)
     normal(Invite.Tab.Zone)
+    GR:HideSelectedButtons(Invite.Party.Btns)
   end
   if (tabIndex == "zone") then
     normal(Invite.Tab.Server)
     normal(Invite.Tab.Friends)
     normal(Invite.Tab.Party)
     active(Invite.Tab.Zone)
+    GR:HideSelectedButtons(Invite.Zone.Btns)
   end
-
+  
+  GR:DisableMultiGameButtons()
+  GR.Target = nil
+  GR_GUI.Main.Tab3.InviteText:SetText("Challenge...")
 end
 
 function GR:DisableMultiGameButtons()

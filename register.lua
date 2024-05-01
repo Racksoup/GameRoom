@@ -155,10 +155,7 @@ function GR:RefreshFriendsListUI()
         GR_GUI.Main.Tab3.GameButtons:Show()
         GR:EnableMultiGameButtons()
         -- hide/show Btns selection texture
-        for j,k in ipairs(Btns) do
-          local x, tex = k:GetRegions()
-          tex:Hide()
-        end
+        GR:HideSelectedButtons(Btns)
         Btns[i].Tex:Show()
       end
     end)
@@ -398,10 +395,7 @@ function GR:RefreshZoneList()
         GR_GUI.Main.Tab3.GameButtons:Show()
         GR:EnableMultiGameButtons()
         -- hide/show Btns selection texture
-        for j,k in ipairs(Btns) do
-          local x, tex = k:GetRegions()
-          tex:Hide()
-        end
+        GR:HideSelectedButtons(Btns)
         Btns[i].Tex:Show()
       end
     end)
@@ -608,10 +602,7 @@ function GR:RefreshGuildGroupListUI()
         GR_GUI.Main.Tab3.GameButtons:Show()
         GR:EnableMultiGameButtons()
         -- hide/show Btns selection texture
-        for j,k in ipairs(Btns) do
-          local x, tex = k:GetRegions()
-          tex:Hide()
-        end
+        GR:HideSelectedButtons(Btns)
         Btns[i].Tex:Show()
       end
     end)
@@ -707,10 +698,7 @@ function GR:RefreshServerListUI()
         GR_GUI.Main.Tab3.InviteText:Show()
         GR_GUI.Main.Tab3.GameButtons:Show()
         GR:EnableMultiGameButtons()
-        for j,k in ipairs(Btns) do
-          local x, tex = k:GetRegions()
-          tex:Hide()
-        end
+        GR:HideSelectedButtons(Btns)
         Btns[i].Tex:Show()
       end
     end)
@@ -735,4 +723,12 @@ function GR:RegisterPlayers(...)
   GR:RegisterFriendResponseReceived(text)
 
   GR:RegisterServerResponseReceived(text)
+end
+
+-- hide selected buttons
+function GR:HideSelectedButtons(Btns)
+  for j,k in ipairs(Btns) do
+    local x, tex = k:GetRegions()
+    tex:Hide()
+  end
 end
