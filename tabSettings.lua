@@ -439,7 +439,7 @@ function GR:CreateListControls()
   end)
 end
 
--- Resize
+-- Size
 function GR:SizeTabSettings()
   local Main = GR_GUI.Main
   local Tab4 = Main.Tab4

@@ -99,8 +99,8 @@ function GR:OnInitialize()
   GR:SuikaCreate()
   GR:CreateMinesweepers()
 
-  GR:ResizeMain()
-  GR:ResizeAllGames()
+  GR:SizeMain()
+  GR:SizeAllGames()
   
   GR.db.realm.tab = "solo"
   GR:TabSelect()
@@ -166,8 +166,8 @@ function GR:CreateMainWindow()
   end)
   ResizeBtn:SetScript("OnMouseUp", function()
     Main:StopMovingOrSizing("BOTTOMRIGHT")
-    GR:ResizeMain()
-    GR:ResizeAllGames()
+    GR:SizeMain()
+    GR:SizeAllGames()
   end)
   
   -- Game Room Title
@@ -378,11 +378,11 @@ function GR:CreateAcceptDecline()
   AcceptMover:Hide()
 end
 
--- Resize
-function GR:ResizeMain()
+-- Size
+function GR:SizeMain()
   local Main = GR_GUI.Main
 
-  -- Resize Main Ratios
+  -- Size Main Ratios
   -- In Game
   if (GR.db.realm.tab == "game") then
     if (GR.GameType == 'Suika') then 
@@ -425,13 +425,13 @@ function GR:ResizeMain()
     Main.ScreenRatio = (Main.XRatio + Main.YRatio) / 2
   end
   
-  GR:ResizeHeaderInfo()
-  GR:ResizeTabSoloGames()
+  GR:SizeHeaderInfo()
+  GR:SizeTabSoloGames()
   GR:SizeTabMultiGames()
   GR:SizeTabSettings()
 end
 
-function GR:ResizeHeaderInfo()
+function GR:SizeHeaderInfo()
   -- Frame
   local Main = GR_GUI.Main
   local HeaderInfo = GR_GUI.Main.HeaderInfo
@@ -495,9 +495,9 @@ function GR:ResizeHeaderInfo()
   Main.ExitBtn:SetSize(100 * Main.XRatio, 30 * Main.YRatio)
 end
 
-function GR:ResizeAllGames()
+function GR:SizeAllGames()
   GR:SizeTictactoe()
-  GR:ResizeBattleships()
+  GR:SizeBattleships()
   GR:SizeAsteroids()
   GR:SnakeSize()
   GR:SizeBC()
@@ -537,7 +537,7 @@ function GR:TabSelect()
     Main:SetSize(Width, Height)
     Main:SetResizeBounds(BoundX, BoundY)
 
-    GR:ResizeMain()
+    GR:SizeMain()
     
     if (GR.GameType == "Asteroids") then
       Main.Asteroids:Show()
@@ -567,7 +567,7 @@ function GR:TabSelect()
     Main:SetSize(GR.Win.Const.Tab2Width, GR.Win.Const.Tab2Height)
     Main:SetResizeBounds(GR.Win.Const.Tab2Width, GR.Win.Const.Tab2Height)
 
-    GR:ResizeMain()
+    GR:SizeMain()
 
     Main.Tab2:Show()
     Main.H2:SetText("Single Player Games")
@@ -578,7 +578,7 @@ function GR:TabSelect()
     Main:SetSize(GR.Win.Const.Tab3Width, GR.Win.Const.Tab3Height)
     Main:SetResizeBounds(GR.Win.Const.Tab3Width, GR.Win.Const.Tab3Height)
     
-    GR:ResizeMain()
+    GR:SizeMain()
 
     Main.Tab3:Show()
     Main.Tab3.Invite.ServerScrollFrame:Show()
@@ -593,7 +593,7 @@ function GR:TabSelect()
     Main:SetSize(GR.Win.Const.Tab4Width, GR.Win.Const.Tab4Height)
     Main:SetResizeBounds(GR.Win.Const.Tab4Width, GR.Win.Const.Tab4Height)
   
-    GR:ResizeMain()
+    GR:SizeMain()
 
     Main.Tab4:Show()
     Main.H2:SetText("Settings")
@@ -780,7 +780,7 @@ function GR:ShowMain()
 
   SizeMain()
 
-  GR:ResizeMain()
+  GR:SizeMain()
 end
 
 -- Extra

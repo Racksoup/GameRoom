@@ -292,7 +292,7 @@ function GR:CreateAsteroidsTimer()
   GR:SizeAsteroidsTimer()
 end
 
--- resize
+-- Size
 function GR:SizeAsteroids()
   local Main = GR_GUI.Main
   local Asteroids = GR_GUI.Main.Asteroids

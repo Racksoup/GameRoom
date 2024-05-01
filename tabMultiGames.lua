@@ -316,7 +316,7 @@ function GR:CreateInviteTab()
   end)
 end
 
--- Resize
+-- Size
 function GR:SizeTabMultiGames()
   local Main = GR_GUI.Main
   local Tab3 = Main.Tab3

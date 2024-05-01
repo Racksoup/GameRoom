@@ -421,7 +421,7 @@ function GR:CreateLegend()
 end 
 
 -- redraw
-function GR:ResizeBattleships()
+function GR:SizeBattleships()
   local Battleships = GR_GUI.Main.Battleships
   local Board = GR_GUI.Main.Battleships.Board
   local VLines = GR_GUI.Main.Battleships.VLines
@@ -439,7 +439,7 @@ function GR:ResizeBattleships()
   local WidthRatio = Battleships:GetWidth() / 770
   local HeightRatio = Battleships:GetHeight() / 450
 
-  -- resize Game Window
+  -- Size Game Window
   if (GR.Phase == 1) then
     Board:SetSize(Battleships:GetWidth() * (570 / 770), Battleships:GetHeight() * (450 / 450))
   end 
@@ -447,14 +447,14 @@ function GR:ResizeBattleships()
     Board:SetSize(Battleships:GetWidth() * (380 / 770), Battleships:GetHeight() * (420 / 450))
   end
   OppBoard:SetSize(Battleships:GetWidth() * (380 / 770), Battleships:GetHeight() * (420 / 450))
-  -- resize lines and buttons
+  -- Size lines and buttons
   GR:RedrawBattleshipLinesAndButtons(Board, VLines, HLines, Buttons, Board:GetWidth(), Board:GetHeight())
   GR:RedrawBattleshipLinesAndButtons(OppBoard, OppVLines, OppHLines, OppButtons, OppBoard:GetWidth(), OppBoard:GetHeight())
-  -- resize Ships, Legend
-  GR:ResizeShips(Board)
-  GR:ResizeLegend()
+  -- Size Ships, Legend
+  GR:SizeShips(Board)
+  GR:SizeLegend()
 
-  -- resize FontStrings
+  -- Size FontStrings
   local FontScale = ((WidthRatio + HeightRatio) / 2)
   Battleships.Board.FS:SetTextScale(FontScale * 1.3)
   Battleships.Board.FS:SetPoint("TOP", 0, 22 * HeightRatio)
@@ -466,11 +466,11 @@ function GR:ResizeBattleships()
   Battleships.ExtraInfo:SetPoint("TOP", 0, 22 * HeightRatio)
   Battleships.ExtraInfo:SetTextScale(FontScale * 1.6)
 
-  -- resize Phase Button
+  -- Size Phase Button
   Battleships.Phase:SetPoint("TOPLEFT", 20 * WidthRatio, 60 * HeightRatio)
   Battleships.Phase:SetSize(230 * WidthRatio, 58 * HeightRatio)
   Battleships.PhaseFS:SetTextScale(FontScale * 1.8)
-  -- resize ShowLegend Button
+  -- Size ShowLegend Button
   Battleships.ShowLegend:SetPoint("TOPRIGHT", -20 * WidthRatio, 60 * HeightRatio)
   Battleships.ShowLegend:SetSize(230 * WidthRatio, 58 * HeightRatio)
   Battleships.ShowLegendFS:SetTextScale(FontScale * 1.8)
@@ -546,7 +546,7 @@ function GR:RedrawBattleshipLinesAndButtons(Content, VLines, HLines, Buttons, x,
   end
 end
 
-function GR:ResizeShips(Board)
+function GR:SizeShips(Board)
   local Battleships = GR_GUI.Main.Battleships
   local Ship1 = GR_GUI.Main.Battleships.Ship1
   local Ship2 = GR_GUI.Main.Battleships.Ship2
@@ -590,7 +590,7 @@ function GR:ResizeShips(Board)
   Tex5:SetTexCoord(.14,0, .14,1, .36,0, .36,1)
 end
 
-function GR:ResizeLegend()
+function GR:SizeLegend()
   local Battleships = GR_GUI.Main.Battleships
   local Legend = GR_GUI.Main.Battleships.Legend
   
@@ -1424,8 +1424,8 @@ function GR:BattleshipsShow()
   Battleships.Ship5:Show()
   Battleships.Ship5:SetMovable(true)
   Battleships.Ship5:EnableMouse(true)
-  GR:ResizeShips(Battleships.Board)
-  GR:ResizeBattleships(Battleships.Board)
+  GR:SizeShips(Battleships.Board)
+  GR:SizeBattleships(Battleships.Board)
 end
 
 function GR:OverlapingSquares(Rect1, Rect2)

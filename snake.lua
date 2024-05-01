@@ -164,7 +164,7 @@ function GR:CreateSnakeApple()
   Apple:Hide()
 end
 
--- Resize
+-- Size
 function GR:SnakeSize()
   local Snake = GR_GUI.Main.Snake
 
