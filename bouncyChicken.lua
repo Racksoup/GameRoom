@@ -48,7 +48,6 @@ function GR:CreateBouncyChicken()
   -- Create
   GR:CreateBCGameLoop()
   GR:ControlsBC()
-  GR:CreateBCActiveStatusBtns()
   GR:CreateBCInfo()
   GR:CreateBCWalls()
   GR:CreateBCChicken()
@@ -64,60 +63,6 @@ function GR:CreateBCGameLoop()
     GR:UpdateBC(self, elapsed)
   end)
   Game:Hide()
-end
-
-function GR:CreateBCActiveStatusBtns()
-  local Main = GR_GUI.Main
-  local BC = GR_GUI.Main.BC
-
-  -- Start / Unpause
-  BC.Start = CreateFrame("Button", Start, Main)
-  BC.Start.Line1 = BC.Start:CreateLine()
-  BC.Start.Line1:SetColorTexture(0,1,0, 1)
-  BC.Start.Line2 = BC.Start:CreateLine()
-  BC.Start.Line2:SetColorTexture(0,1,0, 1)
-  BC.Start.Line3 = BC.Start:CreateLine()
-  BC.Start.Line3:SetColorTexture(0,1,0, 1)
-  BC.Start:SetScript("OnClick", function(self, button, down) 
-    if (button == "LeftButton" and down == false) then
-      if (GR.BC.ActiveState == "Stop" or GR.BC.ActiveState == "Start") then
-        GR.BC.ActiveState = "Start"
-        GR.BCStart()
-      end
-      if (GR.BC.ActiveState == "Pause") then
-        GR.BC.ActiveState = "Start"
-        GR.BCUnpause()
-      end
-    end
-  end)
-  BC.Start:Hide()
-  
-  -- Stop
-  BC.Stopx = CreateFrame("Button", Stopx, Main)
-  BC.Stopx.Tex = BC.Stopx:CreateTexture()
-  BC.Stopx.Tex:SetColorTexture(1,0,0, 1)
-  BC.Stopx.Tex:SetPoint("CENTER")
-  BC.Stopx:SetScript("OnClick", function(self, button, down) 
-    if (button == "LeftButton" and down == false) then
-      BC.ActiveState = "Stop"
-      GR:BCStop()
-    end
-  end)
-  BC.Stopx:Hide()
-  
-  -- Pause
-  BC.Pausex = CreateFrame("Button", Pausex, Main)
-  BC.Pausex.Tex1 = BC.Pausex:CreateTexture()
-  BC.Pausex.Tex1:SetColorTexture(1,1,0, 1)
-  BC.Pausex.Tex2 = BC.Pausex:CreateTexture()
-  BC.Pausex.Tex2:SetColorTexture(1,1,0, 1)
-  BC.Pausex:SetScript("OnClick", function(self, button, down) 
-    if (button == "LeftButton" and down == false) then
-      BC.ActiveState = "Pause"
-      GR:BCPause()
-    end
-  end)
-  BC.Pausex:Hide()
 end
 
 function GR:CreateBCInfo()
@@ -191,43 +136,9 @@ function GR:SizeBC()
   GR.BC.YRatio = BC:GetHeight() / GR.Win.Const.GameScreenHeight
   GR.BC.ScreenRatio = (BC:GetWidth() / GR.Win.Const.GameScreenWidth + BC:GetHeight() / GR.Win.Const.GameScreenHeight) / 2
 
-  GR:SizeBCActiveStatusBtns()
   GR:SizeBCInfo()
   GR:SizeBCWalls()
   GR:SizeBCChicken()
-end
-
-function GR:SizeBCActiveStatusBtns()
-  local BC = GR_GUI.Main.BC
-  local XRatio = GR.BC.XRatio
-  local YRatio = GR.BC.YRatio
-  local ScreenRatio = GR.BC.ScreenRatio
-  
-  -- Start
-  BC.Start:SetPoint("TOPLEFT", BC, 50 * XRatio, 34 * YRatio)
-  BC.Start:SetSize(30 * XRatio, 30 * YRatio)
-  BC.Start.Line1:SetStartPoint("CENTER", -8 * XRatio, 8 * YRatio)
-  BC.Start.Line1:SetEndPoint("CENTER", 8 * XRatio, 0)
-  BC.Start.Line1:SetThickness(3 * ScreenRatio)
-  BC.Start.Line2:SetStartPoint("CENTER", -8 * XRatio, -8 * YRatio)
-  BC.Start.Line2:SetEndPoint("CENTER", 8 * XRatio, 0)
-  BC.Start.Line2:SetThickness(3 * ScreenRatio)
-  BC.Start.Line3:SetStartPoint("CENTER", -8 * XRatio, -8 * YRatio)
-  BC.Start.Line3:SetEndPoint("CENTER", -8 * XRatio, 8 * YRatio)
-  BC.Start.Line3:SetThickness(3 * ScreenRatio)
-
-  -- Stop
-  BC.Stopx:SetPoint("TOPLEFT", BC, 83 * XRatio, 34 * YRatio)
-  BC.Stopx:SetSize(30 * XRatio, 30 * YRatio)
-  BC.Stopx.Tex:SetSize(15 * XRatio, 15 * YRatio)
-  
-  -- Unpause
-  BC.Pausex:SetPoint("TOPLEFT", BC, 50 * XRatio, 34 * YRatio)
-  BC.Pausex:SetSize(30 * XRatio, 30 * YRatio)
-  BC.Pausex.Tex1:SetSize(6 * XRatio, 15 * YRatio)
-  BC.Pausex.Tex1:SetPoint("CENTER", -6 * XRatio, 0)
-  BC.Pausex.Tex2:SetSize(6 * XRatio, 15 * YRatio)
-  BC.Pausex.Tex2:SetPoint("CENTER", 6 * XRatio, 0)
 end
 
 function GR:SizeBCInfo()
@@ -456,9 +367,6 @@ function GR:BCHide()
   GR:BCStop()
 
   BC:Hide()
-  BC.Start:Hide()
-  BC.Stopx:Hide()
-  BC.Pausex:Hide()
   BC.Timer:Hide()
   BC.PointsFS:Hide()
   BC.GameOverFS:Hide()
@@ -471,7 +379,7 @@ function GR:BCShow()
   GR:SizeBC()
 
   BC:Show()
-  BC.Start:Show()
+  GR_GUI.Main.HeaderInfo.Solo.Start:Show()
   BC.Timer:Show()
   BC.PointsFS:Show()
   BC.GameOverFS:Hide()
@@ -481,6 +389,7 @@ end
 -- Start Stop Pause Unpause
 function GR:BCStart()
   local BC = GR_GUI.Main.BC
+  local Solo = GR_GUI.Main.HeaderInfo.Solo
   local Walls = GR_GUI.Main.BC.Walls
 
   for i = 1, #Walls, 1 do
@@ -505,41 +414,44 @@ function GR:BCStart()
   -- Show Game Info and Buttons
   GR.BC.ActiveState = "Start"
   BC.PointsFS:SetText(GR.BC.Points)
-  BC.Stopx:Show()
-  BC.Pausex:Show()
-  BC.Start:Hide()
+  Solo.Stopx:Show()
+  Solo.Pausex:Show()
+  Solo.Start:Hide()
   BC.GameOverFS:Hide()
 end
 
 function GR:BCStop()
   local BC = GR_GUI.Main.BC
+  local Solo = GR_GUI.Main.HeaderInfo.Solo
   local Walls = BC.Walls
 
   GR.BC.ActiveState = "Stop"
   BC.Game:Hide()
-  BC.Start:Show()
-  BC.Pausex:Hide()
-  BC.Stopx:Hide()
+  Solo.Start:Show()
+  Solo.Pausex:Hide()
+  Solo.Stopx:Hide()
 end
 
 function GR:BCPause()
   local BC = GR_GUI.Main.BC
+  local Solo = GR_GUI.Main.HeaderInfo.Solo
 
   GR.BC.ActiveState = "Pause"
-  BC.Start:Show()
-  BC.Pausex:Hide()
-  BC.Stopx:Hide()
+  Solo.Start:Show()
+  Solo.Pausex:Hide()
+  Solo.Stopx:Hide()
 
   BC.Game:Hide()
 end
 
 function GR:BCUnpause()
   local BC = GR_GUI.Main.BC
+  local Solo = GR_GUI.Main.HeaderInfo.Solo
 
   GR.BC.ActiveState = "Start"
-  BC.Start:Hide()
-  BC.Pausex:Show()
-  BC.Stopx:Show()
+  Solo.Start:Hide()
+  Solo.Pausex:Show()
+  Solo.Stopx:Show()
 
   BC.Game:Show()
 end

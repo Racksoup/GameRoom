@@ -300,19 +300,31 @@ function GR:HeaderSoloStart()
   if (GR.GameType == "Snake") then
     GR:SnakeStart()
   end
+  if (GR.GameType == "Bouncy Chicken") then
+    GR:BCStart()
+  end
 end
 function GR:HeaderSoloStop()
   if (GR.GameType == "Snake") then
     GR:SnakeStop()
+  end
+  if (GR.GameType == "Bouncy Chicken") then
+    GR:BCStop()
   end
 end
 function GR:HeaderSoloPause()
   if (GR.GameType == "Snake") then
     GR:SnakePause()
   end
+  if (GR.GameType == "Bouncy Chicken") then
+    GR:BCPause()
+  end
 end
 function GR:HeaderSoloUnpause()
   if (GR.GameType == "Snake") then
     GR:SnakeUnpause()
+  end
+  if (GR.GameType == "Bouncy Chicken") then
+    GR:BCUnpause()
   end
 end
