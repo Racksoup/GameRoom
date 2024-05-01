@@ -215,7 +215,7 @@ function GR:AcceptGameClicked()
   end
 
   -- show game
-  GR.db.realm.tab = 1
+  GR.db.realm.tab = "game"
   GR:TabSelect()
 end
 
@@ -288,7 +288,7 @@ function GR:AcceptGameInvite(text, distribution)
       end
       
       -- show game
-      GR.db.realm.tab = 1
+      GR.db.realm.tab = "game"
       GR:TabSelect()
     end
   end
@@ -377,7 +377,7 @@ function GR:ExitGameClicked()
 
   GR_GUI.Main.ExitBtn:Hide()
   GR.GameType = nil
-  GR.db.realm.tab = 2
+  GR.db.realm.tab = "solo"
   GR:TabSelect()
 end
 

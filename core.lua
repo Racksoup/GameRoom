@@ -102,7 +102,7 @@ function GR:OnInitialize()
   GR:ResizeMain()
   GR:ResizeAllGames()
   
-  GR.db.realm.tab = 2
+  GR.db.realm.tab = "solo"
   GR:TabSelect()
 
   GR:RegisterComm("GameRoom_Reg", function(...) GR:RegisterPlayers(...) end)
@@ -187,7 +187,7 @@ function GR:CreateMainWindow()
   TabButton1:SetPoint("BOTTOMLEFT", 10, -30)
   TabButton1:SetText("Solo")
   TabButton1:SetScript("OnClick", function()
-    GR.db.realm.tab = 2 
+    GR.db.realm.tab = "solo" 
     GR:TabSelect()
   end)
   
@@ -196,7 +196,7 @@ function GR:CreateMainWindow()
   TabButton2:SetPoint("BOTTOMLEFT", 90, -30)
   TabButton2:SetText("Multi")
   TabButton2:SetScript("OnClick", function()
-    GR.db.realm.tab = 3 
+    GR.db.realm.tab = "multi" 
     GR:TabSelect()
   end)
 
@@ -205,7 +205,7 @@ function GR:CreateMainWindow()
   TabButton3:SetPoint("BOTTOMLEFT", 170, -30)
   TabButton3:SetText("Settings")
   TabButton3:SetScript("OnClick", function()
-    GR.db.realm.tab = 4 
+    GR.db.realm.tab = "settings"
     GR:TabSelect()
   end)
 
@@ -287,13 +287,13 @@ function GR:CreateHeaderInfo()
           if (GR.GameType == "Tictactoe") then
               GR:TicTacToeHideContent()
               GR:SendCommMessage("GameRoom_Inv", "TicTacToe_Accept, " .. Rand .. ", " .. UnitName("Player"), "WHISPER", Opponent)
-              GR.db.realm.tab = 1
+              GR.db.realm.tab = "game"
               GR:TabSelect()
             end
             if (GR.GameType == "Battleships") then
               GR:BattleshipsHideContent()
               GR:SendCommMessage("GameRoom_Inv", "Battleships_Accept, " .. Rand .. ", " .. UnitName("player"), "WHISPER", Opponent)
-              GR.db.realm.tab = 1
+              GR.db.realm.tab = "game"
               GR:TabSelect()
           end
       end
@@ -384,7 +384,7 @@ function GR:ResizeMain()
 
   -- Resize Main Ratios
   -- In Game
-  if (GR.db.realm.tab == 1) then
+  if (GR.db.realm.tab == "game") then
     if (GR.GameType == 'Suika') then 
       Main.XRatio = Main:GetWidth() / GR.Win.Const.SuikaScreenWidth
       Main.YRatio = Main:GetHeight() / GR.Win.Const.SuikaScreenHeight
@@ -407,19 +407,19 @@ function GR:ResizeMain()
     Main.ScreenRatio = (Main.XRatio + Main.YRatio) / 2
   end
   -- Solo Games
-  if (GR.db.realm.tab == 2) then
+  if (GR.db.realm.tab == "solo") then
     Main.XRatio = Main:GetWidth() / GR.Win.Const.Tab2Width 
     Main.YRatio = Main:GetHeight() / GR.Win.Const.Tab2Height
     Main.ScreenRatio = (Main.XRatio + Main.YRatio) / 2
   end
   -- Mutli Games
-  if (GR.db.realm.tab == 3) then
+  if (GR.db.realm.tab == "multi") then
     Main.XRatio = Main:GetWidth() / GR.Win.Const.Tab3Width 
     Main.YRatio = Main:GetHeight() / GR.Win.Const.Tab3Height
     Main.ScreenRatio = (Main.XRatio + Main.YRatio) / 2
   end
   -- Settings
-  if (GR.db.realm.tab == 4) then
+  if (GR.db.realm.tab == "settings") then
     Main.XRatio = Main:GetWidth() / GR.Win.Const.Tab4Width 
     Main.YRatio = Main:GetHeight() / GR.Win.Const.Tab4Height
     Main.ScreenRatio = (Main.XRatio + Main.YRatio) / 2
@@ -433,7 +433,7 @@ function GR:ResizeMainNoRatioChange()
   local HeaderInfo = Main.HeaderInfo
 
   -- Main
-  if (GR.db.realm.tab == 2 or GR.db.realm.tab == 3 or GR.db.realm.tab == 4) then
+  if (GR.db.realm.tab == "solo" or GR.db.realm.tab == "multi" or GR.db.realm.tab == "settings") then
     Main.H2:SetPoint("TOP", 0, -38 * Main.YRatio)
   else
     if (GR.GameType == "Bouncy Chicken") then
@@ -524,7 +524,7 @@ function GR:TabSelect()
   Main.Tab4:Hide() 
   
   -- In Game
-  if (tab == 1) then
+  if (tab == "game") then
     local Width, Height, BoundX, BoundY
     
     if (GR.GameType == "Suika") then
@@ -568,7 +568,7 @@ function GR:TabSelect()
     end
   end
   -- Solo Games
-  if (tab == 2) then
+  if (tab == "solo") then
     Main:SetSize(GR.Win.Const.Tab2Width, GR.Win.Const.Tab2Height)
     Main:SetResizeBounds(GR.Win.Const.Tab2Width, GR.Win.Const.Tab2Height)
 
@@ -579,7 +579,7 @@ function GR:TabSelect()
     Main.H2:Show()
   end
   -- Multiplayer Games
-  if (tab == 3) then
+  if (tab == "multi") then
     Main:SetSize(GR.Win.Const.Tab3Width, GR.Win.Const.Tab3Height)
     Main:SetResizeBounds(GR.Win.Const.Tab3Width, GR.Win.Const.Tab3Height)
     
@@ -594,7 +594,7 @@ function GR:TabSelect()
     Main.H2:Show()
   end
   -- Settings
-  if (tab == 4) then
+  if (tab == "settings") then
     Main:SetSize(GR.Win.Const.Tab4Width, GR.Win.Const.Tab4Height)
     Main:SetResizeBounds(GR.Win.Const.Tab4Width, GR.Win.Const.Tab4Height)
   
@@ -656,7 +656,7 @@ function GR:ToggleTab()
     tab.RightHighlight:Show() 
   end
   
-  if (tabIndex == 1) then
+  if (tabIndex == "game") then
     tab1:Hide()
     tab2:Hide()
     tab3:Hide()
@@ -665,17 +665,17 @@ function GR:ToggleTab()
     tab2:Show()
     tab3:Show()
   end
-  if (tabIndex == 2) then
+  if (tabIndex == "solo") then
     active(tab1)
     normal(tab2)
     normal(tab3)
   end
-  if (tabIndex == 3) then
+  if (tabIndex == "multi") then
     normal(tab1)
     active(tab2)
     normal(tab3)
   end
-  if (tabIndex == 4) then
+  if (tabIndex == "settings") then
     normal(tab1)
     normal(tab2)
     active(tab3)
@@ -735,7 +735,7 @@ function GR:ShowSoloGame()
   GR_GUI.Main.ExitBtn:Show()
   GR_GUI.Main.H2:SetText(GR.GameType)
 
-  GR.db.realm.tab = 1
+  GR.db.realm.tab = "game"
   GR:TabSelect()
 end
 
@@ -752,16 +752,16 @@ function GR:ShowMain()
   local Main = GR_GUI.Main
 
   local function SizeMain()
-    if (GR.db.realm.tab == 1) then 
+    if (GR.db.realm.tab == "game") then 
       Main:SetSize(GR.Win.Const.Tab1Width, GR.Win.Const.Tab1Height)
     end
-    if (GR.db.realm.tab == 2) then 
+    if (GR.db.realm.tab == "solo") then 
       Main:SetSize(GR.Win.Const.Tab2Width, GR.Win.Const.Tab2Height)
     end
-    if (GR.db.realm.tab == 3) then 
+    if (GR.db.realm.tab == "multi") then 
       Main:SetSize(GR.Win.Const.Tab3Width, GR.Win.Const.Tab3Height)
     end
-    if (GR.db.realm.tab == 4) then 
+    if (GR.db.realm.tab == "settings") then 
       Main:SetSize(GR.Win.Const.Tab4Width, GR.Win.Const.Tab4Height)
     end
   end

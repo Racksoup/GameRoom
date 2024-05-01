@@ -143,7 +143,7 @@ function GR:TicTacToeEndGame()
   GR_GUI.Main.HeaderInfo:Hide()
   GR_GUI.Main.ExitBtn:Hide()
 
-  GR.db.realm.tab = 2
+  GR.db.realm.tab = "game"
   GR:TabSelect()
 end
 

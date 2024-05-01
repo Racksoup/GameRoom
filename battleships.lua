@@ -1354,7 +1354,7 @@ function GR:BattleshipsEndGame()
   GR.IsChallenged = false
   GR.Opponent = nil
 
-  GR.db.realm.tab = 2
+  GR.db.realm.tab = "solo"
   GR:TabSelect()
 end
 
