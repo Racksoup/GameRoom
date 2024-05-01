@@ -20,6 +20,24 @@ function GR:CreateGameButtons()
   Tab3.InviteText = Tab3:CreateFontString(nil, "ARTWORK", "GameTooltipText")
   Tab3.InviteText:SetText("Challenge ...")
 
+  local function unselect()
+    GR.Target = nil
+    local tabIndex = Tab3.Invite.ActiveTab
+
+    if (tabIndex == "server") then
+      GR:HideSelectedButtons(Tab3.Invite.Server.Btns)
+    end
+    if (tabIndex == "friends") then
+      GR:HideSelectedButtons(Tab3.Invite.Friends.Btns)
+    end
+    if (tabIndex == "party") then
+      GR:HideSelectedButtons(Tab3.Invite.Party.Btns)
+    end
+    if (tabIndex == "zone") then
+      GR:HideSelectedButtons(Tab3.Invite.Zone.Btns)
+    end
+  end
+
   GameButtons.TicTacToeBtn = CreateFrame("Button", "TicTacToeBtn", GameButtons, "UIPanelButtonTemplate")
   local TicTacToeBtn = GameButtons.TicTacToeBtn
   TicTacToeBtn.FS = TicTacToeBtn:CreateFontString(nil, "OVERLAY", "GameTooltipText")
@@ -32,9 +50,10 @@ function GR:CreateGameButtons()
       Tab3.InviteText:SetText("Challenged " .. GR.Target .. " To " .. GR.GameType)
       GR:DisableMultiGameButtons()
       GR:SendGameInvite(self, button, down)
+      unselect()
     end
   end)
-
+  
   GameButtons.BattleshipsBtn = CreateFrame("Button", "BattleshipsBtn", GameButtons, "UIPanelButtonTemplate")
   local BattleshipsBtn = GameButtons.BattleshipsBtn
   BattleshipsBtn.FS = BattleshipsBtn:CreateFontString(nil, "OVERLAY", "GameTooltipText")
@@ -47,6 +66,7 @@ function GR:CreateGameButtons()
       Tab3.InviteText:SetText("Challenged " .. GR.Target .. " To " .. GR.GameType)
       GR:DisableMultiGameButtons()
       GR:SendGameInvite(self, button, down)
+      unselect()
     end
   end)
 end
