@@ -235,6 +235,7 @@ function GR:CreateHeaderInfo()
   end)
   
   GR:CreateHeaderMultiGames()
+  GR:CreateHeaderSoloGames()
 
   HeaderInfo:Hide()
 end
@@ -326,6 +327,15 @@ function GR:CreateHeaderMultiGames()
   end)
 
   Multi:Hide()
+end
+
+function GR:CreateHeaderSoloGames()
+  local HeaderInfo = GR_GUI.Main.HeaderInfo
+
+  -- Solo Frame
+  HeaderInfo.Solo = CreateFrame("Frame", "Solo", HeaderInfo)
+  HeaderInfo.Solo:SetAllPoints(HeaderInfo)
+  local Solo = HeaderInfo.Solo
 end
 
 function GR:CreateAcceptDecline()
@@ -473,24 +483,25 @@ function GR:SizeHeaderInfo()
   ExitBtn:SetSize(100 * Main.XRatio, 30 * Main.YRatio)
   
   GR:SizeHeaderMultiGames()
+  GR:SizeHeaderSoloGames()
 end
 
 function GR:SizeHeaderMultiGames()
   local Main = GR_GUI.Main
-  local HeaderInfo = Main.HeaderInfo
+  local Multi = Main.HeaderInfo.Multi
 
   -- Turn String
-  local TurnString = HeaderInfo.Multi.TurnString
+  local TurnString = Multi.TurnString
   TurnString:SetPoint("TOP", 0, 0 * Main.YRatio)
   TurnString:SetTextScale(2 * Main.ScreenRatio)
 
   -- Opponet String
-  local Opp = HeaderInfo.Multi.OpponentString
+  local Opp = Multi.OpponentString
   Opp:SetPoint("TOPLEFT", 0, -2 * Main.YRatio)
   Opp:SetTextScale(1.5 * Main.ScreenRatio)
 
   -- Reinvite Button
-  local ReInvite = HeaderInfo.Multi.ReInvite
+  local ReInvite = Multi.ReInvite
   ReInvite:SetPoint("TOPRIGHT", -130 * Main.XRatio, 7 * Main.YRatio)
   ReInvite:SetSize(100 * Main.XRatio, 30 * Main.YRatio)
   local ReInviteFS = ReInvite.FS
@@ -498,7 +509,7 @@ function GR:SizeHeaderMultiGames()
   ReInviteFS:SetTextScale(1.1 * Main.ScreenRatio)
 
   -- Rematch Button
-  local ReMatch = HeaderInfo.Multi.ReMatch
+  local ReMatch = Multi.ReMatch
   ReMatch:SetPoint("TOPRIGHT", -130 * Main.XRatio, 7 * Main.YRatio)
   ReMatch:SetSize(100 * Main.XRatio, 30 * Main.YRatio)
   local ReMatchFS = ReMatch.FS
@@ -506,12 +517,17 @@ function GR:SizeHeaderMultiGames()
   ReMatchFS:SetTextScale(1.1 * Main.ScreenRatio)
 
   -- Add Rival Button
-  local Rival = HeaderInfo.Multi.Rival
+  local Rival = Multi.Rival
   Rival:SetPoint("TOPLEFT", 0 * Main.XRatio, 7 * Main.YRatio)
   Rival:SetSize(100 * Main.XRatio, 30 * Main.YRatio)
   local RivalFS = Rival.FS
   RivalFS:SetPoint("CENTER", 0, 0)
   RivalFS:SetTextScale(1.1 * Main.ScreenRatio)
+end
+
+function GR:SizeHeaderSoloGames()
+  local Main = GR_GUI.Main
+  local Solo = Main.HeaderInfo.Solo
 end
 
 function GR:SizeAllGames()
