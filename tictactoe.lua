@@ -71,7 +71,7 @@ function GR:SizeTictactoe()
   Tictactoe:SetPoint("BOTTOM", 0 * Main.XRatio, 17 * Main.YRatio)
   Tictactoe:SetSize(GR.Tic.Width * Main.XRatio, GR.Tic.Height * Main.YRatio)
 
-  Main.HeaderInfo.TurnString:SetPoint("TOP", 0 * Main.XRatio, 0 * Main.YRatio)
+  Main.HeaderInfo.Multi.TurnString:SetPoint("TOP", 0 * Main.XRatio, 0 * Main.YRatio)
 
   Tictactoe.VLine1:SetStartPoint("TOPLEFT", (GR.Tic.Width / 3) * Main.XRatio, 0 * Main.YRatio)
   Tictactoe.VLine1:SetEndPoint("BOTTOMLEFT", (GR.Tic.Width / 3) * Main.XRatio, 0 * Main.YRatio)
@@ -246,11 +246,11 @@ function GR:TicCheckForWin()
       GR.TicBoard[3] ~= 0 and GR.TicBoard[3] == GR.TicBoard[5] and GR.TicBoard[3] == GR.TicBoard[7] 
   ) then
       GR.GameOver = true
-      -- GR_GUI.Main.HeaderInfo.ReInvite:Show()
-      GR_GUI.Main.HeaderInfo.OpponentString:Hide()
+      -- GR_GUI.Main.HeaderInfo.Multi.ReInvite:Show()
+      GR_GUI.Main.HeaderInfo.Multi.OpponentString:Hide()
       -- show add to rival if not in rivals
       -- GR:ShowRivalsBtn()
-      local TurnString = GR_GUI.Main.HeaderInfo.TurnString
+      local TurnString = GR_GUI.Main.HeaderInfo.Multi.TurnString
       if (GR.IsPlayerTurn == false) then
           TurnString:SetText("Win!")
       else

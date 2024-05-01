@@ -840,7 +840,7 @@ function GR:CheckToStartPhase2()
     Battleships.CurrPhase:Hide()
     Battleships.ExtraInfo:SetText("Time to Fight!")
     Battleships.Phase:Hide()
-    GR_GUI.Main.HeaderInfo.TurnString:Show()
+    GR_GUI.Main.HeaderInfo.Multi.TurnString:Show()
     Battleships.OppBoard:Show()
     Battleships.ShowLegend:Show()
 
@@ -1064,25 +1064,25 @@ function GR:BattleshipsCountRemainingSpaces()
     -- if your player 1 or player 2 and your enemy clears your board, you lose. 
     if ((P1SpacesLeft == 0 and GR.PlayerPos == 1) or (P2SpacesLeft == 0 and GR.PlayerPos == 2)) then
       -- Lose
-      GR_GUI.Main.HeaderInfo.TurnString:SetTextColor(1,0,0,1)
-      GR_GUI.Main.HeaderInfo.TurnString:SetText("You lose")
+      GR_GUI.Main.HeaderInfo.Multi.TurnString:SetTextColor(1,0,0,1)
+      GR_GUI.Main.HeaderInfo.Multi.TurnString:SetText("You lose")
       for i,v in ipairs(GR_GUI.Main.Battleships.OppButtons) do
           v:EnableMouse(false)
       end
-      GR_GUI.Main.HeaderInfo.ReInvite:Show()
-      GR_GUI.Main.HeaderInfo.OpponentString:Hide()
+      GR_GUI.Main.HeaderInfo.Multi.ReInvite:Show()
+      GR_GUI.Main.HeaderInfo.Multi.OpponentString:Hide()
       GR:ShowRivalButtons()
     end
     -- if your player 1 or player 2 and you clear your enemies board, you win. 
     if ((P1SpacesLeft == 0 and GR.PlayerPos == 2) or (P2SpacesLeft == 0 and GR.PlayerPos == 1)) then
       -- Win
-      GR_GUI.Main.HeaderInfo.TurnString:SetTextColor(0,1,0,1)
-      GR_GUI.Main.HeaderInfo.TurnString:SetText("You Win!")
+      GR_GUI.Main.HeaderInfo.Multi.TurnString:SetTextColor(0,1,0,1)
+      GR_GUI.Main.HeaderInfo.Multi.TurnString:SetText("You Win!")
       for i,v in ipairs(GR_GUI.Main.Battleships.OppButtons) do
           v:EnableMouse(false)
       end
-      -- GR_GUI.Main.HeaderInfo.ReInvite:Show()
-      GR_GUI.Main.HeaderInfo.OpponentString:Hide()
+      -- GR_GUI.Main.HeaderInfo.Multi.ReInvite:Show()
+      GR_GUI.Main.HeaderInfo.Multi.OpponentString:Hide()
       GR:ShowRivalButtons()
     end
   end
@@ -1384,11 +1384,11 @@ function GR:BattleshipsShow()
   
   GR_GUI.Main.H2:SetText("Battleships")
   Battleships.CurrPhase:SetText("Place your Battleships")
-  GR_GUI.Main.HeaderInfo.TurnString:Hide()
+  GR_GUI.Main.HeaderInfo.Multi.TurnString:Hide()
   GR_GUI.Main.Battleships.ShowLegend:Hide()
-  GR_GUI.Main.HeaderInfo.OpponentString:Show()
+  GR_GUI.Main.HeaderInfo.Multi.OpponentString:Show()
   GR_GUI.Main.Battleships.Legend:Hide()
-  GR_GUI.Main.HeaderInfo.TurnString:SetPoint("TOP", 0, -67 * (GR_GUI.Main:GetHeight() / 750))
+  GR_GUI.Main.HeaderInfo.Multi.TurnString:SetPoint("TOP", 0, -67 * (GR_GUI.Main:GetHeight() / 750))
   
   GR:RedrawBattleshipLinesAndButtons(Battleships.Board, Battleships.VLines, Battleships.HLines, Battleships.Buttons, 570, 450)
   for i,v in ipairs(GR_GUI.Main.Battleships.OppButtons) do

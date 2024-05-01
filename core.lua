@@ -242,18 +242,23 @@ end
 function GR:CreateHeaderMultiGames()
   local HeaderInfo = GR_GUI.Main.HeaderInfo
   
+  -- Multi Frame
+  HeaderInfo.Multi = CreateFrame("Frame", "Multi", HeaderInfo)
+  HeaderInfo.Multi:SetAllPoints(HeaderInfo)
+  local Multi = HeaderInfo.Multi
+
   -- Turn String
-  HeaderInfo.TurnString = HeaderInfo:CreateFontString(nil, "OVERLAY", "GameTooltipText")
-  local TurnString = HeaderInfo.TurnString
+  Multi.TurnString = Multi:CreateFontString(nil, "OVERLAY", "GameTooltipText")
+  local TurnString = Multi.TurnString
 
   -- Opponet String
-  HeaderInfo.OpponentString = HeaderInfo:CreateFontString(nil, "OVERLAY", "GameTooltipText")
-  local Opp = HeaderInfo.OpponentString
+  Multi.OpponentString = Multi:CreateFontString(nil, "OVERLAY", "GameTooltipText")
+  local Opp = Multi.OpponentString
   Opp:SetTextColor(1,1,1, 1)
 
   -- Reinvite Button
-  HeaderInfo.ReInvite = CreateFrame("Button", ReInvite, HeaderInfo, "UIPanelButtonTemplate")
-  local ReInvite = HeaderInfo.ReInvite
+  Multi.ReInvite = CreateFrame("Button", "ReInvite", Multi, "UIPanelButtonTemplate")
+  local ReInvite = Multi.ReInvite
   ReInvite.FS = ReInvite:CreateFontString(nil, "OVERLAY", "GameTooltipText")
   ReInvite.FS:SetTextColor(1,1,1, 1)
   ReInvite.FS:SetText("Rematch?")
@@ -275,8 +280,8 @@ function GR:CreateHeaderMultiGames()
   end)
 
   -- Rematch Button
-  HeaderInfo.ReMatch = CreateFrame("Button", ReMatch, HeaderInfo, "UIPanelButtonTemplate")
-  local ReMatch = HeaderInfo.ReMatch
+  Multi.ReMatch = CreateFrame("Button", "ReMatch", Multi, "UIPanelButtonTemplate")
+  local ReMatch = Multi.ReMatch
   ReMatch.FS = ReMatch:CreateFontString(nil, "OVERLAY", "GameTooltipText")
   local ReMatchFS = ReMatch.FS
   ReMatchFS:SetTextColor(1,1,1, 1)
@@ -307,8 +312,8 @@ function GR:CreateHeaderMultiGames()
   end)
 
   -- Add Rival Button
-  HeaderInfo.Rival = CreateFrame("Button", Rival, HeaderInfo, "UIPanelButtonTemplate")
-  local Rival = HeaderInfo.Rival
+  Multi.Rival = CreateFrame("Button", "Rival", Multi, "UIPanelButtonTemplate")
+  local Rival = Multi.Rival
   Rival.FS = Rival:CreateFontString(nil, "OVERLAY", "GameTooltipText")
   local RivalFS = Rival.FS
   RivalFS:SetTextColor(1,1,1, 1)
@@ -473,17 +478,17 @@ function GR:SizeHeaderMultiGames()
   local HeaderInfo = Main.HeaderInfo
 
   -- Turn String
-  local TurnString = HeaderInfo.TurnString
+  local TurnString = HeaderInfo.Multi.TurnString
   TurnString:SetPoint("TOP", 0, 0 * Main.YRatio)
   TurnString:SetTextScale(2 * Main.ScreenRatio)
 
   -- Opponet String
-  local Opp = HeaderInfo.OpponentString
+  local Opp = HeaderInfo.Multi.OpponentString
   Opp:SetPoint("TOPLEFT", 0, -2 * Main.YRatio)
   Opp:SetTextScale(1.5 * Main.ScreenRatio)
 
   -- Reinvite Button
-  local ReInvite = HeaderInfo.ReInvite
+  local ReInvite = HeaderInfo.Multi.ReInvite
   ReInvite:SetPoint("TOPRIGHT", -130 * Main.XRatio, 7 * Main.YRatio)
   ReInvite:SetSize(100 * Main.XRatio, 30 * Main.YRatio)
   local ReInviteFS = ReInvite.FS
@@ -491,7 +496,7 @@ function GR:SizeHeaderMultiGames()
   ReInviteFS:SetTextScale(1.1 * Main.ScreenRatio)
 
   -- Rematch Button
-  local ReMatch = HeaderInfo.ReMatch
+  local ReMatch = HeaderInfo.Multi.ReMatch
   ReMatch:SetPoint("TOPRIGHT", -130 * Main.XRatio, 7 * Main.YRatio)
   ReMatch:SetSize(100 * Main.XRatio, 30 * Main.YRatio)
   local ReMatchFS = ReMatch.FS
@@ -499,7 +504,7 @@ function GR:SizeHeaderMultiGames()
   ReMatchFS:SetTextScale(1.1 * Main.ScreenRatio)
 
   -- Add Rival Button
-  local Rival = HeaderInfo.Rival
+  local Rival = HeaderInfo.Multi.Rival
   Rival:SetPoint("TOPLEFT", 0 * Main.XRatio, 7 * Main.YRatio)
   Rival:SetSize(100 * Main.XRatio, 30 * Main.YRatio)
   local RivalFS = Rival.FS
@@ -691,7 +696,7 @@ function GR:ToggleTab()
 end
 
 function GR:SetTurnString()
-    local TurnString = GR_GUI.Main.HeaderInfo.TurnString
+    local TurnString = GR_GUI.Main.HeaderInfo.Multi.TurnString
     if (GR.GameOver == false) then
         if (GR.IsPlayerTurn) then
             TurnString:SetTextColor(0,1,0,1)
@@ -711,7 +716,7 @@ function GR:ShowRivalsBtn()
         end
     end
     if (InRivals == false) then
-        GR_GUI.Main.HeaderInfo.Rival:Show()
+        GR_GUI.Main.HeaderInfo.Multi.Rival:Show()
     end
 end
 
@@ -722,17 +727,17 @@ function GR:ShowGame()
   GR.InGame = true
 
   Main.HeaderInfo:Show()
-  Main.HeaderInfo.OpponentString:Show()
-  Main.HeaderInfo.TurnString:Show()
+  Main.HeaderInfo.Multi.OpponentString:Show()
+  Main.HeaderInfo.Multi.TurnString:Show()
   Main.HeaderInfo.ExitBtn:Show()
   
-  Accept:Hide()
-  Main.HeaderInfo.ReInvite:Hide()
-  Main.HeaderInfo.ReMatch:Hide()
-  Main.HeaderInfo.Rival:Hide()
+  GR_GUI.Accept:Hide()
+  Main.HeaderInfo.Multi.ReInvite:Hide()
+  Main.HeaderInfo.Multi.ReMatch:Hide()
+  Main.HeaderInfo.Multi.Rival:Hide()
   
   if (GR.Opponent) then 
-    Main.HeaderInfo.OpponentString:SetText("Opponent: " .. GR.Opponent)
+    Main.HeaderInfo.Multi.OpponentString:SetText("Opponent: " .. GR.Opponent)
   end
   GR:SetTurnString()
 end
