@@ -39,7 +39,7 @@ function GR:CreateSnake()
 
   -- Create
   GR:CreateSnakeGameLoop()
-  GR:CreateSnakeStartStop()
+  -- GR:CreateSnakeStartStop()
   GR:CreateSnakeTimer()
   GR:CreateSnakeGrid()
   GR:CreateSnakeApple()
@@ -178,7 +178,7 @@ function GR:SnakeSize()
   Snake.ScreenRatio = ((Snake:GetWidth() / GR.Snake.Const.Width) + (Snake:GetHeight() / GR.Snake.Const.Height)) / 2
 
 
-  GR:SnakeSizeStartStop()
+  -- GR:SnakeSizeStartStop()
   GR:SizeSnakeTimer()
   GR:SizeSnakeGrid()
   GR:SizeSnakeApple()
@@ -264,8 +264,9 @@ end
 -- Start Stop Pause Unpause
 function GR:SnakeStart()
   local Snake = GR_GUI.Main.Snake
+  local Solo = GR_GUI.Main.HeaderInfo.Solo
   local Apple = Snake.Apple
-
+  
   Snake.GameTime = 0
   Snake.Points = 0
   Snake.Dir = "Up"
@@ -278,44 +279,49 @@ function GR:SnakeStart()
   Snake.Tail = {}
   Snake.TailLength = 0
   GR:SnakeMoveApple()
-
+  
   Snake.PointsFS:SetText(Snake.Points)
-
+  
   Snake.Game:Show()
-  Snake.Stopx:Show()
-  Snake.Pausex:Show()
   Snake.Apple:Show()
-  Snake.Start:Hide()
   Snake.GameOverFS:Hide()
+  
+  Solo.Stopx:Show()
+  Solo.Pausex:Show()
+  Solo.Start:Hide()
 end
 
 function GR:SnakeStop()
   local Snake = GR_GUI.Main.Snake
+  local Solo = GR_GUI.Main.HeaderInfo.Solo
   
   Snake.Game:Hide()
-  Snake.Start:Show()
-  Snake.Pausex:Hide()
-  Snake.Stopx:Hide()
+
+  Solo.Start:Show()
+  Solo.Pausex:Hide()
+  Solo.Stopx:Hide()
 end
 
 function GR:SnakePause()
   local Snake = GR_GUI.Main.Snake
-
-  Snake.Start:Show()
-  Snake.Pausex:Hide()
-  Snake.Stopx:Hide()
-
+  local Solo = GR_GUI.Main.HeaderInfo.Solo
+  
   Snake.Game:Hide()
+  
+  Solo.Start:Show()
+  Solo.Pausex:Hide()
+  Solo.Stopx:Hide()
 end
 
 function GR:SnakeUnpause()
   local Snake = GR_GUI.Main.Snake
-
-  Snake.Start:Hide()
-  Snake.Pausex:Show()
-  Snake.Stopx:Show()
+  local Solo = GR_GUI.Main.HeaderInfo.Solo
 
   Snake.Game:Show()
+
+  Solo.Start:Hide()
+  Solo.Pausex:Show()
+  Solo.Stopx:Show()
 end
 
 -- Update

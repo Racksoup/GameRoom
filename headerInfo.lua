@@ -120,6 +120,58 @@ function GR:CreateHeaderSoloGames()
   HeaderInfo.Solo = CreateFrame("Frame", "Solo", HeaderInfo)
   HeaderInfo.Solo:SetAllPoints(HeaderInfo)
   local Solo = HeaderInfo.Solo
+  Solo.OnState = "Stop"
+
+  GR:CreateHeaderSoloStartStop()
+end
+
+function GR:CreateHeaderSoloStartStop()
+  local Solo = GR_GUI.Main.HeaderInfo.Solo
+
+  Solo.Start = CreateFrame("Button", "Start", Solo)
+  Solo.Start.Line1 = Solo.Start:CreateLine()
+  Solo.Start.Line1:SetColorTexture(0,1,0, 1)
+  Solo.Start.Line2 = Solo.Start:CreateLine()
+  Solo.Start.Line2:SetColorTexture(0,1,0, 1)
+  Solo.Start.Line3 = Solo.Start:CreateLine()
+  Solo.Start.Line3:SetColorTexture(0,1,0, 1)
+  Solo.Start:SetScript("OnClick", function(self, button, down) 
+    if (button == "LeftButton" and down == false) then
+      if (Solo.OnState == "Stop" or Solo.OnState == "Start") then
+        Solo.OnState = "Start"
+        GR:HeaderSoloStart()
+      end
+      if (Solo.OnState == "Pause") then
+        Solo.OnState = "Start"
+        GR:HeaderSoloUnpause()
+      end
+    end
+  end)
+
+  Solo.Stopx = CreateFrame("Button", "Stopx", Solo)
+  Solo.Stopx.Tex = Solo.Stopx:CreateTexture()
+  Solo.Stopx.Tex:SetColorTexture(1,0,0, 1)
+  Solo.Stopx.Tex:SetPoint("CENTER")
+  Solo.Stopx:SetScript("OnClick", function(self, button, down) 
+    if (button == "LeftButton" and down == false) then
+      Solo.OnState = "Stop"
+      GR:HeaderSoloStop()
+    end
+  end)
+  Solo.Stopx:Hide()
+  
+  Solo.Pausex = CreateFrame("Button", "Pausex", Solo)
+  Solo.Pausex.Tex1 = Solo.Pausex:CreateTexture()
+  Solo.Pausex.Tex1:SetColorTexture(1,1,0, 1)
+  Solo.Pausex.Tex2 = Solo.Pausex:CreateTexture()
+  Solo.Pausex.Tex2:SetColorTexture(1,1,0, 1)
+  Solo.Pausex:SetScript("OnClick", function(self, button, down) 
+    if (button == "LeftButton" and down == false) then
+      Solo.OnState = "Pause"
+      GR:HeaderSoloPause()
+    end
+  end)
+  Solo.Pausex:Hide()
 end
 
 -- Size
@@ -185,6 +237,36 @@ end
 function GR:SizeHeaderSoloGames()
   local Main = GR_GUI.Main
   local Solo = Main.HeaderInfo.Solo
+
+  GR:SizeHeaderSoloStartStop()
+end
+
+function GR:SizeHeaderSoloStartStop()
+  local Main = GR_GUI.Main
+  local Solo = Main.HeaderInfo.Solo
+  
+  Solo.Start:SetPoint("TOPLEFT", 50 * Main.XRatio, 0 * Main.YRatio)
+  Solo.Start:SetSize(30 * Main.XRatio, 30 * Main.YRatio)
+  Solo.Start.Line1:SetStartPoint("CENTER", -8 * Main.XRatio, 8 * Main.YRatio)
+  Solo.Start.Line1:SetEndPoint("CENTER", 8 * Main.XRatio, 0)
+  Solo.Start.Line1:SetThickness(3 * Main.ScreenRatio)
+  Solo.Start.Line2:SetStartPoint("CENTER", -8 * Main.XRatio, -8 * Main.YRatio)
+  Solo.Start.Line2:SetEndPoint("CENTER", 8 * Main.XRatio, 0)
+  Solo.Start.Line2:SetThickness(3 * Main.ScreenRatio)
+  Solo.Start.Line3:SetStartPoint("CENTER", -8 * Main.XRatio, -8 * Main.YRatio)
+  Solo.Start.Line3:SetEndPoint("CENTER", -8 * Main.XRatio, 8 * Main.YRatio)
+  Solo.Start.Line3:SetThickness(3 * Main.ScreenRatio)
+
+  Solo.Stopx:SetPoint("TOPLEFT", 83 * Main.XRatio, 0 * Main.YRatio)
+  Solo.Stopx:SetSize(30 * Main.XRatio, 30 * Main.YRatio)
+  Solo.Stopx.Tex:SetSize(15 * Main.XRatio, 15 * Main.YRatio)
+  
+  Solo.Pausex:SetPoint("TOPLEFT", 50 * Main.XRatio, 0 * Main.YRatio)
+  Solo.Pausex:SetSize(30 * Main.XRatio, 30 * Main.YRatio)
+  Solo.Pausex.Tex1:SetSize(6 * Main.XRatio, 15 * Main.YRatio)
+  Solo.Pausex.Tex1:SetPoint("CENTER", -6 * Main.XRatio, 0)
+  Solo.Pausex.Tex2:SetSize(6 * Main.XRatio, 15 * Main.YRatio)
+  Solo.Pausex.Tex2:SetPoint("CENTER", 6 * Main.XRatio, 0)
 end
 
 -- Func
@@ -210,5 +292,27 @@ function GR:ShowRivalsBtn()
   end
   if (InRivals == false) then
     GR_GUI.Main.HeaderInfo.Multi.Rival:Show()
+  end
+end
+
+-- Start Stop Pause Unpause
+function GR:HeaderSoloStart()
+  if (GR.GameType == "Snake") then
+    GR:SnakeStart()
+  end
+end
+function GR:HeaderSoloStop()
+  if (GR.GameType == "Snake") then
+    GR:SnakeStop()
+  end
+end
+function GR:HeaderSoloPause()
+  if (GR.GameType == "Snake") then
+    GR:SnakePause()
+  end
+end
+function GR:HeaderSoloUnpause()
+  if (GR.GameType == "Snake") then
+    GR:SnakeUnpause()
   end
 end
