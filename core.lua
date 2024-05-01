@@ -424,33 +424,6 @@ function GR:ResizeMain()
     Main.YRatio = Main:GetHeight() / GR.Win.Const.Tab4Height
     Main.ScreenRatio = (Main.XRatio + Main.YRatio) / 2
   end
-
-  GR:ResizeMainNoRatioChange()
-end
-
-function GR:ResizeMainNoRatioChange()
-  local Main = GR_GUI.Main
-  local HeaderInfo = Main.HeaderInfo
-
-  -- Main
-  if (GR.db.realm.tab == "solo" or GR.db.realm.tab == "multi" or GR.db.realm.tab == "settings") then
-    Main.H2:SetPoint("TOP", 0, -38 * Main.YRatio)
-  else
-    if (GR.GameType == "Bouncy Chicken") then
-      Main.H2:SetPoint("TOP", 0, -50 * Main.YRatio)
-    else
-      Main.H2:SetPoint("TOP", 0, -65 * Main.YRatio)
-    end
-  end
-  Main.H2:SetTextScale(1.7 * Main.ScreenRatio)
-  
-  -- Exit Button
-  if (GR.GameType == "Bouncy Chicken") then
-    Main.ExitBtn:SetPoint("TOPRIGHT", -40 * Main.XRatio, -44 * Main.YRatio)
-  else
-    Main.ExitBtn:SetPoint("TOPRIGHT", -40 * Main.XRatio, -56 * Main.YRatio)
-  end
-  Main.ExitBtn:SetSize(100 * Main.XRatio, 30 * Main.YRatio)
   
   GR:ResizeHeaderInfo()
   GR:ResizeSoloGames()
@@ -498,6 +471,28 @@ function GR:ResizeHeaderInfo()
   local RivalFS = Rival.FS
   RivalFS:SetPoint("CENTER", 0, 0)
   RivalFS:SetTextScale(1.1 * Main.ScreenRatio)
+
+  local HeaderInfo = Main.HeaderInfo
+  
+  -- H2
+  if (GR.db.realm.tab == "solo" or GR.db.realm.tab == "multi" or GR.db.realm.tab == "settings") then
+    Main.H2:SetPoint("TOP", 0, -38 * Main.YRatio)
+  else
+    if (GR.GameType == "Bouncy Chicken") then
+      Main.H2:SetPoint("TOP", 0, -50 * Main.YRatio)
+    else
+      Main.H2:SetPoint("TOP", 0, -65 * Main.YRatio)
+    end
+  end
+  Main.H2:SetTextScale(1.7 * Main.ScreenRatio)
+  
+  -- Exit Button
+  if (GR.GameType == "Bouncy Chicken") then
+    Main.ExitBtn:SetPoint("TOPRIGHT", -40 * Main.XRatio, -44 * Main.YRatio)
+  else
+    Main.ExitBtn:SetPoint("TOPRIGHT", -40 * Main.XRatio, -56 * Main.YRatio)
+  end
+  Main.ExitBtn:SetSize(100 * Main.XRatio, 30 * Main.YRatio)
 end
 
 function GR:ResizeAllGames()
@@ -542,7 +537,7 @@ function GR:TabSelect()
     Main:SetSize(Width, Height)
     Main:SetResizeBounds(BoundX, BoundY)
 
-    GR:ResizeMainNoRatioChange()
+    GR:ResizeMain()
     
     if (GR.GameType == "Asteroids") then
       Main.Asteroids:Show()
@@ -572,7 +567,7 @@ function GR:TabSelect()
     Main:SetSize(GR.Win.Const.Tab2Width, GR.Win.Const.Tab2Height)
     Main:SetResizeBounds(GR.Win.Const.Tab2Width, GR.Win.Const.Tab2Height)
 
-    GR:ResizeMainNoRatioChange()
+    GR:ResizeMain()
 
     Main.Tab2:Show()
     Main.H2:SetText("Single Player Games")
@@ -583,7 +578,7 @@ function GR:TabSelect()
     Main:SetSize(GR.Win.Const.Tab3Width, GR.Win.Const.Tab3Height)
     Main:SetResizeBounds(GR.Win.Const.Tab3Width, GR.Win.Const.Tab3Height)
     
-    GR:ResizeMainNoRatioChange()
+    GR:ResizeMain()
 
     Main.Tab3:Show()
     Main.Tab3.Invite.ServerScrollFrame:Show()
@@ -598,7 +593,7 @@ function GR:TabSelect()
     Main:SetSize(GR.Win.Const.Tab4Width, GR.Win.Const.Tab4Height)
     Main:SetResizeBounds(GR.Win.Const.Tab4Width, GR.Win.Const.Tab4Height)
   
-    GR:ResizeMainNoRatioChange()
+    GR:ResizeMain()
 
     Main.Tab4:Show()
     Main.H2:SetText("Settings")
@@ -785,7 +780,7 @@ function GR:ShowMain()
 
   SizeMain()
 
-  GR:ResizeMainNoRatioChange()
+  GR:ResizeMain()
 end
 
 -- Extra
@@ -836,3 +831,10 @@ end
 -- maybe maybe... comms through bnet for cross-server games with bnet friends (while out of party/raid)
 
 -- highlight selected opponent on multiplayer invite scroll
+
+
+
+
+-- fix resize
+-- fix show / hide
+-- standardize game header bar
