@@ -52,7 +52,7 @@ function GR:CreateAsteroids()
 
   -- Create
   GR:CreateAsteroidsGameLoop()
-  GR:CreateAsteroidsGameButtons()
+  -- GR:CreateAsteroidsGameButtons()
   GR:CreateAsteroidsShip()
   GR:CreateAsteroidsBullets()
   GR:CreateAsteroidsComets()
@@ -112,46 +112,46 @@ function GR:CreateAsteroidsGameLoop()
   Game:Hide()
 end
 
-function GR:CreateAsteroidsGameButtons()
-  local Asteroids = GR_GUI.Main.Asteroids
+-- function GR:CreateAsteroidsGameButtons()
+--   local Asteroids = GR_GUI.Main.Asteroids
 
-  -- pause button
-  Asteroids.PauseBtn = CreateFrame("Button", PauseBtn, Asteroids, "UIPanelButtonTemplate")
-  local PauseBtn = Asteroids.PauseBtn
-  PauseBtn.FS = PauseBtn:CreateFontString(nil, "ARTWORK", "GameTooltipText")
-  PauseBtn.FS:SetPoint("CENTER")
-  PauseBtn.FS:SetTextColor(.8,.8,.8, 1)
-  PauseBtn.FS:SetText("Start")
-  PauseBtn:SetScript("OnClick", function(self, button, down)
-    if (button == "LeftButton" and down == false) then
-      if (GR.Asteroids.Phase == "Stopped") then
-        -- start game
-        GR:AsteroidsStartGame()      
-      elseif (GR.Asteroids.Phase == "Paused") then 
-        -- unpause
-        GR:AsteroidsUnPauseGame()
-      elseif (GR.Asteroids.Phase == "Started") then
-        -- pause game
-        GR:AsteroidsPauseGame()
-      end
-    end
-  end)
+--   -- pause button
+--   Asteroids.PauseBtn = CreateFrame("Button", PauseBtn, Asteroids, "UIPanelButtonTemplate")
+--   local PauseBtn = Asteroids.PauseBtn
+--   PauseBtn.FS = PauseBtn:CreateFontString(nil, "ARTWORK", "GameTooltipText")
+--   PauseBtn.FS:SetPoint("CENTER")
+--   PauseBtn.FS:SetTextColor(.8,.8,.8, 1)
+--   PauseBtn.FS:SetText("Start")
+--   PauseBtn:SetScript("OnClick", function(self, button, down)
+--     if (button == "LeftButton" and down == false) then
+--       if (GR.Asteroids.Phase == "Stopped") then
+--         -- start game
+--         GR:AsteroidsStartGame()      
+--       elseif (GR.Asteroids.Phase == "Paused") then 
+--         -- unpause
+--         GR:AsteroidsUnPauseGame()
+--       elseif (GR.Asteroids.Phase == "Started") then
+--         -- pause game
+--         GR:AsteroidsPauseGame()
+--       end
+--     end
+--   end)
   
-  -- stop button
-  Asteroids.StopBtn = CreateFrame("Button", StopBtn, Asteroids, "UIPanelButtonTemplate")
-  local StopBtn = Asteroids.StopBtn
-  StopBtn.FS = StopBtn:CreateFontString(nil, "ARTWORK", "GameTooltipText")
-  StopBtn.FS:SetPoint("CENTER")
-  StopBtn.FS:SetTextColor(.8,.8,.8, 1)
-  StopBtn.FS:SetText("Stop")
-  StopBtn:SetScript("OnClick", function(self, button, down)
-    if (button == "LeftButton" and down == false) then
-      -- stop game
-      GR:AsteroidsStopGame()
-    end
-  end)
-  StopBtn:Hide()
-end
+--   -- stop button
+--   Asteroids.StopBtn = CreateFrame("Button", StopBtn, Asteroids, "UIPanelButtonTemplate")
+--   local StopBtn = Asteroids.StopBtn
+--   StopBtn.FS = StopBtn:CreateFontString(nil, "ARTWORK", "GameTooltipText")
+--   StopBtn.FS:SetPoint("CENTER")
+--   StopBtn.FS:SetTextColor(.8,.8,.8, 1)
+--   StopBtn.FS:SetText("Stop")
+--   StopBtn:SetScript("OnClick", function(self, button, down)
+--     if (button == "LeftButton" and down == false) then
+--       -- stop game
+--       GR:AsteroidsStopGame()
+--     end
+--   end)
+--   StopBtn:Hide()
+-- end
 
 function GR:CreateAsteroidsShip()
   local Main = GR_GUI.Main
@@ -308,15 +308,15 @@ function GR:SizeAsteroids()
   local WidthRatio = GR.Asteroids.ScreenXRatio
   local HeightRatio = GR.Asteroids.ScreenYRatio
   
-  -- pause button
-  PauseBtn:SetPoint("TOPLEFT", 15 * WidthRatio, 40 * HeightRatio)
-  PauseBtn:SetSize(100 * WidthRatio, 35 * HeightRatio)
-  PauseBtn.FS:SetTextScale(1.8 * ((WidthRatio + HeightRatio) / 2))
+  -- -- pause button
+  -- PauseBtn:SetPoint("TOPLEFT", 15 * WidthRatio, 40 * HeightRatio)
+  -- PauseBtn:SetSize(100 * WidthRatio, 35 * HeightRatio)
+  -- PauseBtn.FS:SetTextScale(1.8 * ((WidthRatio + HeightRatio) / 2))
   
-  -- stop button
-  StopBtn:SetPoint("TOPLEFT", 120 * WidthRatio, 40 * HeightRatio)
-  StopBtn:SetSize(100 * WidthRatio, 35 * HeightRatio)
-  StopBtn.FS:SetTextScale(1.8 * ((WidthRatio + HeightRatio) / 2))
+  -- -- stop button
+  -- StopBtn:SetPoint("TOPLEFT", 120 * WidthRatio, 40 * HeightRatio)
+  -- StopBtn:SetSize(100 * WidthRatio, 35 * HeightRatio)
+  -- StopBtn.FS:SetTextScale(1.8 * ((WidthRatio + HeightRatio) / 2))
   
   GR:SizeAsteroidsShip(WidthRatio, HeightRatio)
   GR:SizeAsteroidsBullets()
@@ -458,11 +458,13 @@ function GR:AsteroidsStartGame()
   local Asteroids = GR_GUI.Main.Asteroids
   local Comets = GR_GUI.Main.Asteroids.Comets
   local Bullets = GR_GUI.Main.Asteroids.Bullets
+  local Solo = GR_GUI.Main.HeaderInfo.Solo
   
   -- game buttons
   GR.Asteroids.Phase = "Started"
-  Asteroids.PauseBtn.FS:SetText("Pause")
-  Asteroids.StopBtn:Show()
+  Solo.Stopx:Show()
+  Solo.Pausex:Show()
+  Solo.Start:Hide()
   
   Asteroids.Timer:SetText("0")
   GR.Asteroids.TimerSave = 0 
@@ -487,11 +489,13 @@ end
 
 function GR:AsteroidsUnPauseGame()
   local Asteroids = GR_GUI.Main.Asteroids
+  local Solo = GR_GUI.Main.HeaderInfo.Solo
 
   -- game buttons
   GR.Asteroids.Phase = "Started"
-  Asteroids.PauseBtn.FS:SetText("Pause")
-  Asteroids.StopBtn:Show()
+  Solo.Start:Hide()
+  Solo.Pausex:Show()
+  Solo.Stopx:Show()
 
   GR.Asteroids.GameTime = GR.Asteroids.TimerSave
   GR.Asteroids.TimerSave = 0
@@ -505,13 +509,15 @@ end
 
 function GR:AsteroidsStopGame()
   local Asteroids = GR_GUI.Main.Asteroids
+  local Solo = GR_GUI.Main.HeaderInfo.Solo
   local Ship = Asteroids.Ship
   local Comets = Asteroids.Comets
 
   -- game buttons
   GR.Asteroids.Phase = "Stopped"
-  Asteroids.PauseBtn.FS:SetText("Start")
-  Asteroids.StopBtn:Hide()
+  Solo.Start:Show()
+  Solo.Pausex:Hide()
+  Solo.Stopx:Hide()
   
   GR.Asteroids.GameTime = GR.Asteroids.TimerSave
   GR.Asteroids.TimerSave = 0
@@ -561,7 +567,9 @@ function GR:AsteroidsPauseGame()
     
   -- game buttons
   GR.Asteroids.Phase = "Paused"
-  Asteroids.PauseBtn.FS:SetText("Start")
+  Solo.Start:Show()
+  Solo.Pausex:Hide()
+  Solo.Stopx:Hide()
 
   GR.Asteroids.TimerSave = GR.Asteroids.GameTime
   

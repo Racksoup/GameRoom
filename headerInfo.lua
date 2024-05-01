@@ -303,6 +303,9 @@ function GR:HeaderSoloStart()
   if (GR.GameType == "Bouncy Chicken") then
     GR:BCStart()
   end
+  if (GR.GameType == "Asteroids") then
+    GR:AsteroidsStartGame()
+  end
 end
 function GR:HeaderSoloStop()
   if (GR.GameType == "Snake") then
@@ -310,6 +313,9 @@ function GR:HeaderSoloStop()
   end
   if (GR.GameType == "Bouncy Chicken") then
     GR:BCStop()
+  end
+  if (GR.GameType == "Asteroids") then
+    GR:AsteroidsStopGame()
   end
 end
 function GR:HeaderSoloPause()
@@ -319,6 +325,9 @@ function GR:HeaderSoloPause()
   if (GR.GameType == "Bouncy Chicken") then
     GR:BCPause()
   end
+  if (GR.GameType == "Asteroids") then
+    GR:AsteroidsPauseGame()
+  end
 end
 function GR:HeaderSoloUnpause()
   if (GR.GameType == "Snake") then
@@ -326,5 +335,8 @@ function GR:HeaderSoloUnpause()
   end
   if (GR.GameType == "Bouncy Chicken") then
     GR:BCUnpause()
+  end
+  if (GR.GameType == "Asteroids") then
+    GR:AsteroidsUnPauseGame()
   end
 end
