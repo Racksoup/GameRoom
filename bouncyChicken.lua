@@ -18,8 +18,6 @@ function GR:CreateBouncyChicken()
   -- Bouncy Chicken Frame
   GR_GUI.Main.BC = CreateFrame("Frame", BouncyChicken, GR_GUI.Main, "ThinBorderTemplate")
   local BC = GR_GUI.Main.BC
-  BC:SetPoint("BOTTOM", 0, 25 * (GR_GUI.Main:GetHeight() / GR.Win.Const.Tab1Height))
-  BC:SetSize(GR_GUI.Main:GetWidth() * (GR.Win.Const.GameScreenWidth / GR.Win.Const.Tab1Width), GR_GUI.Main:GetHeight() * (GR.Win.Const.GameScreenHeight / GR.Win.Const.Tab1Height))
   BC:SetClipsChildren(true)
   BC:Hide()
   

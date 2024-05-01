@@ -2,10 +2,6 @@ function GR:SuikaCreate()
   -- Contants
   GR.Suika = {}
   GR.Suika.Const = {}
-  GR.Suika.Const.GameScreenWidth = 425
-  GR.Suika.Const.GameScreenHeight = 660
-  GR.Suika.Const.Tab1Width = 475
-  GR.Suika.Const.Tab1Height = 800
   GR.Suika.Const.BallSizes = {42, 67, 82.8, 105, 133, 213, 241.15, 280.7, 320.5, 380.1, 423.5, 467.8, 536.6, 590.3, 649.3, 714.2, 785.6}
   GR.Suika.Const.Gravity = -1300
   GR.Suika.Const.MinGravity = -6000
@@ -48,15 +44,15 @@ function GR:SuikaCreate()
   -- Suika Frame
   GR_GUI.Main.Suika = CreateFrame("Frame", Suika, GR_GUI.Main, "ThinBorderTemplate")
   local Suika = GR_GUI.Main.Suika
-  Suika:SetPoint("BOTTOM", 0, 25 * (GR_GUI.Main:GetHeight() / GR.Suika.Const.Tab1Height))
-  Suika:SetSize(GR_GUI.Main:GetWidth() * (GR.Suika.Const.GameScreenWidth / GR.Suika.Const.Tab1Width), GR_GUI.Main:GetHeight() * (GR.Suika.Const.GameScreenHeight / GR.Suika.Const.Tab1Height))
+  Suika:SetPoint("BOTTOM", 0, 25 * (GR_GUI.Main:GetHeight() / GR.Win.Const.Tab1HeightSuika))
+  Suika:SetSize(GR_GUI.Main:GetWidth() * (GR.Win.Const.SuikaScreenWidth / GR.Win.Const.Tab1WidthSuika), GR_GUI.Main:GetHeight() * (GR.Win.Const.SuikaScreenHeight / GR.Win.Const.Tab1HeightSuika))
   Suika:SetClipsChildren(true)
   Suika:Hide()
   
   -- Variables
   GR.Suika.XRatio = 1
   GR.Suika.YRatio = 1
-  GR.Suika.ScreenRatio = (Suika:GetWidth() / GR.Suika.Const.GameScreenWidth + Suika:GetHeight() / GR.Suika.Const.GameScreenHeight) / 2
+  GR.Suika.ScreenRatio = (Suika:GetWidth() / GR.Win.Const.SuikaScreenWidth + Suika:GetHeight() / GR.Win.Const.SuikaScreenHeight) / 2
   GR.Suika.BallSizes = {}
   for i,v in ipairs(GR.Suika.Const.BallSizes) do
     GR.Suika.BallSizes[i] = v * GR.Suika.ScreenRatio
@@ -212,11 +208,11 @@ function GR:SuikaSize()
   local Suika = Main.Suika
 
   -- Game Screen
-  Suika:SetPoint("BOTTOM", 0, 25 * (Main:GetHeight() / GR.Suika.Const.Tab1Height))
-  Suika:SetSize(Main:GetWidth() * (GR.Suika.Const.GameScreenWidth / GR.Suika.Const.Tab1Width), Main:GetHeight() * (GR.Suika.Const.GameScreenHeight / GR.Suika.Const.Tab1Height))
+  Suika:SetPoint("BOTTOM", 0, 25 * (Main:GetHeight() / GR.Win.Const.Tab1HeightSuika))
+  Suika:SetSize(Main:GetWidth() * (GR.Win.Const.SuikaScreenWidth / GR.Win.Const.Tab1WidthSuika), Main:GetHeight() * (GR.Win.Const.SuikaScreenHeight / GR.Win.Const.Tab1HeightSuika))
   GR.Suika.XRatio = 1
   GR.Suika.YRatio = 1
-  GR.Suika.ScreenRatio = (Suika:GetWidth() / GR.Suika.Const.GameScreenWidth + Suika:GetHeight() / GR.Suika.Const.GameScreenHeight) / 2
+  GR.Suika.ScreenRatio = (Suika:GetWidth() / GR.Win.Const.SuikaScreenWidth + Suika:GetHeight() / GR.Win.Const.SuikaScreenHeight) / 2
 
   -- variables
   GR.Suika.Gravity = GR.Suika.Const.Gravity * GR.Suika.YRatio

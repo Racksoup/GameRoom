@@ -30,7 +30,7 @@ function GR:CreateGameButtons()
     if (button == "LeftButton" and down == false) then
       GR.GameType = "Tictactoe"
       Tab3.InviteText:SetText("Challenged " .. GR.Target .. " To " .. GR.GameType)
-      Tab3.GameButtons:Hide()
+      GR:DisableMultiGameButtons()
       GR:SendGameInvite(self, button, down)
     end
   end)
@@ -45,7 +45,7 @@ function GR:CreateGameButtons()
     if (button == "LeftButton" and down == false) then
       GR.GameType = "Battleships"
       Tab3.InviteText:SetText("Challenged " .. GR.Target .. " To " .. GR.GameType)
-      Tab3.GameButtons:Hide()
+      GR:DisableMultiGameButtons()
       GR:SendGameInvite(self, button, down)
     end
   end)
@@ -87,6 +87,10 @@ function GR:CreateInviteServer()
     Btn:Hide()
     Btn.FS = Btn:CreateFontString(nil, "ARTWORK", "GameTooltipText")
     Btn.FS:SetPoint("TOPLEFT")
+    Btn.Tex = Btn:CreateTexture()
+    Btn.Tex:SetAllPoints(Btn)
+    Btn.Tex:SetColorTexture(.7,.7,.7, .4)
+    Btn.Tex:Hide()
     table.insert(Invite.Server.Btns, Btn)
   end
 
@@ -112,6 +116,10 @@ function GR:CreateInviteFriends()
     Btn:Hide()
     Btn.FS = Btn:CreateFontString(nil, "ARTWORK", "GameTooltipText")
     Btn.FS:SetPoint("TOPLEFT")
+    Btn.Tex = Btn:CreateTexture()
+    Btn.Tex:SetAllPoints(Btn)
+    Btn.Tex:SetColorTexture(.7,.7,.7, .4)
+    Btn.Tex:Hide()
     table.insert(Invite.Friends.Btns, Btn)
   end
 end
@@ -135,6 +143,10 @@ function GR:CreateInviteParty()
     Btn:Hide()
     Btn.FS = Btn:CreateFontString(nil, "ARTWORK", "GameTooltipText")
     Btn.FS:SetPoint("TOPLEFT")
+    Btn.Tex = Btn:CreateTexture()
+    Btn.Tex:SetAllPoints(Btn)
+    Btn.Tex:SetColorTexture(.7,.7,.7, .4)
+    Btn.Tex:Hide()
     table.insert(Invite.Party.Btns, Btn)
   end
 
@@ -176,6 +188,10 @@ function GR:CreateInviteZone()
     Btn:Hide()
     Btn.FS = Btn:CreateFontString(nil, "ARTWORK", "GameTooltipText")
     Btn.FS:SetPoint("TOPLEFT")
+    Btn.Tex = Btn:CreateTexture()
+    Btn.Tex:SetAllPoints(Btn)
+    Btn.Tex:SetColorTexture(.7,.7,.7, .4)
+    Btn.Tex:Hide()
     table.insert(Invite.Zone.Btns, Btn)
   end
 
@@ -421,6 +437,7 @@ function GR:SizeInviteTab()
   Tab.Zone:SetSize(65 * Main.XRatio, 20)
 end
 
+-- func
 function GR:ToggleInviteTab()
   local Invite = GR_GUI.Main.Tab3.Invite
   local tabIndex = Invite.ActiveTab
@@ -490,4 +507,20 @@ function GR:ToggleInviteTab()
     active(Invite.Tab.Zone)
   end
 
+end
+
+function GR:DisableMultiGameButtons()
+  local Main = GR_GUI.Main
+  local GameButtons = GR_GUI.Main.Tab3.GameButtons
+
+  GameButtons.TicTacToeBtn:Disable()
+  GameButtons.BattleshipsBtn:Disable()
+end
+
+function GR:EnableMultiGameButtons()
+  local Main = GR_GUI.Main
+  local GameButtons = GR_GUI.Main.Tab3.GameButtons
+
+  GameButtons.TicTacToeBtn:Enable()
+  GameButtons.BattleshipsBtn:Enable()
 end

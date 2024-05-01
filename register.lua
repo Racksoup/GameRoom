@@ -153,6 +153,13 @@ function GR:RefreshFriendsListUI()
         GR_GUI.Main.Tab3.InviteText:SetText("Challenge " .. GR.Target)
         GR_GUI.Main.Tab3.InviteText:Show()
         GR_GUI.Main.Tab3.GameButtons:Show()
+        GR:EnableMultiGameButtons()
+        -- hide/show Btns selection texture
+        for j,k in ipairs(Btns) do
+          local x, tex = k:GetRegions()
+          tex:Hide()
+        end
+        Btns[i].Tex:Show()
       end
     end)
   end
@@ -389,6 +396,13 @@ function GR:RefreshZoneList()
         GR_GUI.Main.Tab3.InviteText:SetText("Challenge " .. GR.Target)
         GR_GUI.Main.Tab3.InviteText:Show()
         GR_GUI.Main.Tab3.GameButtons:Show()
+        GR:EnableMultiGameButtons()
+        -- hide/show Btns selection texture
+        for j,k in ipairs(Btns) do
+          local x, tex = k:GetRegions()
+          tex:Hide()
+        end
+        Btns[i].Tex:Show()
       end
     end)
   end 
@@ -592,6 +606,13 @@ function GR:RefreshGuildGroupListUI()
         GR_GUI.Main.Tab3.InviteText:SetText("Challenge " .. GR.Target)
         GR_GUI.Main.Tab3.InviteText:Show()
         GR_GUI.Main.Tab3.GameButtons:Show()
+        GR:EnableMultiGameButtons()
+        -- hide/show Btns selection texture
+        for j,k in ipairs(Btns) do
+          local x, tex = k:GetRegions()
+          tex:Hide()
+        end
+        Btns[i].Tex:Show()
       end
     end)
   end
@@ -616,6 +637,13 @@ function GR:JoinGRChannel()
   local delay = 3
   C_Timer.After(delay, function()
     JoinChannelByName("gameroom", "gameroompw");
+    local channel_num = GetChannelName("gameroom")
+    if channel_num == 0 then
+      print("failed to join gameroom chat-channel")
+    else
+      print("successfully joined gameroom chat-channel")
+    end
+
     local tempChannelNum = 1 
     for i,v in ipairs({GetChannelList()}) do
       if (type(v) == 'number') then
@@ -678,6 +706,12 @@ function GR:RefreshServerListUI()
         GR_GUI.Main.Tab3.InviteText:SetText("Challenge " .. GR.Target)
         GR_GUI.Main.Tab3.InviteText:Show()
         GR_GUI.Main.Tab3.GameButtons:Show()
+        GR:EnableMultiGameButtons()
+        for j,k in ipairs(Btns) do
+          local x, tex = k:GetRegions()
+          tex:Hide()
+        end
+        Btns[i].Tex:Show()
       end
     end)
   end 

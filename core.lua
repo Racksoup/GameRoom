@@ -54,14 +54,18 @@ function GR:OnInitialize()
   GR.Win = {}
   GR.Win.Const = {}
   GR.Win.Const.Tab1Width = 800
-  GR.Win.Const.Tab1Height = 640
+  GR.Win.Const.Tab1Height = 620
+  GR.Win.Const.Tab1WidthSuika = 475
+  GR.Win.Const.Tab1HeightSuika = 800
   GR.Win.Const.GameScreenWidth = 750
   GR.Win.Const.GameScreenHeight = 500
+  GR.Win.Const.SuikaScreenWidth = 435
+  GR.Win.Const.SuikaScreenHeight = 660
   GR.Win.Const.Tab2Width = 310
   GR.Win.Const.Tab2Height = 156
-  GR.Win.Const.Tab3Width = 330
+  GR.Win.Const.Tab3Width = 340
   GR.Win.Const.Tab3Height = 300
-  GR.Win.Const.Tab4Width = 330
+  GR.Win.Const.Tab4Width = 340
   GR.Win.Const.Tab4Height = 470
 
   -- Game Varibales
@@ -202,36 +206,6 @@ function GR:CreateMainWindow()
     GR.db.realm.tab = 4 
     GR:TabSelect()
   end)
-
-
-
-  -- -- Close XButton
-  -- Main.xButton = CreateFrame("Button", XButton, Main)
-  -- local xButton = Main.xButton
-  -- xButton:RegisterForClicks("AnyUp", "AnyDown")
-  -- Main.xButton.tex = xButton:CreateTexture()
-  -- local buttonTex = Main.xButton.tex
-  -- buttonTex:SetAllPoints(xButton)
-  -- buttonTex:SetTexture("Interface\\AddOns\\GameRoom\\images\\XButton.blp")
-  -- buttonTex:SetTexCoord(0, 1, 0, 1)
-  -- Main.xButton.tint = xButton:CreateTexture()
-  -- local buttonTint = Main.xButton.tint
-  -- buttonTint:SetPoint("TOPLEFT", xButton, "TOPLEFT", 2, -2)
-  -- buttonTint:SetPoint("BOTTOMRIGHT", xButton, "BOTTOMRIGHT", -2, 2)
-  -- buttonTint:SetColorTexture(0,0,0,0);
-  -- Main.xButton:SetScript("OnClick", function(self, button, down) 
-  --   if(button == "LeftButton" and down == true) then Main.xButton.tex:SetTexture("Interface\\AddOns\\GameRoom\\images\\XButtonDown.blp") end
-  --   if(button == "LeftButton" and down == false) then 
-  --     Main:Hide()
-  --   end
-  -- end)
-  -- Main.xButton:SetScript("OnEnter", function(self, motion)
-  --   Main.xButton.tint:SetColorTexture(0,0,0,.3);
-  -- end)
-  -- Main.xButton:SetScript("OnLeave", function(self, motion)
-  --   Main.xButton.tint:SetColorTexture(0,0,0,0);
-  --   Main.xButton.tex:SetTexture("Interface\\AddOns\\GameRoom\\images\\XButton.blp")
-  -- end)
 
   -- Header 2
   Main.H2 = Main:CreateFontString(nil, "OVERLAY", "GameTooltipText")
@@ -511,7 +485,6 @@ function GR:ResizeMain()
 end
 
 function GR:ResizeMainNoRatioChange()
-  -- resize FontStrings
   local Main = GR_GUI.Main
   local HeaderInfo = Main.HeaderInfo
 
@@ -519,15 +492,20 @@ function GR:ResizeMainNoRatioChange()
   if (GR.db.realm.tab == 2 or GR.db.realm.tab == 3 or GR.db.realm.tab == 4) then
     Main.H2:SetPoint("TOP", 0, -38 * Main.YRatio)
   else
-    Main.H2:SetPoint("TOP", 0, -65 * Main.YRatio)
+    if (GR.GameType == "Bouncy Chicken") then
+      Main.H2:SetPoint("TOP", 0, -50 * Main.YRatio)
+    else
+      Main.H2:SetPoint("TOP", 0, -65 * Main.YRatio)
+    end
   end
   Main.H2:SetTextScale(1.7 * Main.ScreenRatio)
-
-  -- Main.xButton:SetSize(25 * Main.XRatio, 25 * Main.YRatio)
-  -- Main.xButton:SetPoint("TOPRIGHT", -13 * Main.XRatio, -13 * Main.YRatio)
-
+  
   -- Exit Button
-  Main.ExitBtn:SetPoint("TOPRIGHT", -40 * Main.XRatio, -56 * Main.YRatio)
+  if (GR.GameType == "Bouncy Chicken") then
+    Main.ExitBtn:SetPoint("TOPRIGHT", -40 * Main.XRatio, -44 * Main.YRatio)
+  else
+    Main.ExitBtn:SetPoint("TOPRIGHT", -40 * Main.XRatio, -56 * Main.YRatio)
+  end
   Main.ExitBtn:SetSize(100 * Main.XRatio, 30 * Main.YRatio)
   Main.ExitBtn.FS:SetPoint("CENTER", 0, 0)
   Main.ExitBtn.FS:SetTextScale(1.1 * Main.ScreenRatio)
@@ -620,7 +598,10 @@ end
 function GR:TabSelect()
   local Main = GR_GUI.Main
   local tab = GR.db.realm.tab
-  local point, relativeTo, relativePoint, xOfs, yOfs = Main:GetPoint()
+
+  Main.XRatio = 1
+  Main.YRatio = 1
+  Main.ScreenRatio = 1
   
   Main.Tab2:Hide()
   Main.Tab3:Hide()
@@ -629,49 +610,25 @@ function GR:TabSelect()
   Main.Asteroids:Hide() 
   Main.Tictactoe:Hide() 
   Main.Battleships:Hide()
-
-  local function CheckWidthHeight(Width, Height)
-    local Change = false
-    if (Width > UIParent:GetWidth()) then
-      Width = UIParent:GetWidth() - 100
-      Change = true
-    end
-    if (Width < 150) then
-      Width = 150
-      Change = true
-    end
-    if (Height > UIParent:GetHeight()) then
-      Height = UIParent:GetHeight() - 100
-      Change = true
-    end
-    if (Height < 150) then
-      Height = 150
-      Change = true
-    end
-
-    return Width, Height, Change
-  end
   
   -- In Game
   if (tab == 1) then
-    local Width, Height, Change
+    local Width, Height, BoundX, BoundY
 
     if (GR.GameType == 'Suika') then 
-      Width, Height, Change = CheckWidthHeight((GR.Suika.Const.GameScreenWidth + 10) * Main.XRatio, GR.Suika.Const.GameScreenHeight * Main.YRatio)
+      Width = GR.Win.Const.SuikaScreenWidth
+      Height = GR.Win.Const.SuikaScreenHeight
+      BoundX = GR.Win.Const.Tab1Width /2
+      BoundY = GR.Win.Const.Tab1Height /2
     else
-      Width, Height, Change = CheckWidthHeight(GR.Win.Const.GameScreenWidth * Main.XRatio, GR.Win.Const.GameScreenHeight * Main.YRatio)
+      Width = GR.Win.Const.GameScreenWidth
+      Height = GR.Win.Const.GameScreenHeight
     end
 
     Main:SetSize(Width, Height)
-    Main:SetPoint(point, relativeTo, relativePoint, xOfs, yOfs)
     Main:SetResizeBounds(GR.Win.Const.Tab1Width /2, GR.Win.Const.Tab1Height /2)
 
-
-    if (Change) then
-      GR:ResizeMain()
-    else
-      GR:ResizeMainNoRatioChange()
-    end
+    GR:ResizeMainNoRatioChange()
     
     if (GR.GameType == "Asteroids") then
       Main.Asteroids:Show()
@@ -695,23 +652,10 @@ function GR:TabSelect()
   end
   -- Solo Games
   if (tab == 2) then
-    local Width, Height, Change = CheckWidthHeight(GR.Win.Const.Tab2Width * Main.XRatio, GR.Win.Const.Tab2Height * Main.YRatio)
-
-    Main.XRatio = 1
-    Main.YRatio = 1
-    Main.ScreenRatio = 1
     Main:SetSize(GR.Win.Const.Tab2Width, GR.Win.Const.Tab2Height)
     Main:SetResizeBounds(GR.Win.Const.Tab2Width, GR.Win.Const.Tab2Height)
-    if (point == nil) then
-    else
-      Main:SetPoint(point, relativeTo, relativePoint, xOfs, yOfs)
-    end
 
-    if (Change) then
-      GR:ResizeMain()
-    else
-      GR:ResizeMainNoRatioChange()
-    end
+    GR:ResizeMainNoRatioChange()
 
     Main.Tab2:Show()
     Main.H2:SetText("Single Player Games")
@@ -719,45 +663,22 @@ function GR:TabSelect()
   end
   -- Multiplayer Games
   if (tab == 3) then
-    local Width, Height, Change = CheckWidthHeight(GR.Win.Const.Tab3Width * Main.XRatio, GR.Win.Const.Tab3Height * Main.YRatio)
-
-    Main.XRatio = 1
-    Main.YRatio = 1
-    Main.ScreenRatio = 1
     Main:SetSize(GR.Win.Const.Tab3Width, GR.Win.Const.Tab3Height)
-    Main:SetPoint(point, relativeTo, relativePoint, xOfs, yOfs)
     Main:SetResizeBounds(GR.Win.Const.Tab3Width, GR.Win.Const.Tab3Height)
     
-    if (Change) then
-      GR:ResizeMain()
-    else
-      GR:ResizeMainNoRatioChange()
-    end
+    GR:ResizeMainNoRatioChange()
 
     Main.Tab3:Show()
-    Main.Tab3.Invite:Show()
-    Main.Tab3.InviteText:Hide()
-    Main.Tab3.GameButtons:Hide()
+    GR:DisableMultiGameButtons()
     Main.H2:SetText("Multi Player Games")
     Main.H2:Show()
-
   end
   -- Settings
   if (tab == 4) then
-    local Width, Height, Change = CheckWidthHeight(GR.Win.Const.Tab4Width * Main.XRatio, GR.Win.Const.Tab4Height * Main.YRatio)
-
-    Main.XRatio = 1
-    Main.YRatio = 1
-    Main.ScreenRatio = 1
     Main:SetSize(GR.Win.Const.Tab4Width, GR.Win.Const.Tab4Height)
-    Main:SetPoint(point, relativeTo, relativePoint, xOfs, yOfs)
     Main:SetResizeBounds(GR.Win.Const.Tab4Width, GR.Win.Const.Tab4Height)
-    
-    if (Change) then
-      GR:ResizeMain()
-    else
-      GR:ResizeMainNoRatioChange()
-    end
+  
+    GR:ResizeMainNoRatioChange()
 
     Main.Tab4:Show()
     Main.H2:SetText("Settings")
