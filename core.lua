@@ -62,7 +62,7 @@ function GR:OnInitialize()
   GR.Win.Const.SuikaScreenWidth = 435
   GR.Win.Const.SuikaScreenHeight = 660
   GR.Win.Const.Tab2Width = 310
-  GR.Win.Const.Tab2Height = 156
+  GR.Win.Const.Tab2Height = 181
   GR.Win.Const.Tab3Width = 340
   GR.Win.Const.Tab3Height = 400
   GR.Win.Const.Tab4Width = 340
@@ -401,7 +401,7 @@ function GR:CreateSoloGames()
     end
   end)
 
-  SoloGames.SnakeBtn = CreateFrame("Button", SnakeBtn, SoloGames, "UIPanelButtonTemplate")
+  SoloGames.SnakeBtn = CreateFrame("Button", "SnakeBtn", SoloGames, "UIPanelButtonTemplate")
   local SnakeBtn = SoloGames.SnakeBtn
   SnakeBtn.FS = SnakeBtn:CreateFontString(nil, "OVERLAY", "GameTooltipText")
   local SnakeFS = SnakeBtn.FS
@@ -414,7 +414,7 @@ function GR:CreateSoloGames()
     end
   end)
 
-  SoloGames.BCBtn = CreateFrame("Button", BCBtn, SoloGames, "UIPanelButtonTemplate")
+  SoloGames.BCBtn = CreateFrame("Button", "BCBtn", SoloGames, "UIPanelButtonTemplate")
   local BCBtn = SoloGames.BCBtn
   BCBtn.FS = BCBtn:CreateFontString(nil, "OVERLAY", "GameTooltipText")
   local BCFS = BCBtn.FS
@@ -427,15 +427,28 @@ function GR:CreateSoloGames()
     end
   end)
 
-  SoloGames.SuikaBtn = CreateFrame("Button", SuikaBtn, SoloGames, "UIPanelButtonTemplate")
+  SoloGames.SuikaBtn = CreateFrame("Button", "SuikaBtn", SoloGames, "UIPanelButtonTemplate")
   local SuikaBtn = SoloGames.SuikaBtn
   SuikaBtn.FS = SuikaBtn:CreateFontString(nil, "OVERLAY", "GameTooltipText")
-  local BCFS = SuikaBtn.FS
-  BCFS:SetTextColor(1,1,1, 1)
-  BCFS:SetText("Suika")
+  local SuikaFS = SuikaBtn.FS
+  SuikaFS:SetTextColor(1,1,1, 1)
+  SuikaFS:SetText("Suika")
   SuikaBtn:SetScript("OnClick", function(self, button, down) 
     if (button == "LeftButton" and down == false) then
       GR.GameType = "Suika"
+      GR:ShowSoloGame()
+    end
+  end)
+
+  SoloGames.MinesweepersBtn = CreateFrame("Button", "MinesweepersBtn", SoloGames, "UIPanelButtonTemplate")
+  local MinesweepersBtn = SoloGames.MinesweepersBtn
+  MinesweepersBtn.FS = MinesweepersBtn:CreateFontString(nil, "OVERLAY", "GameTooltipText")
+  local MinesweepersFS = MinesweepersBtn.FS
+  MinesweepersFS:SetTextColor(1,1,1, 1)
+  MinesweepersFS:SetText("Minesweepers")
+  MinesweepersBtn:SetScript("OnClick", function(self, button, down) 
+    if (button == "LeftButton" and down == false) then
+      GR.GameType = "Minesweepers"
       GR:ShowSoloGame()
     end
   end)
@@ -601,6 +614,12 @@ function GR:ResizeSoloGames()
   local SuikaFS = SuikaBtn.FS
   SuikaFS:SetPoint("CENTER", 0, 0)
   SuikaFS:SetTextScale(1 * Main.ScreenRatio)
+  local MinesweepersBtn = SoloGames.MinesweepersBtn
+  MinesweepersBtn:SetPoint("TOPLEFT", 5 * Main.XRatio, -75 * Main.YRatio)
+  MinesweepersBtn:SetSize(120 * Main.XRatio, 30 * Main.YRatio)
+  local MinesweepersFS = MinesweepersBtn.FS
+  MinesweepersFS:SetPoint("CENTER", 0, 0)
+  MinesweepersFS:SetTextScale(1 * Main.ScreenRatio)
 end
 
 -- Functionality
@@ -659,6 +678,9 @@ function GR:TabSelect()
     end
     if (GR.GameType == "Suika") then
       GR:SuikaShow()
+    end
+    if (GR.GameType == "Minesweepers") then
+      GR:MinesweepersShow()
     end
   end
   -- Solo Games
@@ -911,11 +933,17 @@ end
 
 -- GAMES
 -- chess
+-- pac-man
+-- suduko
+-- tetris
+-- bejeweled
+-- galaga
+-- frogger
+-- minesweeper
 -- pin-ball macheine
 -- tower defense
 -- boat launch game (like angry birds  but you shoot the boat then they shoot you)
 -- heli attack 3 (or something similar thats generated where you shoot targets, dodge attacks, get power ups)
--- og mario
 
 -- FUNCTIONS
 -- rematch button

@@ -19,4 +19,5 @@ asteroids.lua
 snake.lua
 bouncyChicken.lua
 suika.lua
+minesweepers.lua
 multiplayer.lua
