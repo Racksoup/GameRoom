@@ -3,8 +3,8 @@ function GR:SuikaCreate()
   GR.Suika = {}
   GR.Suika.Const = {}
   GR.Suika.Const.BallSizes = {42, 67, 82.8, 105, 133, 213, 241.15, 280.7, 320.5, 380.1, 423.5, 467.8, 536.6, 590.3, 649.3, 714.2, 785.6}
-  GR.Suika.Const.Gravity = -13000
-  GR.Suika.Const.MinGravity = -18000
+  GR.Suika.Const.Gravity = -6000
+  GR.Suika.Const.MinGravity = -10000
   GR.Suika.Const.MaxSpeed = 2900
   GR.Suika.Const.StartSizes = 5
   GR.Suika.Const.TargetFrameTime = 1.0 / 60
@@ -526,6 +526,5 @@ function GR:SuikaGameOver()
 end
 
 -- balls spawn with left offset
--- needs resize dimensions locked so circles stay circles
 -- points
 -- end-game
