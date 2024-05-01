@@ -66,7 +66,6 @@ function GR:SuikaCreate()
 
   -- Create
   GR:SuikaGameLoop()
-  GR:SuikaCreateStatusBtns()
   GR:SuikaCreateInfo()
   Suika.Balls = {}
 end
@@ -81,40 +80,6 @@ function GR:SuikaGameLoop()
     GR:SuikaUpdate(self, elapsed)
   end)
   Game:Hide()
-end
-
-function GR:SuikaCreateStatusBtns()
-  local Main = GR_GUI.Main
-  local Suika = Main.Suika
-
-  -- Start
-  Suika.Start = CreateFrame("Button", Start, Main)
-  Suika.Start.Line1 = Suika.Start:CreateLine()
-  Suika.Start.Line1:SetColorTexture(0,1,0, 1)
-  Suika.Start.Line2 = Suika.Start:CreateLine()
-  Suika.Start.Line2:SetColorTexture(0,1,0, 1)
-  Suika.Start.Line3 = Suika.Start:CreateLine()
-  Suika.Start.Line3:SetColorTexture(0,1,0, 1)
-  Suika.Start:SetScript("OnClick", function(self, button, down) 
-    if (button == "LeftButton" and down == false) then
-      GR.Suika.ActiveState = "Start"
-      GR.SuikaStart()
-    end
-  end)
-  Suika.Start:Hide()
-
-  -- Stop
-  Suika.Stopx = CreateFrame("Button", Stopx, Main)
-  Suika.Stopx.Tex = Suika.Stopx:CreateTexture()
-  Suika.Stopx.Tex:SetColorTexture(1,0,0, 1)
-  Suika.Stopx.Tex:SetPoint("CENTER")
-  Suika.Stopx:SetScript("OnClick", function(self, button, down) 
-    if (button == "LeftButton" and down == false) then
-      GR.Suika.ActiveState = "Stop"
-      GR:SuikaStop()
-    end
-  end)
-  Suika.Stopx:Hide()
 end
 
 function GR:SuikaCreateInfo()
@@ -219,34 +184,8 @@ function GR:SuikaSize()
   GR.Suika.MinGravity = GR.Suika.Const.MinGravity * GR.Suika.YRatio
   GR.Suika.MaxSpeed = GR.Suika.Const.MaxSpeed * GR.Suika.ScreenRatio
 
-  GR:SuikaSizeStatusBtns()
   GR:SuikaSizeInfo()
   GR:SuikaSizeBalls()
-end
-
-function GR:SuikaSizeStatusBtns()
-  local Suika = GR_GUI.Main.Suika
-  local XRatio = GR.Suika.XRatio
-  local YRatio = GR.Suika.YRatio
-  local ScreenRatio = GR.Suika.ScreenRatio
-  
-  -- Start
-  Suika.Start:SetPoint("TOPLEFT", Suika, 30 * XRatio, 39 * YRatio)
-  Suika.Start:SetSize(30 * XRatio, 30 * YRatio)
-  Suika.Start.Line1:SetStartPoint("CENTER", -8 * XRatio, 8 * YRatio)
-  Suika.Start.Line1:SetEndPoint("CENTER", 8 * XRatio, 0)
-  Suika.Start.Line1:SetThickness(3 * ScreenRatio)
-  Suika.Start.Line2:SetStartPoint("CENTER", -8 * XRatio, -8 * YRatio)
-  Suika.Start.Line2:SetEndPoint("CENTER", 8 * XRatio, 0)
-  Suika.Start.Line2:SetThickness(3 * ScreenRatio)
-  Suika.Start.Line3:SetStartPoint("CENTER", -8 * XRatio, -8 * YRatio)
-  Suika.Start.Line3:SetEndPoint("CENTER", -8 * XRatio, 8 * YRatio)
-  Suika.Start.Line3:SetThickness(3 * ScreenRatio)
-
-  -- Stop
-  Suika.Stopx:SetPoint("TOPLEFT", Suika, 30 * XRatio, 39 * YRatio)
-  Suika.Stopx:SetSize(30 * XRatio, 30 * YRatio)
-  Suika.Stopx.Tex:SetSize(15 * XRatio, 15 * YRatio)
 end
 
 function GR:SuikaSizeInfo()
@@ -463,31 +402,34 @@ end
 -- show / hide
 function GR:SuikaShow()
   local Suika = GR_GUI.Main.Suika
+  local Solo = GR_GUI.Main.HeaderInfo.Solo
   
   GR:SuikaSize()
   
   Suika:Show()
   Suika.PointsFS:Show()
   Suika.GameOverFS:Hide()
-  if (GR.Suika.ActiveState == 'Stop') then Suika.Start:Show() end
-  if (GR.Suika.ActiveState == 'Start') then Suika.Stopx:Show() Suika.Game:Show() end
-
+  if (GR.Suika.ActiveState == 'Stop') then Solo.Start:Show() end
+  if (GR.Suika.ActiveState == 'Start') then Solo.Stopx:Show() Suika.Game:Show() end
+  
   GR:SuikaStart()
 end
 
 function GR:SuikaHide()
   local Suika = GR_GUI.Main.Suika
+  local Solo = GR_GUI.Main.HeaderInfo.Solo
   
   Suika:Hide()
   Suika.PointsFS:Hide()
   Suika.GameOverFS:Hide()
-  Suika.Start:Hide()
-  Suika.Stopx:Hide()
+  Solo.Start:Hide()
+  Solo.Stopx:Hide()
 end
 
 -- Start Stop Pause Unpause
 function GR:SuikaStart()
   local Suika = GR_GUI.Main.Suika
+  local Solo = GR_GUI.Main.HeaderInfo.Solo
   
   -- Reset Variables
   GR.Suika.Points = 0
@@ -502,17 +444,20 @@ function GR:SuikaStart()
   -- Show Game Info and Buttons
   GR.Suika.ActiveState = 'Start'
   Suika.PointsFS:SetText(GR.Suika.Points)
-  Suika.Start:Hide()
-  Suika.Stopx:Show()
+  Solo.Start:Hide()
+  Solo.Stopx:Show()
+  Solo.Pausex:Hide()
   Suika.GameOverFS:Hide()
 end
 
 function GR:SuikaStop()
   local Suika = GR_GUI.Main.Suika
+  local Solo = GR_GUI.Main.HeaderInfo.Solo
   
   GR.Suika.ActiveState = 'Stop'
-  Suika.Stopx:Hide()
-  Suika.Start:Show()
+  Solo.Stopx:Hide()
+  Solo.Start:Show()
+  Solo.Pausex:Hide()
   for i,v in pairs(Suika.Balls) do
     v.IsActive = false
     v:Hide()
