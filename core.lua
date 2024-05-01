@@ -455,10 +455,22 @@ function GR:ResizeMain()
     if (GR.GameType == 'Suika') then 
       Main.XRatio = Main:GetWidth() / GR.Win.Const.SuikaScreenWidth
       Main.YRatio = Main:GetHeight() / GR.Win.Const.SuikaScreenHeight
+      if (Main.XRatio > Main.YRatio) then
+        Main.XRatio = Main.YRatio
+      else
+        Main.YRatio = Main.XRatio
+      end
+      Main:SetSize(Main.XRatio * GR.Win.Const.SuikaScreenWidth, Main.YRatio * GR.Win.Const.SuikaScreenHeight)
     else
       Main.XRatio = Main:GetWidth() / GR.Win.Const.GameScreenWidth
+      Main.YRatio = Main:GetHeight() / GR.Win.Const.GameScreenHeight
+      if (Main.XRatio > Main.YRatio) then
+        Main.XRatio = Main.YRatio
+      else
+        Main.YRatio = Main.XRatio
+      end
+      Main:SetSize(Main.XRatio * GR.Win.Const.GameScreenWidth, Main.YRatio * GR.Win.Const.GameScreenHeight)
     end
-    Main.YRatio = Main:GetHeight() / GR.Win.Const.GameScreenHeight
     Main.ScreenRatio = (Main.XRatio + Main.YRatio) / 2
   end
   -- Solo Games
@@ -479,7 +491,6 @@ function GR:ResizeMain()
     Main.YRatio = Main:GetHeight() / GR.Win.Const.Tab4Height
     Main.ScreenRatio = (Main.XRatio + Main.YRatio) / 2
   end
-  
 
   GR:ResizeMainNoRatioChange()
 end
