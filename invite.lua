@@ -375,7 +375,7 @@ function GR:ExitGameClicked()
     GR:MinesweepersHide()    
   end
 
-  GR_GUI.Main.ExitBtn:Hide()
+  GR_GUI.Main.HeaderInfo.ExitBtn:Hide()
   GR.GameType = nil
   GR.db.realm.tab = "solo"
   GR:TabSelect()

@@ -213,10 +213,16 @@ function GR:CreateMainWindow()
   Main.H2 = Main:CreateFontString(nil, "OVERLAY", "GameTooltipText")
   local H2 = Main.H2
   H2:SetTextColor(1,1,1,1)
+end
+
+function GR:CreateHeaderInfo()
+  -- Frame
+  GR_GUI.Main.HeaderInfo = CreateFrame("Frame", HeaderInfo, GR_GUI.Main)
+  local HeaderInfo = GR_GUI.Main.HeaderInfo
 
   -- Exit Button
-  Main.ExitBtn = CreateFrame("Button", "ExitBtn", Main, "UIPanelButtonTemplate")
-  local ExitBtn = Main.ExitBtn
+  HeaderInfo.ExitBtn = CreateFrame("Button", "ExitBtn", HeaderInfo, "UIPanelButtonTemplate")
+  local ExitBtn = HeaderInfo.ExitBtn
   ExitBtn.FS = ExitBtn:CreateFontString(nil, "OVERLAY", "GameTooltipText")
   local ExitFS = ExitBtn.FS 
   ExitFS:SetTextColor(1,1,1, 1)
@@ -227,12 +233,13 @@ function GR:CreateMainWindow()
       GR:ExitGameClicked()
     end
   end)
-  Main.ExitBtn:Hide()
+  
+  GR:CreateHeaderMultiGames()
+
+  HeaderInfo:Hide()
 end
 
-function GR:CreateHeaderInfo()
-  -- Frame
-  GR_GUI.Main.HeaderInfo = CreateFrame("Frame", HeaderInfo, GR_GUI.Main)
+function GR:CreateHeaderMultiGames()
   local HeaderInfo = GR_GUI.Main.HeaderInfo
   
   -- Turn String
@@ -251,20 +258,20 @@ function GR:CreateHeaderInfo()
   ReInvite.FS:SetTextColor(1,1,1, 1)
   ReInvite.FS:SetText("Rematch?")
   ReInvite:SetScript("OnClick", function(self, button, down)
-      if (button == "LeftButton" and down == false) then
-          local UserName = UnitName("player")
-          if (GR.GameType == "Tictactoe") then
-              GR:SendCommMessage("GameRoom_Inv", "TicTacToe_Challenge, " .. UserName, "WHISPER", GR.Opponent)
-          end
-          if (GR.GameType == "Battleships") then
-              GR:SendCommMessage("GameRoom_Inv", "Battleships_Challenge, " .. UserName, "WHISPER", GR.Opponent)
-          end
-          GR.CanSendInvite = false
-          ReInvite:Hide()
-          C_Timer.After(4, function() 
-              GR.CanSendInvite = true
-          end)
+    if (button == "LeftButton" and down == false) then
+      local UserName = UnitName("player")
+      if (GR.GameType == "Tictactoe") then
+        GR:SendCommMessage("GameRoom_Inv", "TicTacToe_Challenge, " .. UserName, "WHISPER", GR.Opponent)
       end
+      if (GR.GameType == "Battleships") then
+        GR:SendCommMessage("GameRoom_Inv", "Battleships_Challenge, " .. UserName, "WHISPER", GR.Opponent)
+      end
+      GR.CanSendInvite = false
+      ReInvite:Hide()
+      C_Timer.After(4, function() 
+        GR.CanSendInvite = true
+      end)
+    end
   end)
 
   -- Rematch Button
@@ -275,28 +282,28 @@ function GR:CreateHeaderInfo()
   ReMatchFS:SetTextColor(1,1,1, 1)
   ReMatchFS:SetText("Accept")
   ReMatch:SetScript("OnClick", function(self, button, down)
-      if (button == "LeftButton" and down == false) then 
-          local Opponent = GR.Opponent
-          local Rand = random(1,2)
-          GR.PlayerPos = Rand
-          if (GR.PlayerPos == 2) then
-              GR.IsPlayerTurn = false
-          else
-              GR.IsPlayerTurn = true
-          end
-          if (GR.GameType == "Tictactoe") then
-              GR:TicTacToeHideContent()
-              GR:SendCommMessage("GameRoom_Inv", "TicTacToe_Accept, " .. Rand .. ", " .. UnitName("Player"), "WHISPER", Opponent)
-              GR.db.realm.tab = "game"
-              GR:TabSelect()
-            end
-            if (GR.GameType == "Battleships") then
-              GR:BattleshipsHideContent()
-              GR:SendCommMessage("GameRoom_Inv", "Battleships_Accept, " .. Rand .. ", " .. UnitName("player"), "WHISPER", Opponent)
-              GR.db.realm.tab = "game"
-              GR:TabSelect()
-          end
+    if (button == "LeftButton" and down == false) then 
+      local Opponent = GR.Opponent
+      local Rand = random(1,2)
+      GR.PlayerPos = Rand
+      if (GR.PlayerPos == 2) then
+        GR.IsPlayerTurn = false
+      else
+        GR.IsPlayerTurn = true
       end
+      if (GR.GameType == "Tictactoe") then
+        GR:TicTacToeHideContent()
+        GR:SendCommMessage("GameRoom_Inv", "TicTacToe_Accept, " .. Rand .. ", " .. UnitName("Player"), "WHISPER", Opponent)
+        GR.db.realm.tab = "game"
+        GR:TabSelect()
+      end
+      if (GR.GameType == "Battleships") then
+        GR:BattleshipsHideContent()
+        GR:SendCommMessage("GameRoom_Inv", "Battleships_Accept, " .. Rand .. ", " .. UnitName("player"), "WHISPER", Opponent)
+        GR.db.realm.tab = "game"
+        GR:TabSelect()
+      end
+    end
   end)
 
   -- Add Rival Button
@@ -307,13 +314,11 @@ function GR:CreateHeaderInfo()
   RivalFS:SetTextColor(1,1,1, 1)
   RivalFS:SetText("Add Rival")
   Rival:SetScript("OnClick", function(self, button, down)
-      if (button == "LeftButton" and down == false) then 
-          table.insert(GR.db.realm.Rivals, GR.Opponent)
-          Rival:Hide()
-      end
+    if (button == "LeftButton" and down == false) then 
+      table.insert(GR.db.realm.Rivals, GR.Opponent)
+      Rival:Hide()
+    end
   end)
-
-  HeaderInfo:Hide()
 end
 
 function GR:CreateAcceptDecline()
@@ -424,6 +429,19 @@ function GR:SizeMain()
     Main.YRatio = Main:GetHeight() / GR.Win.Const.Tab4Height
     Main.ScreenRatio = (Main.XRatio + Main.YRatio) / 2
   end
+
+  -- only resize main element is the h2 fontstring
+  -- H2
+  if (GR.db.realm.tab == "solo" or GR.db.realm.tab == "multi" or GR.db.realm.tab == "settings") then
+    Main.H2:SetPoint("TOP", 0, -38 * Main.YRatio)
+  else
+    if (GR.GameType == "Bouncy Chicken") then
+      Main.H2:SetPoint("TOP", 0, -50 * Main.YRatio)
+    else
+      Main.H2:SetPoint("TOP", 0, -65 * Main.YRatio)
+    end
+  end
+  Main.H2:SetTextScale(1.7 * Main.ScreenRatio)
   
   GR:SizeHeaderInfo()
   GR:SizeTabSoloGames()
@@ -438,6 +456,22 @@ function GR:SizeHeaderInfo()
   HeaderInfo:SetPoint("TOP", 0, -60 * Main.YRatio)
   HeaderInfo:SetSize(700 * Main.XRatio, 100 * Main.YRatio)
   
+  -- Exit Button
+  local ExitBtn = HeaderInfo.ExitBtn
+  if (GR.GameType == "Bouncy Chicken") then
+    ExitBtn:SetPoint("TOPRIGHT", 0 * Main.XRatio, 0 * Main.YRatio)
+  else
+    ExitBtn:SetPoint("TOPRIGHT", 0 * Main.XRatio, 0 * Main.YRatio)
+  end
+  ExitBtn:SetSize(100 * Main.XRatio, 30 * Main.YRatio)
+  
+  GR:SizeHeaderMultiGames()
+end
+
+function GR:SizeHeaderMultiGames()
+  local Main = GR_GUI.Main
+  local HeaderInfo = Main.HeaderInfo
+
   -- Turn String
   local TurnString = HeaderInfo.TurnString
   TurnString:SetPoint("TOP", 0, 0 * Main.YRatio)
@@ -471,28 +505,6 @@ function GR:SizeHeaderInfo()
   local RivalFS = Rival.FS
   RivalFS:SetPoint("CENTER", 0, 0)
   RivalFS:SetTextScale(1.1 * Main.ScreenRatio)
-
-  local HeaderInfo = Main.HeaderInfo
-  
-  -- H2
-  if (GR.db.realm.tab == "solo" or GR.db.realm.tab == "multi" or GR.db.realm.tab == "settings") then
-    Main.H2:SetPoint("TOP", 0, -38 * Main.YRatio)
-  else
-    if (GR.GameType == "Bouncy Chicken") then
-      Main.H2:SetPoint("TOP", 0, -50 * Main.YRatio)
-    else
-      Main.H2:SetPoint("TOP", 0, -65 * Main.YRatio)
-    end
-  end
-  Main.H2:SetTextScale(1.7 * Main.ScreenRatio)
-  
-  -- Exit Button
-  if (GR.GameType == "Bouncy Chicken") then
-    Main.ExitBtn:SetPoint("TOPRIGHT", -40 * Main.XRatio, -44 * Main.YRatio)
-  else
-    Main.ExitBtn:SetPoint("TOPRIGHT", -40 * Main.XRatio, -56 * Main.YRatio)
-  end
-  Main.ExitBtn:SetSize(100 * Main.XRatio, 30 * Main.YRatio)
 end
 
 function GR:SizeAllGames()
@@ -705,20 +717,22 @@ end
 
 -- Show/Hide Game
 function GR:ShowGame()
+  local Main = GR_GUI.Main
+  
   GR.InGame = true
 
-  GR_GUI.Main.HeaderInfo:Show()
-  GR_GUI.Main.HeaderInfo.OpponentString:Show()
-  GR_GUI.Main.HeaderInfo.TurnString:Show()
-  GR_GUI.Main.ExitBtn:Show()
+  Main.HeaderInfo:Show()
+  Main.HeaderInfo.OpponentString:Show()
+  Main.HeaderInfo.TurnString:Show()
+  Main.HeaderInfo.ExitBtn:Show()
   
-  GR_GUI.Accept:Hide()
-  GR_GUI.Main.HeaderInfo.ReInvite:Hide()
-  GR_GUI.Main.HeaderInfo.ReMatch:Hide()
-  GR_GUI.Main.HeaderInfo.Rival:Hide()
+  Accept:Hide()
+  Main.HeaderInfo.ReInvite:Hide()
+  Main.HeaderInfo.ReMatch:Hide()
+  Main.HeaderInfo.Rival:Hide()
   
   if (GR.Opponent) then 
-    GR_GUI.Main.HeaderInfo.OpponentString:SetText("Opponent: " .. GR.Opponent)
+    Main.HeaderInfo.OpponentString:SetText("Opponent: " .. GR.Opponent)
   end
   GR:SetTurnString()
 end
@@ -727,7 +741,7 @@ function GR:ShowSoloGame()
   GR.InGame = true
   GR_GUI.Accept:Hide()
   
-  GR_GUI.Main.ExitBtn:Show()
+  GR_GUI.Main.HeaderInfo.ExitBtn:Show()
   GR_GUI.Main.H2:SetText(GR.GameType)
 
   GR.db.realm.tab = "game"
