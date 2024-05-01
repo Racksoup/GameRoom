@@ -39,7 +39,6 @@ function GR:CreateSnake()
 
   -- Create
   GR:CreateSnakeGameLoop()
-  -- GR:CreateSnakeStartStop()
   GR:CreateSnakeTimer()
   GR:CreateSnakeGrid()
   GR:CreateSnakeApple()
@@ -56,55 +55,6 @@ function GR:CreateSnakeGameLoop()
   Snake.Game:Hide()
 
   GR:SnakeControls()
-end
-
-function GR:CreateSnakeStartStop()
-  local Snake = GR_GUI.Main.Snake
-
-  Snake.Start = CreateFrame("Button", Start, Snake)
-  Snake.Start.Line1 = Snake.Start:CreateLine()
-  Snake.Start.Line1:SetColorTexture(0,1,0, 1)
-  Snake.Start.Line2 = Snake.Start:CreateLine()
-  Snake.Start.Line2:SetColorTexture(0,1,0, 1)
-  Snake.Start.Line3 = Snake.Start:CreateLine()
-  Snake.Start.Line3:SetColorTexture(0,1,0, 1)
-  Snake.Start:SetScript("OnClick", function(self, button, down) 
-    if (button == "LeftButton" and down == false) then
-      if (Snake.OnState == "Stop" or Snake.OnState == "Start") then
-        Snake.OnState = "Start"
-        GR.SnakeStart()
-      end
-      if (Snake.OnState == "Pause") then
-        Snake.OnState = "Start"
-        GR.SnakeUnpause()
-      end
-    end
-  end)
-
-  Snake.Stopx = CreateFrame("Button", Stopx, Snake)
-  Snake.Stopx.Tex = Snake.Stopx:CreateTexture()
-  Snake.Stopx.Tex:SetColorTexture(1,0,0, 1)
-  Snake.Stopx.Tex:SetPoint("CENTER")
-  Snake.Stopx:SetScript("OnClick", function(self, button, down) 
-    if (button == "LeftButton" and down == false) then
-      Snake.OnState = "Stop"
-      GR:SnakeStop()
-    end
-  end)
-  Snake.Stopx:Hide()
-
-  Snake.Pausex = CreateFrame("Button", Pausex, Snake)
-  Snake.Pausex.Tex1 = Snake.Pausex:CreateTexture()
-  Snake.Pausex.Tex1:SetColorTexture(1,1,0, 1)
-  Snake.Pausex.Tex2 = Snake.Pausex:CreateTexture()
-  Snake.Pausex.Tex2:SetColorTexture(1,1,0, 1)
-  Snake.Pausex:SetScript("OnClick", function(self, button, down) 
-    if (button == "LeftButton" and down == false) then
-      Snake.OnState = "Pause"
-      GR:SnakePause()
-    end
-  end)
-  Snake.Pausex:Hide()
 end
 
 function GR:CreateSnakeTimer()
@@ -177,38 +127,9 @@ function GR:SnakeSize()
   Snake.YRatio = Snake:GetHeight() / GR.Snake.Const.Height
   Snake.ScreenRatio = ((Snake:GetWidth() / GR.Snake.Const.Width) + (Snake:GetHeight() / GR.Snake.Const.Height)) / 2
 
-
-  -- GR:SnakeSizeStartStop()
   GR:SizeSnakeTimer()
   GR:SizeSnakeGrid()
   GR:SizeSnakeApple()
-end
-
-function GR:SnakeSizeStartStop()
-  local Snake = GR_GUI.Main.Snake
-  
-  Snake.Start:SetPoint("TOPLEFT", 50 * Snake.XRatio, 34 * Snake.YRatio)
-  Snake.Start:SetSize(30 * Snake.XRatio, 30 * Snake.YRatio)
-  Snake.Start.Line1:SetStartPoint("CENTER", -8 * Snake.XRatio, 8 * Snake.YRatio)
-  Snake.Start.Line1:SetEndPoint("CENTER", 8 * Snake.XRatio, 0)
-  Snake.Start.Line1:SetThickness(3 * Snake.ScreenRatio)
-  Snake.Start.Line2:SetStartPoint("CENTER", -8 * Snake.XRatio, -8 * Snake.YRatio)
-  Snake.Start.Line2:SetEndPoint("CENTER", 8 * Snake.XRatio, 0)
-  Snake.Start.Line2:SetThickness(3 * Snake.ScreenRatio)
-  Snake.Start.Line3:SetStartPoint("CENTER", -8 * Snake.XRatio, -8 * Snake.YRatio)
-  Snake.Start.Line3:SetEndPoint("CENTER", -8 * Snake.XRatio, 8 * Snake.YRatio)
-  Snake.Start.Line3:SetThickness(3 * Snake.ScreenRatio)
-
-  Snake.Stopx:SetPoint("TOPLEFT", 83 * Snake.XRatio, 34 * Snake.YRatio)
-  Snake.Stopx:SetSize(30 * Snake.XRatio, 30 * Snake.YRatio)
-  Snake.Stopx.Tex:SetSize(15 * Snake.XRatio, 15 * Snake.YRatio)
-  
-  Snake.Pausex:SetPoint("TOPLEFT", 50 * Snake.XRatio, 34 * Snake.YRatio)
-  Snake.Pausex:SetSize(30 * Snake.XRatio, 30 * Snake.YRatio)
-  Snake.Pausex.Tex1:SetSize(6 * Snake.XRatio, 15 * Snake.YRatio)
-  Snake.Pausex.Tex1:SetPoint("CENTER", -6 * Snake.XRatio, 0)
-  Snake.Pausex.Tex2:SetSize(6 * Snake.XRatio, 15 * Snake.YRatio)
-  Snake.Pausex.Tex2:SetPoint("CENTER", 6 * Snake.XRatio, 0)
 end
 
 function GR:SizeSnakeTimer()
