@@ -142,6 +142,8 @@ function GR:CreateInviteFriends()
     Btn.Tex:Hide()
     table.insert(Invite.Friends.Btns, Btn)
   end
+
+  FriendsScrollFrame:Hide()
 end
 
 function GR:CreateInviteParty()

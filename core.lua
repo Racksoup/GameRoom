@@ -697,6 +697,8 @@ function GR:TabSelect()
     Main.Tab4:Show()
     Main.H2:SetText("Settings")
     Main.H2:Show()
+    GR.CurrList = "Blacklist"
+    GR:ToggleSettingsListTab()
   end
 
   GR:ToggleTab()
