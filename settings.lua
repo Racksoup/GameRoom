@@ -237,7 +237,7 @@ function GR:CreateSettingsLists()
           local x, tex = k:GetRegions()
           tex:Hide()
         end
-        Btn:Show()
+        Btn.Tex:Show()
       end
     end)
     table.insert(BlackBtns, Btn)

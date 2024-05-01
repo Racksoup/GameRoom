@@ -3,13 +3,13 @@ function GR:SuikaCreate()
   GR.Suika = {}
   GR.Suika.Const = {}
   GR.Suika.Const.BallSizes = {42, 67, 82.8, 105, 133, 213, 241.15, 280.7, 320.5, 380.1, 423.5, 467.8, 536.6, 590.3, 649.3, 714.2, 785.6}
-  GR.Suika.Const.Gravity = -1300
-  GR.Suika.Const.MinGravity = -6000
+  GR.Suika.Const.Gravity = -13000
+  GR.Suika.Const.MinGravity = -18000
   GR.Suika.Const.MaxSpeed = 2900
   GR.Suika.Const.StartSizes = 5
   GR.Suika.Const.TargetFrameTime = 1.0 / 60
-  GR.Suika.Const.DampingFactorX = .8
-  GR.Suika.Const.DampingFactorY = .8
+  GR.Suika.Const.DampingFactorX = .3
+  GR.Suika.Const.DampingFactorY = .3
   GR.Suika.Const.MinVelThres = 5000
   GR.Suika.Const.Colors = {
     {1,0,0,1},
