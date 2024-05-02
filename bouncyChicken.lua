@@ -48,7 +48,6 @@ function GR:CreateBouncyChicken()
   -- Create
   GR:CreateBCGameLoop()
   GR:ControlsBC()
-  GR:CreateBCInfo()
   GR:CreateBCWalls()
   GR:CreateBCChicken()
 end
@@ -63,35 +62,6 @@ function GR:CreateBCGameLoop()
     GR:UpdateBC(self, elapsed)
   end)
   Game:Hide()
-end
-
-function GR:CreateBCInfo()
-  local Main = GR_GUI.Main
-  local BC = GR_GUI.Main.BC
-
-  -- Timer
-  BC.Timer = Main:CreateFontString(nil, "ARTWORK", "GameTooltipText")
-  BC.Timer:SetText(GR.BC.GameTime)
-  BC.Timer:SetTextColor(.8,.8,.8, 1)
-  BC.Timer:Hide()
-
-  -- Points
-  BC.PointsFS = Main:CreateFontString(nil, "ARTWORK", "GameTooltipText")
-  BC.PointsFS:SetText(GR.BC.Points)
-  BC.PointsFS:SetTextColor(.8,.8,.8, 1)
-  BC.PointsFS:Hide()
-
-  -- GameOver
-  BC.GameOverFS = Main:CreateFontString(nil, "ARTWORK", "GameTooltipText")
-  BC.GameOverFS:SetText("Game Over")
-  BC.GameOverFS:SetTextColor(.8,0,0, 1)
-  BC.GameOverFS:Hide()
-
-  -- Controls Info
-  BC.Info = Main:CreateFontString(nil, "ARTWORK", "GameTooltipText")
-  BC.Info:SetText("Bounce: Space, W, Up-Arrow")
-  BC.Info:SetTextColor(.8,.8,.8, 1)
-  BC.Info:Hide()
 end
 
 function GR:CreateBCWalls()
@@ -136,29 +106,8 @@ function GR:SizeBC()
   GR.BC.YRatio = BC:GetHeight() / GR.Win.Const.GameScreenHeight
   GR.BC.ScreenRatio = (BC:GetWidth() / GR.Win.Const.GameScreenWidth + BC:GetHeight() / GR.Win.Const.GameScreenHeight) / 2
 
-  GR:SizeBCInfo()
   GR:SizeBCWalls()
   GR:SizeBCChicken()
-end
-
-function GR:SizeBCInfo()
-  local BC = GR_GUI.Main.BC
-  
-  -- Timer
-  BC.Timer:SetPoint("BOTTOMLEFT", BC, "TOPRIGHT", -220 * GR.BC.XRatio, 6 * GR.BC.YRatio)
-  BC.Timer:SetTextScale(2 * GR.BC.ScreenRatio)
-  
-  -- Points
-  BC.PointsFS:SetPoint("BOTTOMLEFT", BC, "TOPLEFT", 160 * GR.BC.XRatio, 6 * GR.BC.YRatio)
-  BC.PointsFS:SetTextScale(2 * GR.BC.ScreenRatio)
-  
-  -- Game Over
-  BC.GameOverFS:SetPoint("TOP", BC, 0, -140 * GR.BC.YRatio)
-  BC.GameOverFS:SetTextScale(3.7 * GR.BC.ScreenRatio)
-  
-  -- Controls Info
-  BC.Info:SetPoint("TOP", BC, "TOPLEFT", 100 * GR.BC.XRatio, 57 * GR.BC.YRatio)
-  BC.Info:SetTextScale(1 * GR.BC.ScreenRatio)
 end
 
 function GR:SizeBCWalls()
@@ -202,7 +151,7 @@ function GR:UpdateBC(self, elapsed)
 
   GR.BC.GameTime = GR.BC.GameTime + elapsed
 
-  BC.Timer:SetText(math.floor(GR.BC.GameTime * 100) / 100)
+  GR_GUI.Main.HeaderInfo.Solo.Timer:SetText(math.floor(GR.BC.GameTime * 100) / 100)
 
   GR:UpdateBCWalls(self, elapsed)
   GR:UpdateBCChicken(self, elapsed)
@@ -367,23 +316,21 @@ function GR:BCHide()
   GR:BCStop()
 
   BC:Hide()
-  BC.Timer:Hide()
-  BC.PointsFS:Hide()
-  BC.GameOverFS:Hide()
-  BC.Info:Hide()
 end
 
 function GR:BCShow()
   local BC = GR_GUI.Main.BC
+  local Solo = GR_GUI.Main.HeaderInfo.Solo
 
   GR:SizeBC()
 
   BC:Show()
-  GR_GUI.Main.HeaderInfo.Solo.Start:Show()
-  BC.Timer:Show()
-  BC.PointsFS:Show()
-  BC.GameOverFS:Hide()
-  BC.Info:Show()
+  Solo:Show()
+  Solo.Timer:Show()
+  Solo.Info:SetText("Bounce: Space, W, Up-Arrow")
+  Solo.PointsFS:Show()
+  Solo.Info:Show()
+  Solo.Start:Show()
 end
 
 -- Start Stop Pause Unpause
@@ -413,17 +360,16 @@ function GR:BCStart()
   
   -- Show Game Info and Buttons
   GR.BC.ActiveState = "Start"
-  BC.PointsFS:SetText(GR.BC.Points)
+  Solo.PointsFS:SetText(GR.BC.Points)
   Solo.Stopx:Show()
   Solo.Pausex:Show()
   Solo.Start:Hide()
-  BC.GameOverFS:Hide()
+  Solo.GameOverFS:Hide()
 end
 
 function GR:BCStop()
   local BC = GR_GUI.Main.BC
   local Solo = GR_GUI.Main.HeaderInfo.Solo
-  local Walls = BC.Walls
 
   GR.BC.ActiveState = "Stop"
   BC.Game:Hide()
@@ -459,5 +405,5 @@ end
 function GR:BCGameOver()
   GR:BCStop()
 
-  GR_GUI.Main.BC.GameOverFS:Show()
+  GR_GUI.Main.HeaderInfo.Solo.GameOverFS:Show()
 end

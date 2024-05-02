@@ -377,6 +377,7 @@ function GR:ExitGameClicked()
 
   GR.GameType = nil
   GR.db.realm.tab = "solo"
+  GR:ResetHeader()
   GR:TabSelect()
 end
 

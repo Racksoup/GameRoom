@@ -52,12 +52,9 @@ function GR:CreateAsteroids()
 
   -- Create
   GR:CreateAsteroidsGameLoop()
-  -- GR:CreateAsteroidsGameButtons()
   GR:CreateAsteroidsShip()
   GR:CreateAsteroidsBullets()
   GR:CreateAsteroidsComets()
-  GR:CreateAsteroidsFS()
-  GR:CreateAsteroidsTimer()
 
   -- Size
   GR:SizeAsteroids()
@@ -111,47 +108,6 @@ function GR:CreateAsteroidsGameLoop()
   end)
   Game:Hide()
 end
-
--- function GR:CreateAsteroidsGameButtons()
---   local Asteroids = GR_GUI.Main.Asteroids
-
---   -- pause button
---   Asteroids.PauseBtn = CreateFrame("Button", PauseBtn, Asteroids, "UIPanelButtonTemplate")
---   local PauseBtn = Asteroids.PauseBtn
---   PauseBtn.FS = PauseBtn:CreateFontString(nil, "ARTWORK", "GameTooltipText")
---   PauseBtn.FS:SetPoint("CENTER")
---   PauseBtn.FS:SetTextColor(.8,.8,.8, 1)
---   PauseBtn.FS:SetText("Start")
---   PauseBtn:SetScript("OnClick", function(self, button, down)
---     if (button == "LeftButton" and down == false) then
---       if (GR.Asteroids.Phase == "Stopped") then
---         -- start game
---         GR:AsteroidsStartGame()      
---       elseif (GR.Asteroids.Phase == "Paused") then 
---         -- unpause
---         GR:AsteroidsUnPauseGame()
---       elseif (GR.Asteroids.Phase == "Started") then
---         -- pause game
---         GR:AsteroidsPauseGame()
---       end
---     end
---   end)
-  
---   -- stop button
---   Asteroids.StopBtn = CreateFrame("Button", StopBtn, Asteroids, "UIPanelButtonTemplate")
---   local StopBtn = Asteroids.StopBtn
---   StopBtn.FS = StopBtn:CreateFontString(nil, "ARTWORK", "GameTooltipText")
---   StopBtn.FS:SetPoint("CENTER")
---   StopBtn.FS:SetTextColor(.8,.8,.8, 1)
---   StopBtn.FS:SetText("Stop")
---   StopBtn:SetScript("OnClick", function(self, button, down)
---     if (button == "LeftButton" and down == false) then
---       -- stop game
---       GR:AsteroidsStopGame()
---     end
---   end)
---   StopBtn:Hide()
--- end
 
 function GR:CreateAsteroidsShip()
   local Main = GR_GUI.Main
@@ -276,22 +232,6 @@ function GR:CreateAsteroidsComets()
   end
 end
 
-function GR:CreateAsteroidsFS()
-  local Asteroids = GR_GUI.Main.Asteroids
-
-  Asteroids.FS = Asteroids:CreateFontString(nil, "ARTWORK", "GameTooltipText")
-  Asteroids.FS:SetTextColor(0,1,0, 1)
-end
-
-function GR:CreateAsteroidsTimer()
-  local Asteroids = GR_GUI.Main.Asteroids
-  Asteroids.Timer = Asteroids:CreateFontString(nil, "ARTWORK", "GameTooltipText")
-  local Timer = Asteroids.Timer
-  Timer:SetText(GR.Asteroids.GameTime)
-  Timer:SetTextColor(.8,.8,.8, 1)
-  GR:SizeAsteroidsTimer()
-end
-
 -- Size
 function GR:SizeAsteroids()
   local Main = GR_GUI.Main
@@ -308,21 +248,9 @@ function GR:SizeAsteroids()
   local WidthRatio = GR.Asteroids.ScreenXRatio
   local HeightRatio = GR.Asteroids.ScreenYRatio
   
-  -- -- pause button
-  -- PauseBtn:SetPoint("TOPLEFT", 15 * WidthRatio, 40 * HeightRatio)
-  -- PauseBtn:SetSize(100 * WidthRatio, 35 * HeightRatio)
-  -- PauseBtn.FS:SetTextScale(1.8 * ((WidthRatio + HeightRatio) / 2))
-  
-  -- -- stop button
-  -- StopBtn:SetPoint("TOPLEFT", 120 * WidthRatio, 40 * HeightRatio)
-  -- StopBtn:SetSize(100 * WidthRatio, 35 * HeightRatio)
-  -- StopBtn.FS:SetTextScale(1.8 * ((WidthRatio + HeightRatio) / 2))
-  
   GR:SizeAsteroidsShip(WidthRatio, HeightRatio)
   GR:SizeAsteroidsBullets()
   GR:SizeAsteroidsComets()
-  GR:SizeAsteroidsFS()
-  GR:SizeAsteroidsTimer()
 end
 
 function GR:SizeAsteroidsShip(WidthRatio, HeightRatio)
@@ -414,19 +342,6 @@ function GR:SizeAsteroidsComets()
   end
 end
 
-function GR:SizeAsteroidsFS()
-  local FS = GR_GUI.Main.Asteroids.FS
-
-  FS:SetTextScale(4 * (GR.Asteroids.ScreenXRatio + GR.Asteroids.ScreenYRatio) / 2)
-  FS:SetPoint("TOP", 0, -100 * GR.Asteroids.ScreenYRatio)
-end
-
-function GR:SizeAsteroidsTimer()
-  local Timer = GR_GUI.Main.Asteroids.Timer
-  Timer:SetPoint("BOTTOMLEFT", GR_GUI.Main.Asteroids, "TOPRIGHT", -200 * GR.Asteroids.ScreenXRatio, 6 * GR.Asteroids.ScreenYRatio)
-  Timer:SetTextScale(2 * GR.Asteroids.ScreenRatio)
-end
-
 -- hide / show
 function GR:AsteroidsHide()
   local Main = GR_GUI.Main
@@ -446,10 +361,18 @@ end
 function GR:AsteroidsShow()
   local Main = GR_GUI.Main
   local Asteroids = GR_GUI.Main.Asteroids
+  local Solo = GR_GUI.Main.HeaderInfo.Solo
 
   GR.GameType = "Asteroids"
   Asteroids:Show()
   Asteroids.Game:Hide()
+
+  Solo:Show()
+  Solo.Timer:Show()
+  Solo.Info:SetText("Move: w,a,s,d - Shoot: SpaceBar")
+  Solo.Info:Show()
+  Solo.Start:Show()
+
   GR:ShowSoloGame()
 end
 
@@ -466,12 +389,12 @@ function GR:AsteroidsStartGame()
   Solo.Pausex:Show()
   Solo.Start:Hide()
   
-  Asteroids.Timer:SetText("0")
+  Solo.Timer:SetText("0")
   GR.Asteroids.TimerSave = 0 
   GR.Asteroids.GameTime = 0
 
   -- gameover fontstring
-  GR_GUI.Main.Asteroids.FS:Hide()
+  GR_GUI.Main.HeaderInfo.Solo.GameOverFS:Hide()
 
   -- show comets
   for i=1, #Comets, 1 do
@@ -501,7 +424,7 @@ function GR:AsteroidsUnPauseGame()
   GR.Asteroids.TimerSave = 0
 
   -- gameover fontstring
-  GR_GUI.Main.Asteroids.FS:Hide()
+  GR_GUI.Main.HeaderInfo.Solo.GameOverFS:Hide()
 
   -- start game loop
   Asteroids.Game:Show()
@@ -564,6 +487,7 @@ end
   
 function GR:AsteroidsPauseGame()
   local Asteroids = GR_GUI.Main.Asteroids
+  local Solo = GR_GUI.Main.HeaderInfo.Solo
     
   -- game buttons
   GR.Asteroids.Phase = "Paused"
@@ -575,13 +499,13 @@ function GR:AsteroidsPauseGame()
   
   -- pause game loop
   Asteroids.Game:Hide()
-  Asteroids.Timer:SetText(math.floor(GR.Asteroids.GameTime * 100) / 100)
+  Solo.Timer:SetText(math.floor(GR.Asteroids.GameTime * 100) / 100)
 end
 
 -- functionality
 function GR:AsteroidsGameLoop(self, elapsed)
   GR.Asteroids.GameTime = GR.Asteroids.GameTime + elapsed
-  GR_GUI.Main.Asteroids.Timer:SetText(math.floor(GR.Asteroids.GameTime * 100) / 100)
+  GR_GUI.Main.HeaderInfo.Solo.Timer:SetText(math.floor(GR.Asteroids.GameTime * 100) / 100)
 
   GR:AsteroidsUpdateShip(elapsed)
   GR:AsteroidsUpdateBullets(elapsed)
@@ -851,18 +775,18 @@ function GR:AsteroidsCheckForWin()
   end
 
   if (GameOver) then 
-    GR_GUI.Main.Asteroids.FS:SetText("Winner!")
-    GR_GUI.Main.Asteroids.FS:SetTextColor(0,1,0, 1)
-    GR_GUI.Main.Asteroids.FS:Show()
+    GR_GUI.Main.HeaderInfo.Solo.GameOverFS:SetText("Winner!")
+    GR_GUI.Main.HeaderInfo.Solo.GameOverFS:SetTextColor(0,1,0, 1)
+    GR_GUI.Main.HeaderInfo.Solo.GameOverFS:Show()
     GR:AsteroidsStopGame()
   end 
 end
 
 function GR:AsteroidsCheckForLose()
   if (GR.Asteroids.ShipHit == true) then
-    GR_GUI.Main.Asteroids.FS:SetText("Game Over")
-    GR_GUI.Main.Asteroids.FS:SetTextColor(1,0,0, .8)
-    GR_GUI.Main.Asteroids.FS:Show()
+    GR_GUI.Main.HeaderInfo.Solo.GameOverFS:SetText("Game Over")
+    GR_GUI.Main.HeaderInfo.Solo.GameOverFS:SetTextColor(1,0,0, 1)
+    GR_GUI.Main.HeaderInfo.Solo.GameOverFS:Show()
     GR:AsteroidsStopGame()
   end
 end

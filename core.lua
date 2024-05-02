@@ -410,8 +410,6 @@ function GR:TabSelect()
     if (GR.GameType == "Minesweepers") then
       GR:MinesweepersShow()
     end
-  else
-    GR_GUI.Main.HeaderInfo:Hide()
   end
   -- Solo Games
   if (tab == "solo") then

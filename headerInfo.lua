@@ -123,7 +123,26 @@ function GR:CreateHeaderSoloGames()
   Solo.OnState = "Stop"
 
   GR:CreateHeaderSoloStartStop()
-  GR:CreateHeaderSoloElements()
+
+  -- Timer
+  Solo.Timer = Solo:CreateFontString(nil, "ARTWORK", "GameTooltipText")
+  Solo.Timer:SetText("0")
+  Solo.Timer:SetTextColor(1,1,1, 1)
+
+  -- Points
+  Solo.PointsFS = Solo:CreateFontString(nil, "ARTWORK", "GameTooltipText")
+  Solo.PointsFS:SetText()
+  Solo.PointsFS:SetTextColor(1,1,1, 1)
+
+  -- GameOver
+  Solo.GameOverFS = Solo:CreateFontString(nil, "ARTWORK", "GameTooltipText")
+  Solo.GameOverFS:SetText("Game Over")
+  Solo.GameOverFS:SetTextColor(1,0,0, 1)
+  Solo.GameOverFS:Hide()
+
+  -- Info
+  Solo.Info = Solo:CreateFontString(nil, "ARTWORK", "GameTooltipText")
+  Solo.Info:SetTextColor(1,1,1, 1)
 end
 
 function GR:CreateHeaderSoloStartStop()
@@ -175,43 +194,24 @@ function GR:CreateHeaderSoloStartStop()
   Solo.Pausex:Hide()
 end
 
-function GR:CreateHeaderSoloElements()
-  local Solo = GR_GUI.Main.HeaderInfo.Solo
-
-  -- Timer
-  Solo.Timer = Solo:CreateFontString(nil, "ARTWORK", "GameTooltipText")
-  Solo.Timer:SetText("0")
-  Solo.Timer:SetTextColor(1,1,1, 1)
-
-  -- Points
-  Solo.PointsFS = Solo:CreateFontString(nil, "ARTWORK", "GameTooltipText")
-  Solo.PointsFS:SetText()
-  Solo.PointsFS:SetTextColor(1,1,1, 1)
-
-  -- GameOver
-  Solo.GameOverFS = Solo:CreateFontString(nil, "ARTWORK", "GameTooltipText")
-  Solo.GameOverFS:SetText("Game Over")
-  Solo.GameOverFS:SetTextColor(1,0,0, 1)
-  Solo.GameOverFS:Hide()
-
-  -- Info
-  Solo.Info = Solo:CreateFontString(nil, "ARTWORK", "GameTooltipText")
-  Solo.Info:SetTextColor(1,1,1, 1)
-end
-
 -- Size
 function GR:SizeHeaderInfo()
   -- Frame
   local Main = GR_GUI.Main
   local HeaderInfo = GR_GUI.Main.HeaderInfo
   HeaderInfo:SetPoint("TOP", 0, -26 * Main.YRatio)
-  HeaderInfo:SetSize(Main:GetWidth(), 61 * Main.YRatio)
+  if (GR.GameType == "Bouncy Chicken") then
+    HeaderInfo:SetSize(Main:GetWidth(), 47 * Main.YRatio)
+  else
+    HeaderInfo:SetSize(Main:GetWidth(), 61 * Main.YRatio)
+  end
   
   -- Exit Button
   local ExitBtn = HeaderInfo.ExitBtn
   ExitBtn:SetPoint("BOTTOMRIGHT", -30 * Main.XRatio, 0 * Main.YRatio)
   ExitBtn:SetSize(100 * Main.XRatio, 30 * Main.YRatio)
-  
+  ExitBtn.FS:SetTextScale(1 * Main.ScreenRatio)
+
   GR:SizeHeaderMultiGames()
   GR:SizeHeaderSoloGames()
 end
@@ -260,7 +260,15 @@ function GR:SizeHeaderSoloGames()
   local Solo = Main.HeaderInfo.Solo
 
   GR:SizeHeaderSoloStartStop()
-  GR:SizeHeaderSoloElements()
+
+  Solo.Timer:SetPoint("BOTTOM", -180 * Main.XRatio, 0 * Main.YRatio)
+  Solo.Timer:SetTextScale(2 * Main.ScreenRatio)
+  Solo.PointsFS:SetPoint("BOTTOM", 180 * Main.XRatio, 0 * Main.YRatio)
+  Solo.PointsFS:SetTextScale(2 * Main.ScreenRatio)
+  Solo.GameOverFS:SetPoint("TOP", 0, -160 * Main.YRatio)
+  Solo.GameOverFS:SetTextScale(3.7 * Main.ScreenRatio)
+  Solo.Info:SetPoint("TOPLEFT", 100 * Main.XRatio, 0 * Main.YRatio)
+  Solo.Info:SetTextScale(1 * Main.ScreenRatio)
 end
 
 function GR:SizeHeaderSoloStartStop()
@@ -291,19 +299,6 @@ function GR:SizeHeaderSoloStartStop()
   Solo.Pausex.Tex2:SetPoint("CENTER", 6 * Main.XRatio, 0)
 end
 
-function GR:SizeHeaderSoloElements()
-  local Main = GR_GUI.Main
-  local Solo = Main.HeaderInfo.Solo
-  Solo.Timer:SetPoint("BOTTOM", -120 * Main.XRatio, 0 * Main.YRatio)
-  Solo.Timer:SetTextScale(2 * Main.ScreenRatio)
-  Solo.PointsFS:SetPoint("BOTTOM", 120 * Main.XRatio, 0 * Main.YRatio)
-  Solo.PointsFS:SetTextScale(2 * Main.ScreenRatio)
-  Solo.GameOverFS:SetPoint("TOP", 0, -160 * Main.YRatio)
-  Solo.GameOverFS:SetTextScale(3.7 * Main.ScreenRatio)
-  Solo.Info:SetPoint("TOPLEFT", 100 * Main.XRatio, 0 * Main.YRatio)
-  Solo.Info:SetTextScale(1 * Main.ScreenRatio)
-end
-
 -- Func
 function GR:SetTurnString()
   local TurnString = GR_GUI.Main.HeaderInfo.Multi.TurnString
@@ -328,6 +323,23 @@ function GR:ShowRivalsBtn()
   if (InRivals == false) then
     GR_GUI.Main.HeaderInfo.Multi.Rival:Show()
   end
+end
+
+function GR:ResetHeader()
+  local Header = GR_GUI.Main.HeaderInfo
+  Header.Solo.GameOverFS:SetText("Game Over")
+  Header.Solo.GameOverFS:Hide()
+  Header.Solo.Timer:SetText("0")
+  Header.Solo.Timer:Hide()
+  Header.Solo.PointsFS:SetText("0")
+  Header.Solo.PointsFS:Hide()
+  Header.Solo.Info:Hide()
+  Header.Solo.Start:Hide()
+  Header.Solo.Stopx:Hide()
+  Header.Solo.Pausex:Hide()
+  Header.Solo:Hide()
+  Header.Multi:Hide()
+  Header:Hide()
 end
 
 -- Start Stop Pause Unpause

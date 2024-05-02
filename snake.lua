@@ -129,9 +129,16 @@ end
 -- Show / Hide
 function GR:SnakeShow()
   local Snake = GR_GUI.Main.Snake
+  local Solo = GR_GUI.Main.HeaderInfo.Solo
 
   GR:SnakeSize()
-  GR_GUI.Main.HeaderInfo.Solo.Info:SetText("move: w,a,s,d")
+
+  Solo:Show()
+  Solo.Timer:Show()
+  Solo.Info:SetText("Move: w,a,s,d")
+  Solo.PointsFS:Show()
+  Solo.Info:Show()
+  Solo.Start:Show()
 
   Snake:Show()
 end
