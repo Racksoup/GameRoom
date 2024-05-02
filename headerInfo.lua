@@ -230,13 +230,13 @@ function GR:SizeHeaderMultiGames()
 
   -- Turn String
   local TurnString = Multi.TurnString
-  TurnString:SetPoint("TOP", 0, 0 * Main.YRatio)
-  TurnString:SetTextScale(2 * Main.ScreenRatio)
+  TurnString:SetPoint("BOTTOM", 150 * Main.XRatio, 0 * Main.YRatio)
+  TurnString:SetTextScale(1 * Main.ScreenRatio)
 
   -- Opponet String
   local Opp = Multi.OpponentString
-  Opp:SetPoint("TOPLEFT", 0, -2 * Main.YRatio)
-  Opp:SetTextScale(1.5 * Main.ScreenRatio)
+  Opp:SetPoint("BOTTOMLEFT", 30 * Main.XRatio, -2 * Main.YRatio)
+  Opp:SetTextScale(1 * Main.ScreenRatio)
 
   -- Reinvite Button
   local ReInvite = Multi.ReInvite
@@ -324,10 +324,10 @@ function GR:SetTurnString()
   if (GR.GameOver == false) then
     if (GR.IsPlayerTurn) then
       TurnString:SetTextColor(0,1,0,1)
-      TurnString:SetText(UnitName("player"))
+      TurnString:SetText(UnitName("player") .. " It's Your Turn")
     else
       TurnString:SetTextColor(1,0,0,1)
-      TurnString:SetText(GR.Opponent)
+      TurnString:SetText("Waiting For " .. GR.Opponent)
     end
   end
 end

@@ -67,52 +67,53 @@ end
 function GR:SizeTictactoe()
   local Main = GR_GUI.Main
   local Tictactoe = Main.Tictactoe
+  local GameScreenWidth = GR.Win.Const.GameScreenWidth
+  local GameScreenHeight = GR.Win.Const.GameScreenHeight
   
   Tictactoe:SetPoint("BOTTOM", 0 * Main.XRatio, 17 * Main.YRatio)
-  Tictactoe:SetSize(GR.Tic.Width * Main.XRatio, GR.Tic.Height * Main.YRatio)
-
-  Main.HeaderInfo.Multi.TurnString:SetPoint("TOP", 0 * Main.XRatio, 0 * Main.YRatio)
-
-  Tictactoe.VLine1:SetStartPoint("TOPLEFT", (GR.Tic.Width / 3) * Main.XRatio, 0 * Main.YRatio)
-  Tictactoe.VLine1:SetEndPoint("BOTTOMLEFT", (GR.Tic.Width / 3) * Main.XRatio, 0 * Main.YRatio)
-  Tictactoe.VLine2:SetStartPoint("TOPLEFT", ((GR.Tic.Width / 3) *2) * Main.XRatio, 0 * Main.YRatio)
-  Tictactoe.VLine2:SetEndPoint("BOTTOMLEFT", ((GR.Tic.Width / 3) *2) * Main.XRatio, 0 * Main.YRatio)
-  Tictactoe.HLine1:SetStartPoint("TOPLEFT", 0 * Main.XRatio, -(GR.Tic.Height / 3) * Main.YRatio)
-  Tictactoe.HLine1:SetEndPoint("TOPRIGHT", 0 * Main.XRatio, -(GR.Tic.Height / 3) * Main.YRatio)
-  Tictactoe.HLine2:SetStartPoint("TOPLEFT", 0 * Main.XRatio, -((GR.Tic.Height / 3) *2) * Main.YRatio)
-  Tictactoe.HLine2:SetEndPoint("TOPRIGHT", 0 * Main.XRatio, -((GR.Tic.Height / 3) *2) * Main.YRatio)
-
+  Tictactoe:SetSize(GameScreenWidth * Main.XRatio, GameScreenHeight * Main.YRatio)
+  
+  Tictactoe.VLine1:SetStartPoint("TOPLEFT", (GameScreenWidth / 3) * Main.XRatio, 0 * Main.YRatio)
+  Tictactoe.VLine1:SetEndPoint("BOTTOMLEFT", (GameScreenWidth / 3) * Main.XRatio, 0 * Main.YRatio)
+  Tictactoe.VLine2:SetStartPoint("TOPLEFT", ((GameScreenWidth / 3) *2) * Main.XRatio, 0 * Main.YRatio)
+  Tictactoe.VLine2:SetEndPoint("BOTTOMLEFT", ((GameScreenWidth / 3) *2) * Main.XRatio, 0 * Main.YRatio)
+  Tictactoe.HLine1:SetStartPoint("TOPLEFT", 0 * Main.XRatio, -(GameScreenHeight / 3) * Main.YRatio)
+  Tictactoe.HLine1:SetEndPoint("TOPRIGHT", 0 * Main.XRatio, -(GameScreenHeight / 3) * Main.YRatio)
+  Tictactoe.HLine2:SetStartPoint("TOPLEFT", 0 * Main.XRatio, -((GameScreenHeight / 3) *2) * Main.YRatio)
+  Tictactoe.HLine2:SetEndPoint("TOPRIGHT", 0 * Main.XRatio, -((GameScreenHeight / 3) *2) * Main.YRatio)
+  
   GR:SizeTictactoeButtons()
 end
 
 function GR:SizeTictactoeButtons()
   local Main = GR_GUI.Main
   local Tictactoe = Main.Tictactoe
-
-  local Buttons = GR_GUI.Main.Tictactoe.Buttons
+  local Buttons = Tictactoe.Buttons
+  local GameScreenWidth = GR.Win.Const.GameScreenWidth
+  local GameScreenHeight = GR.Win.Const.GameScreenHeight
 
   for i=1, #Buttons, 1 do
     local function xVal() 
       if (i == 3 or i == 6 or i == 9) then 
-        return (((GR.Tic.Width / 3) *2) + 5) * Main.XRatio
+        return (((GameScreenWidth / 3) *2) + 5) * Main.XRatio
       elseif (i == 2 or i == 5 or i == 8) then 
-        return ((GR.Tic.Width / 3) + 5) * Main.XRatio
+        return ((GameScreenWidth / 3) + 5) * Main.XRatio
       else  
         return 5 * Main.XRatio
       end 
     end
     local function yVal() 
       if i > 6 then 
-        return (-((GR.Tic.Height / 3) *2) - 5) * Main.YRatio 
+        return (-((GameScreenHeight / 3) *2) - 5) * Main.YRatio 
       elseif i > 3 then 
-        return (-(GR.Tic.Height / 3) - 5) * Main.YRatio 
+        return (-(GameScreenHeight / 3) - 5) * Main.YRatio 
       else 
         return -6 * Main.YRatio
       end 
     end
 
     Buttons[i]:SetPoint("TOPLEFT", xVal(), yVal())
-    Buttons[i]:SetSize((GR.Tic.Width / 3) * Main.XRatio, (GR.Tic.Height / 3) * Main.YRatio)
+    Buttons[i]:SetSize((GameScreenWidth / 3) * Main.XRatio, (GameScreenHeight / 3) * Main.YRatio)
   end
 end
 
@@ -139,16 +140,11 @@ function GR:TicTacToeEndGame()
   GR.CanSendInvite = true
   GR.IsChallenged = false
   GR.Opponent = nil
-
-  GR_GUI.Main.HeaderInfo:Hide()
-
-  GR.db.realm.tab = "game"
-  GR:TabSelect()
 end
 
 function GR:TictactoeShow()
     GR_GUI.Main.Tictactoe:Show()
-    GR_GUI.Main.H2:Hide()
+    GR:SizeTictactoe()
     GR.GameType = "Tictactoe"
     GR:ShowMultiGame()            
 end

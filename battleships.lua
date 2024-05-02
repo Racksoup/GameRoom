@@ -1423,7 +1423,6 @@ function GR:BattleshipsShow()
   Battleships.Ship5:Show()
   Battleships.Ship5:SetMovable(true)
   Battleships.Ship5:EnableMouse(true)
-  GR:SizeShips(Battleships.Board)
   GR:SizeBattleships(Battleships.Board)
 end
 

@@ -361,7 +361,6 @@ function GR:TabSelect()
   Main.Tab2:Hide()
   Main.Tab3:Hide()
   Main.Tab4:Hide() 
-
   
   -- In Game
   if (tab == "game") then
@@ -536,6 +535,7 @@ function GR:ShowMultiGame()
   Main.HeaderInfo.Multi.ReInvite:Hide()
   Main.HeaderInfo.Multi.ReMatch:Hide()
   Main.HeaderInfo.Multi.Rival:Hide()
+  GR_GUI.Main.H2:SetText(GR.GameType)
   
   if (GR.Opponent) then 
     Main.HeaderInfo.Multi.OpponentString:SetText("Opponent: " .. GR.Opponent)
@@ -631,6 +631,7 @@ end
 -- BUGS
 -- guild needs to unregister offline players
 -- show challenge as msg doesn't allow players to accept challenges
+-- rivals spams 
 
 -- GAMES
 -- chess
@@ -653,6 +654,4 @@ end
 
 
 -- fix multi header
--- fix resize for games
 -- fix show / hide 
--- snake broken

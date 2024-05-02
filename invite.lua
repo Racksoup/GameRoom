@@ -387,10 +387,16 @@ function GR:OpponentEndedGame(text, distribution)
   if P then 
     if (string.match(V.Tag, "TicTacToe_GameEnd") and ((V.Target == "" or V.Target == UnitName("Player")) or (distribution ~= "RAID" and distribution ~= "PARTY"))) then
       GR.GameType = nil
+      GR.db.realm.tab = "solo"
       GR:TicTacToeEndGame()
+      GR:ResetHeader()
+      GR:TabSelect()
     end
     if (string.match(V.Tag, "Battleships_GameEnd") and ((V.Target == "" or V.Target == UnitName("Player")) or (distribution ~= "RAID" and distribution ~= "PARTY"))) then
       GR.GameType = nil
+      GR.db.realm.tab = "solo"
+      GR:ResetHeader()
+      GR:TabSelect()
       GR:BattleshipsEndGame()
     end
   end 
