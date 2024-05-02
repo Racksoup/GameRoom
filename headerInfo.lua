@@ -123,6 +123,7 @@ function GR:CreateHeaderSoloGames()
   Solo.OnState = "Stop"
 
   GR:CreateHeaderSoloStartStop()
+  GR:CreateHeaderSoloElements()
 end
 
 function GR:CreateHeaderSoloStartStop()
@@ -174,21 +175,41 @@ function GR:CreateHeaderSoloStartStop()
   Solo.Pausex:Hide()
 end
 
+function GR:CreateHeaderSoloElements()
+  local Solo = GR_GUI.Main.HeaderInfo.Solo
+
+  -- Timer
+  Solo.Timer = Solo:CreateFontString(nil, "ARTWORK", "GameTooltipText")
+  Solo.Timer:SetText("0")
+  Solo.Timer:SetTextColor(1,1,1, 1)
+
+  -- Points
+  Solo.PointsFS = Solo:CreateFontString(nil, "ARTWORK", "GameTooltipText")
+  Solo.PointsFS:SetText()
+  Solo.PointsFS:SetTextColor(1,1,1, 1)
+
+  -- GameOver
+  Solo.GameOverFS = Solo:CreateFontString(nil, "ARTWORK", "GameTooltipText")
+  Solo.GameOverFS:SetText("Game Over")
+  Solo.GameOverFS:SetTextColor(1,0,0, 1)
+  Solo.GameOverFS:Hide()
+
+  -- Info
+  Solo.Info = Solo:CreateFontString(nil, "ARTWORK", "GameTooltipText")
+  Solo.Info:SetTextColor(1,1,1, 1)
+end
+
 -- Size
 function GR:SizeHeaderInfo()
   -- Frame
   local Main = GR_GUI.Main
   local HeaderInfo = GR_GUI.Main.HeaderInfo
-  HeaderInfo:SetPoint("TOP", 0, -60 * Main.YRatio)
-  HeaderInfo:SetSize(700 * Main.XRatio, 100 * Main.YRatio)
+  HeaderInfo:SetPoint("TOP", 0, -26 * Main.YRatio)
+  HeaderInfo:SetSize(Main:GetWidth(), 61 * Main.YRatio)
   
   -- Exit Button
   local ExitBtn = HeaderInfo.ExitBtn
-  if (GR.GameType == "Bouncy Chicken") then
-    ExitBtn:SetPoint("TOPRIGHT", 0 * Main.XRatio, 0 * Main.YRatio)
-  else
-    ExitBtn:SetPoint("TOPRIGHT", 0 * Main.XRatio, 0 * Main.YRatio)
-  end
+  ExitBtn:SetPoint("BOTTOMRIGHT", -30 * Main.XRatio, 0 * Main.YRatio)
   ExitBtn:SetSize(100 * Main.XRatio, 30 * Main.YRatio)
   
   GR:SizeHeaderMultiGames()
@@ -239,13 +260,14 @@ function GR:SizeHeaderSoloGames()
   local Solo = Main.HeaderInfo.Solo
 
   GR:SizeHeaderSoloStartStop()
+  GR:SizeHeaderSoloElements()
 end
 
 function GR:SizeHeaderSoloStartStop()
   local Main = GR_GUI.Main
   local Solo = Main.HeaderInfo.Solo
   
-  Solo.Start:SetPoint("TOPLEFT", 50 * Main.XRatio, 0 * Main.YRatio)
+  Solo.Start:SetPoint("BOTTOMLEFT", 50 * Main.XRatio, 0 * Main.YRatio)
   Solo.Start:SetSize(30 * Main.XRatio, 30 * Main.YRatio)
   Solo.Start.Line1:SetStartPoint("CENTER", -8 * Main.XRatio, 8 * Main.YRatio)
   Solo.Start.Line1:SetEndPoint("CENTER", 8 * Main.XRatio, 0)
@@ -257,16 +279,29 @@ function GR:SizeHeaderSoloStartStop()
   Solo.Start.Line3:SetEndPoint("CENTER", -8 * Main.XRatio, 8 * Main.YRatio)
   Solo.Start.Line3:SetThickness(3 * Main.ScreenRatio)
 
-  Solo.Stopx:SetPoint("TOPLEFT", 83 * Main.XRatio, 0 * Main.YRatio)
+  Solo.Stopx:SetPoint("BOTTOMLEFT", 83 * Main.XRatio, 0 * Main.YRatio)
   Solo.Stopx:SetSize(30 * Main.XRatio, 30 * Main.YRatio)
   Solo.Stopx.Tex:SetSize(15 * Main.XRatio, 15 * Main.YRatio)
   
-  Solo.Pausex:SetPoint("TOPLEFT", 50 * Main.XRatio, 0 * Main.YRatio)
+  Solo.Pausex:SetPoint("BOTTOMLEFT", 50 * Main.XRatio, 0 * Main.YRatio)
   Solo.Pausex:SetSize(30 * Main.XRatio, 30 * Main.YRatio)
   Solo.Pausex.Tex1:SetSize(6 * Main.XRatio, 15 * Main.YRatio)
   Solo.Pausex.Tex1:SetPoint("CENTER", -6 * Main.XRatio, 0)
   Solo.Pausex.Tex2:SetSize(6 * Main.XRatio, 15 * Main.YRatio)
   Solo.Pausex.Tex2:SetPoint("CENTER", 6 * Main.XRatio, 0)
+end
+
+function GR:SizeHeaderSoloElements()
+  local Main = GR_GUI.Main
+  local Solo = Main.HeaderInfo.Solo
+  Solo.Timer:SetPoint("BOTTOM", -120 * Main.XRatio, 0 * Main.YRatio)
+  Solo.Timer:SetTextScale(2 * Main.ScreenRatio)
+  Solo.PointsFS:SetPoint("BOTTOM", 120 * Main.XRatio, 0 * Main.YRatio)
+  Solo.PointsFS:SetTextScale(2 * Main.ScreenRatio)
+  Solo.GameOverFS:SetPoint("TOP", 0, -160 * Main.YRatio)
+  Solo.GameOverFS:SetTextScale(3.7 * Main.ScreenRatio)
+  Solo.Info:SetPoint("TOPLEFT", 100 * Main.XRatio, 0 * Main.YRatio)
+  Solo.Info:SetTextScale(1 * Main.ScreenRatio)
 end
 
 -- Func
@@ -306,6 +341,9 @@ function GR:HeaderSoloStart()
   if (GR.GameType == "Asteroids") then
     GR:AsteroidsStartGame()
   end
+  if (GR.GameType == "Suika") then
+    GR:SuikaStart()
+  end
 end
 function GR:HeaderSoloStop()
   if (GR.GameType == "Snake") then
@@ -316,6 +354,9 @@ function GR:HeaderSoloStop()
   end
   if (GR.GameType == "Asteroids") then
     GR:AsteroidsStopGame()
+  end
+  if (GR.GameType == "Suika") then
+    GR:SuikaStop()
   end
 end
 function GR:HeaderSoloPause()

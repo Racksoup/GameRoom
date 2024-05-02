@@ -422,8 +422,6 @@ function GR:SuikaHide()
   Suika:Hide()
   Suika.PointsFS:Hide()
   Suika.GameOverFS:Hide()
-  Solo.Start:Hide()
-  Solo.Stopx:Hide()
 end
 
 -- Start Stop Pause Unpause

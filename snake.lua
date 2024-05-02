@@ -39,7 +39,6 @@ function GR:CreateSnake()
 
   -- Create
   GR:CreateSnakeGameLoop()
-  GR:CreateSnakeTimer()
   GR:CreateSnakeGrid()
   GR:CreateSnakeApple()
 
@@ -55,31 +54,6 @@ function GR:CreateSnakeGameLoop()
   Snake.Game:Hide()
 
   GR:SnakeControls()
-end
-
-function GR:CreateSnakeTimer()
-  local Snake = GR_GUI.Main.Snake
-
-  -- Timer
-  Snake.Timer = Snake:CreateFontString(nil, "ARTWORK", "GameTooltipText")
-  Snake.Timer:SetText(Snake.GameTime)
-  Snake.Timer:SetTextColor(.8,.8,.8, 1)
-
-  -- Points
-  Snake.PointsFS = Snake:CreateFontString(nil, "ARTWORK", "GameTooltipText")
-  Snake.PointsFS:SetText(Snake.Points)
-  Snake.PointsFS:SetTextColor(.8,.8,.8, 1)
-
-  -- GameOver
-  Snake.GameOverFS = Snake:CreateFontString(nil, "ARTWORK", "GameTooltipText")
-  Snake.GameOverFS:SetText("Game Over")
-  Snake.GameOverFS:SetTextColor(.8,0,0, 1)
-  Snake.GameOverFS:Hide()
-
-  -- Info
-  Snake.Info = Snake:CreateFontString(nil, "ARTWORK", "GameTooltipText")
-  Snake.Info:SetText("move: w,a,s,d")
-  Snake.Info:SetTextColor(.8,.8,.8, 1)
 end
 
 function GR:CreateSnakeGrid()
@@ -127,21 +101,8 @@ function GR:SnakeSize()
   Snake.YRatio = Snake:GetHeight() / GR.Snake.Const.Height
   Snake.ScreenRatio = ((Snake:GetWidth() / GR.Snake.Const.Width) + (Snake:GetHeight() / GR.Snake.Const.Height)) / 2
 
-  GR:SizeSnakeTimer()
   GR:SizeSnakeGrid()
   GR:SizeSnakeApple()
-end
-
-function GR:SizeSnakeTimer()
-  local Snake = GR_GUI.Main.Snake
-  Snake.Timer:SetPoint("BOTTOMLEFT", Snake, "TOPRIGHT", -220 * Snake.XRatio, 6 * Snake.YRatio)
-  Snake.Timer:SetTextScale(2 * Snake.ScreenRatio)
-  Snake.PointsFS:SetPoint("BOTTOMLEFT", Snake, "TOPLEFT", 160 * Snake.XRatio, 6 * Snake.YRatio)
-  Snake.PointsFS:SetTextScale(2 * Snake.ScreenRatio)
-  Snake.GameOverFS:SetPoint("TOP", 0, -80 * Snake.YRatio)
-  Snake.GameOverFS:SetTextScale(3.7 * Snake.ScreenRatio)
-  Snake.Info:SetPoint("TOP", Snake, "TOPLEFT", 100 * Snake.XRatio, 57 * Snake.YRatio)
-  Snake.Info:SetTextScale(1 * Snake.ScreenRatio)
 end
 
 function GR:SizeSnakeGrid()
@@ -170,6 +131,7 @@ function GR:SnakeShow()
   local Snake = GR_GUI.Main.Snake
 
   GR:SnakeSize()
+  GR_GUI.Main.HeaderInfo.Solo.Info:SetText("move: w,a,s,d")
 
   Snake:Show()
 end
@@ -201,11 +163,11 @@ function GR:SnakeStart()
   Snake.TailLength = 0
   GR:SnakeMoveApple()
   
-  Snake.PointsFS:SetText(Snake.Points)
+  Solo.PointsFS:SetText(Snake.Points)
   
   Snake.Game:Show()
   Snake.Apple:Show()
-  Snake.GameOverFS:Hide()
+  Solo.GameOverFS:Hide()
   
   Solo.Stopx:Show()
   Solo.Pausex:Show()
@@ -251,7 +213,7 @@ function GR:SnakeUpdate(self, elapsed)
 
   Snake.GameTime = Snake.GameTime + elapsed
 
-  Snake.Timer:SetText(math.floor(Snake.GameTime * 100) / 100)
+  GR_GUI.Main.HeaderInfo.Solo.Timer:SetText(math.floor(Snake.GameTime * 100) / 100)
 
   local MoveSnake = GR:SnakeUpdatePos(elapsed)
 
@@ -395,7 +357,7 @@ end
 function GR:SnakeGameOver()
   GR:SnakeStop()
 
-  GR_GUI.Main.Snake.GameOverFS:Show()
+  GR_GUI.Main.HeaderInfo.Solo.GameOverFS:Show()
 end
 
 function GR:SnakeAddPoints()
@@ -427,7 +389,7 @@ function GR:SnakeAddPoints()
     Snake.Points = math.floor(Snake.Points * 2 - (Snake.Points * .91))
   end
 
-  Snake.PointsFS:SetText(Snake.Points)
+  GR_GUI.Main.HeaderInfo.Solo.PointsFS:SetText(Snake.Points)
 end
 
 function GR:SnakeIntervalSpeed()
