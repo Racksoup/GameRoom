@@ -199,16 +199,31 @@ function GR:SizeHeaderInfo()
   -- Frame
   local Main = GR_GUI.Main
   local HeaderInfo = GR_GUI.Main.HeaderInfo
-  HeaderInfo:SetPoint("TOP", 0, -26 * Main.YRatio)
+  HeaderInfo:SetPoint("TOP", 0, -26)
+  local height
   if (GR.GameType == "Bouncy Chicken") then
-    HeaderInfo:SetSize(Main:GetWidth(), 47 * Main.YRatio)
+    height = (47 * Main.YRatio) * Main.YRatio
+    if (height > 70) then
+      height = 47 * (Main.YRatio * 1.13)
+    end
+    HeaderInfo:SetSize(Main:GetWidth(), height)
+  elseif (GR.GameType == "Suika") then
+    height = (69 * Main.YRatio) * Main.YRatio
+    if (height > 90) then
+      height = 61 * (Main.YRatio * 1.13)
+    end
+    HeaderInfo:SetSize(Main:GetWidth(), height)
   else
-    HeaderInfo:SetSize(Main:GetWidth(), 61 * Main.YRatio)
+    height = (61 * Main.YRatio) * Main.YRatio
+    if (height > 90) then
+      height = 61 * (Main.YRatio * 1.13)
+    end
+    HeaderInfo:SetSize(Main:GetWidth(), height)
   end
   
   -- Exit Button
   local ExitBtn = HeaderInfo.ExitBtn
-  ExitBtn:SetPoint("BOTTOMRIGHT", -30 * Main.XRatio, 0 * Main.YRatio)
+  ExitBtn:SetPoint("BOTTOMRIGHT", -20 * Main.XRatio, 0 * Main.YRatio)
   ExitBtn:SetSize(100 * Main.XRatio, 30 * Main.YRatio)
   ExitBtn.FS:SetTextScale(1 * Main.ScreenRatio)
 
@@ -261,13 +276,18 @@ function GR:SizeHeaderSoloGames()
 
   GR:SizeHeaderSoloStartStop()
 
-  Solo.Timer:SetPoint("BOTTOM", -180 * Main.XRatio, 0 * Main.YRatio)
-  Solo.Timer:SetTextScale(2 * Main.ScreenRatio)
-  Solo.PointsFS:SetPoint("BOTTOM", 180 * Main.XRatio, 0 * Main.YRatio)
-  Solo.PointsFS:SetTextScale(2 * Main.ScreenRatio)
+  if (GR.GameType == "Suika") then
+    Solo.Timer:SetPoint("BOTTOM", -70 * Main.XRatio, 0 * Main.YRatio)
+    Solo.PointsFS:SetPoint("BOTTOM", 70 * Main.XRatio, 0 * Main.YRatio)
+  else
+    Solo.Timer:SetPoint("BOTTOM", -180 * Main.XRatio, 0 * Main.YRatio)
+    Solo.PointsFS:SetPoint("BOTTOM", 180 * Main.XRatio, 0 * Main.YRatio)
+  end
   Solo.GameOverFS:SetPoint("TOP", 0, -160 * Main.YRatio)
-  Solo.GameOverFS:SetTextScale(3.7 * Main.ScreenRatio)
   Solo.Info:SetPoint("TOPLEFT", 100 * Main.XRatio, 0 * Main.YRatio)
+  Solo.Timer:SetTextScale(2 * Main.ScreenRatio)
+  Solo.PointsFS:SetTextScale(2 * Main.ScreenRatio)
+  Solo.GameOverFS:SetTextScale(3.7 * Main.ScreenRatio)
   Solo.Info:SetTextScale(1 * Main.ScreenRatio)
 end
 
@@ -275,7 +295,15 @@ function GR:SizeHeaderSoloStartStop()
   local Main = GR_GUI.Main
   local Solo = Main.HeaderInfo.Solo
   
-  Solo.Start:SetPoint("BOTTOMLEFT", 50 * Main.XRatio, 0 * Main.YRatio)
+  if (GR.GameType == "Suika") then
+    Solo.Start:SetPoint("BOTTOMLEFT", 20 * Main.XRatio, 0 * Main.YRatio)
+    Solo.Stopx:SetPoint("BOTTOMLEFT", 53 * Main.XRatio, 0 * Main.YRatio)
+    Solo.Pausex:SetPoint("BOTTOMLEFT", 20 * Main.XRatio, 0 * Main.YRatio)
+  else
+    Solo.Start:SetPoint("BOTTOMLEFT", 50 * Main.XRatio, 0 * Main.YRatio)
+    Solo.Stopx:SetPoint("BOTTOMLEFT", 83 * Main.XRatio, 0 * Main.YRatio)
+    Solo.Pausex:SetPoint("BOTTOMLEFT", 50 * Main.XRatio, 0 * Main.YRatio)
+  end
   Solo.Start:SetSize(30 * Main.XRatio, 30 * Main.YRatio)
   Solo.Start.Line1:SetStartPoint("CENTER", -8 * Main.XRatio, 8 * Main.YRatio)
   Solo.Start.Line1:SetEndPoint("CENTER", 8 * Main.XRatio, 0)
@@ -287,11 +315,9 @@ function GR:SizeHeaderSoloStartStop()
   Solo.Start.Line3:SetEndPoint("CENTER", -8 * Main.XRatio, 8 * Main.YRatio)
   Solo.Start.Line3:SetThickness(3 * Main.ScreenRatio)
 
-  Solo.Stopx:SetPoint("BOTTOMLEFT", 83 * Main.XRatio, 0 * Main.YRatio)
   Solo.Stopx:SetSize(30 * Main.XRatio, 30 * Main.YRatio)
   Solo.Stopx.Tex:SetSize(15 * Main.XRatio, 15 * Main.YRatio)
   
-  Solo.Pausex:SetPoint("BOTTOMLEFT", 50 * Main.XRatio, 0 * Main.YRatio)
   Solo.Pausex:SetSize(30 * Main.XRatio, 30 * Main.YRatio)
   Solo.Pausex.Tex1:SetSize(6 * Main.XRatio, 15 * Main.YRatio)
   Solo.Pausex.Tex1:SetPoint("CENTER", -6 * Main.XRatio, 0)

@@ -328,8 +328,8 @@ function GR:BCShow()
   Solo:Show()
   Solo.Timer:Show()
   Solo.Info:SetText("Bounce: Space, W, Up-Arrow")
-  Solo.PointsFS:Show()
   Solo.Info:Show()
+  Solo.PointsFS:Show()
   Solo.Start:Show()
 end
 

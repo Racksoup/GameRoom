@@ -66,7 +66,6 @@ function GR:SuikaCreate()
 
   -- Create
   GR:SuikaGameLoop()
-  GR:SuikaCreateInfo()
   Suika.Balls = {}
 end
 
@@ -80,23 +79,6 @@ function GR:SuikaGameLoop()
     GR:SuikaUpdate(self, elapsed)
   end)
   Game:Hide()
-end
-
-function GR:SuikaCreateInfo()
-  local Main = GR_GUI.Main
-  local Suika = Main.Suika
-
-  -- Points 
-  Suika.PointsFS = Main:CreateFontString(nil, "ARTWORK", "GameTooltipText")
-  Suika.PointsFS:SetText(GR.Suika.Points)
-  Suika.PointsFS:SetTextColor(.8,.8,.8, 1)
-  Suika.PointsFS:Hide()
-
-  -- GameOver
-  Suika.GameOverFS = Main:CreateFontString(nil, "ARTWORK", "GameTooltipText")
-  Suika.GameOverFS:SetText("Game Over")
-  Suika.GameOverFS:SetTextColor(.8,0,0, 1)
-  Suika.GameOverFS:Hide()
 end
 
 function GR:CreateUseNextBall()
@@ -184,20 +166,7 @@ function GR:SuikaSize()
   GR.Suika.MinGravity = GR.Suika.Const.MinGravity * GR.Suika.YRatio
   GR.Suika.MaxSpeed = GR.Suika.Const.MaxSpeed * GR.Suika.ScreenRatio
 
-  GR:SuikaSizeInfo()
   GR:SuikaSizeBalls()
-end
-
-function GR:SuikaSizeInfo()
-  local Suika = GR_GUI.Main.Suika
-
-  -- Points
-  Suika.PointsFS:SetPoint("BOTTOMLEFT", Suika, "TOPLEFT", 110 * GR.Suika.XRatio, 10 * GR.Suika.YRatio)
-  Suika.PointsFS:SetTextScale(2 * GR.Suika.ScreenRatio)
-  
-  -- Game Over
-  Suika.GameOverFS:SetPoint("TOP", Suika, 0, -140 * GR.Suika.YRatio)
-  Suika.GameOverFS:SetTextScale(3.7 * GR.Suika.ScreenRatio)
 end
 
 function GR:SuikaSizeBalls()
@@ -407,8 +376,11 @@ function GR:SuikaShow()
   GR:SuikaSize()
   
   Suika:Show()
-  Suika.PointsFS:Show()
-  Suika.GameOverFS:Hide()
+  Solo:Show()
+  Solo.Timer:Show()
+  Solo.Info:SetText("Click and Drag Balls")
+  Solo.Info:Show()
+  Solo.PointsFS:Show()
   if (GR.Suika.ActiveState == 'Stop') then Solo.Start:Show() end
   if (GR.Suika.ActiveState == 'Start') then Solo.Stopx:Show() Suika.Game:Show() end
   
@@ -420,8 +392,8 @@ function GR:SuikaHide()
   local Solo = GR_GUI.Main.HeaderInfo.Solo
   
   Suika:Hide()
-  Suika.PointsFS:Hide()
-  Suika.GameOverFS:Hide()
+  Solo.PointsFS:Hide()
+  Solo.GameOverFS:Hide()
 end
 
 -- Start Stop Pause Unpause
@@ -441,11 +413,11 @@ function GR:SuikaStart()
   
   -- Show Game Info and Buttons
   GR.Suika.ActiveState = 'Start'
-  Suika.PointsFS:SetText(GR.Suika.Points)
-  Solo.Start:Hide()
+  Solo.PointsFS:SetText(GR.Suika.Points)
   Solo.Stopx:Show()
   Solo.Pausex:Hide()
-  Suika.GameOverFS:Hide()
+  Solo.Start:Hide()
+  Solo.GameOverFS:Hide()
 end
 
 function GR:SuikaStop()
@@ -453,9 +425,9 @@ function GR:SuikaStop()
   local Solo = GR_GUI.Main.HeaderInfo.Solo
   
   GR.Suika.ActiveState = 'Stop'
-  Solo.Stopx:Hide()
   Solo.Start:Show()
   Solo.Pausex:Hide()
+  Solo.Stopx:Hide()
   for i,v in pairs(Suika.Balls) do
     v.IsActive = false
     v:Hide()
