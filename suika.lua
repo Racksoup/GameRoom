@@ -443,3 +443,4 @@ end
 -- balls spawn with left offset
 -- points
 -- end-game
+-- make balls work properly

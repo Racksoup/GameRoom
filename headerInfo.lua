@@ -201,25 +201,18 @@ function GR:SizeHeaderInfo()
   local HeaderInfo = GR_GUI.Main.HeaderInfo
   HeaderInfo:SetPoint("TOP", 0, -26)
   local height
-  if (GR.GameType == "Bouncy Chicken") then
-    height = (47 * Main.YRatio) * Main.YRatio
-    if (height > 70) then
-      height = 47 * (Main.YRatio * 1.13)
-    end
-    HeaderInfo:SetSize(Main:GetWidth(), height)
-  elseif (GR.GameType == "Suika") then
+  if (GR.GameType == "Suika") then
     height = (69 * Main.YRatio) * Main.YRatio
     if (height > 90) then
       height = 61 * (Main.YRatio * 1.13)
     end
-    HeaderInfo:SetSize(Main:GetWidth(), height)
   else
-    height = (61 * Main.YRatio) * Main.YRatio
-    if (height > 90) then
-      height = 61 * (Main.YRatio * 1.13)
+    height = (47 * Main.YRatio) * Main.YRatio
+    if (height > 70) then
+      height = 47 * (Main.YRatio * 1.13)
     end
-    HeaderInfo:SetSize(Main:GetWidth(), height)
   end
+  HeaderInfo:SetSize(Main:GetWidth(), height)
   
   -- Exit Button
   local ExitBtn = HeaderInfo.ExitBtn

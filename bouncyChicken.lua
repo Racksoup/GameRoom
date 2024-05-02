@@ -100,8 +100,8 @@ function GR:SizeBC()
   local BC = GR_GUI.Main.BC
 
   -- Game Screen
-  BC:SetPoint("BOTTOM", 0, 25 * (Main:GetHeight() / GR.Win.Const.Tab1Height))
-  BC:SetSize(Main:GetWidth() * (GR.Win.Const.GameScreenWidth / GR.Win.Const.Tab1Width), Main:GetHeight() * (GR.Win.Const.GameScreenHeight / GR.Win.Const.Tab1Height))
+  BC:SetPoint("BOTTOM", 0, 25 * Main.YRatio)
+  BC:SetSize(GR.Win.Const.GameScreenWidth * Main.XRatio, GR.Win.Const.GameScreenHeight * Main.YRatio)
   GR.BC.XRatio = BC:GetWidth() / GR.Win.Const.GameScreenWidth
   GR.BC.YRatio = BC:GetHeight() / GR.Win.Const.GameScreenHeight
   GR.BC.ScreenRatio = (BC:GetWidth() / GR.Win.Const.GameScreenWidth + BC:GetHeight() / GR.Win.Const.GameScreenHeight) / 2

@@ -54,11 +54,11 @@ function GR:OnInitialize()
   GR.Win = {}
   GR.Win.Const = {}
   GR.Win.Const.Tab1Width = 800
-  GR.Win.Const.Tab1Height = 620
+  GR.Win.Const.Tab1Height = 520
   GR.Win.Const.Tab1WidthSuika = 475
   GR.Win.Const.Tab1HeightSuika = 800
   GR.Win.Const.GameScreenWidth = 750
-  GR.Win.Const.GameScreenHeight = 500
+  GR.Win.Const.GameScreenHeight = 420
   GR.Win.Const.SuikaScreenWidth = 435
   GR.Win.Const.SuikaScreenHeight = 660
   GR.Win.Const.Tab2Width = 310
@@ -217,7 +217,7 @@ end
 
 function GR:CreateAcceptDecline()
   local PlayerName = UnitName("player")
-  GR_GUI.Accept = CreateFrame("Button", Accept, UIParent, "UIPanelButtonTemplate")
+  GR_GUI.Accept = CreateFrame("Button", "Accept", UIParent, "UIPanelButtonTemplate")
   local Accept = GR_GUI.Accept
   Accept:SetPoint(GR.db.realm.Point, GR.db.realm.Xpos, GR.db.realm.Ypos)
   Accept:SetSize(214, 58)
@@ -236,7 +236,7 @@ function GR:CreateAcceptDecline()
     GR:AcceptGameClicked()
   end)
 
-  Accept.DeclineBtn = CreateFrame("Button", DeclineBtn, Accept, "UIPanelButtonTemplate")
+  Accept.DeclineBtn = CreateFrame("Button", "DeclineBtn", Accept, "UIPanelButtonTemplate")
   local DeclineBtn = Accept.DeclineBtn
   DeclineBtn:SetPoint("RIGHT", 100, 0)
   DeclineBtn:SetSize(70, 20)
@@ -246,14 +246,14 @@ function GR:CreateAcceptDecline()
   DeclineFS:SetTextColor(1,1,1, 1)
   DeclineFS:SetText("Decline")
   DeclineBtn:SetScript("OnClick", function(self, button, down)
-      if (button == "LeftButton" and down == false) then 
-        GR_GUI.Accept:Hide()
-        GR:DeclineGameClicked()
-      end 
+    if (button == "LeftButton" and down == false) then 
+      GR_GUI.Accept:Hide()
+      GR:DeclineGameClicked()
+    end 
   end)
 
   -- Mover for Accept Button
-  GR_GUI.AcceptMover = CreateFrame("Frame", AcceptMover, UIParent)
+  GR_GUI.AcceptMover = CreateFrame("Frame", "AcceptMover", UIParent)
   local AcceptMover = GR_GUI.AcceptMover
   AcceptMover:SetPoint(GR.db.realm.Point, GR.db.realm.Xpos, GR.db.realm.Ypos)
   AcceptMover:SetSize(50, 50)
@@ -265,12 +265,12 @@ function GR:CreateAcceptDecline()
   AcceptMover:RegisterForDrag("LeftButton")
   AcceptMover:SetScript("OnDragStart", function(self, button) self:StartMoving() end)
   AcceptMover:SetScript("OnDragStop", function(self) 
-      self:StopMovingOrSizing() 
-      local point, relativeTo, relativePoint, xOfs, yOfs = self:GetPoint()
-      GR.db.realm.Point = point
-      GR.db.realm.Xpos = xOfs
-      GR.db.realm.Ypos = yOfs
-      Accept:SetPoint(GR.db.realm.Point, GR.db.realm.Xpos, GR.db.realm.Ypos)
+    self:StopMovingOrSizing() 
+    local point, relativeTo, relativePoint, xOfs, yOfs = self:GetPoint()
+    GR.db.realm.Point = point
+    GR.db.realm.Xpos = xOfs
+    GR.db.realm.Ypos = yOfs
+    Accept:SetPoint(GR.db.realm.Point, GR.db.realm.Xpos, GR.db.realm.Ypos)
   end)
 
   Accept:Hide()
@@ -285,23 +285,23 @@ function GR:SizeMain()
   -- In Game
   if (GR.db.realm.tab == "game") then
     if (GR.GameType == 'Suika') then 
-      Main.XRatio = Main:GetWidth() / GR.Win.Const.SuikaScreenWidth
-      Main.YRatio = Main:GetHeight() / GR.Win.Const.SuikaScreenHeight
+      Main.XRatio = Main:GetWidth() / GR.Win.Const.Tab1WidthSuika
+      Main.YRatio = Main:GetHeight() / GR.Win.Const.Tab1HeightSuika
       if (Main.XRatio > Main.YRatio) then
         Main.XRatio = Main.YRatio
       else
         Main.YRatio = Main.XRatio
       end
-      Main:SetSize(Main.XRatio * GR.Win.Const.SuikaScreenWidth, Main.YRatio * GR.Win.Const.SuikaScreenHeight)
+      Main:SetSize(Main.XRatio * GR.Win.Const.Tab1WidthSuika, Main.YRatio * GR.Win.Const.Tab1HeightSuika)
     else
-      Main.XRatio = Main:GetWidth() / GR.Win.Const.GameScreenWidth
-      Main.YRatio = Main:GetHeight() / GR.Win.Const.GameScreenHeight
+      Main.XRatio = Main:GetWidth() / GR.Win.Const.Tab1Width
+      Main.YRatio = Main:GetHeight() / GR.Win.Const.Tab1Height
       if (Main.XRatio > Main.YRatio) then
         Main.XRatio = Main.YRatio
       else
         Main.YRatio = Main.XRatio
       end
-      Main:SetSize(Main.XRatio * GR.Win.Const.GameScreenWidth, Main.YRatio * GR.Win.Const.GameScreenHeight)
+      Main:SetSize(Main.XRatio * GR.Win.Const.Tab1Width, Main.YRatio * GR.Win.Const.Tab1Height)
     end
     Main.ScreenRatio = (Main.XRatio + Main.YRatio) / 2
   end
@@ -329,11 +329,7 @@ function GR:SizeMain()
   if (GR.db.realm.tab == "solo" or GR.db.realm.tab == "multi" or GR.db.realm.tab == "settings") then
     Main.H2:SetPoint("TOP", 0, -38 * Main.YRatio)
   else
-    if (GR.GameType == "Bouncy Chicken") then
-      Main.H2:SetPoint("TOP", 0, -50 * Main.YRatio)
-    else
-      Main.H2:SetPoint("TOP", 0, -65 * Main.YRatio)
-    end
+    Main.H2:SetPoint("TOP", 0, -50 * Main.YRatio)
   end
   Main.H2:SetTextScale(1.7 * Main.ScreenRatio)
   
@@ -652,15 +648,11 @@ end
 
 -- FUNCTIONS
 -- rematch button
--- look into retail custom chat channel addon comms
 -- rival message/response to register/unregister online/offline rivals
 -- maybe maybe... comms through bnet for cross-server games with bnet friends (while out of party/raid)
 
--- highlight selected opponent on multiplayer invite scroll
 
-
-
--- standard solo game header
+-- fix multi header
 -- fix resize for games
--- fix show / hide
--- standardize game header bar
+-- fix show / hide 
+-- snake broken

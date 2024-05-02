@@ -5,8 +5,6 @@ function GR:CreateSnake()
   -- Constants
   GR.Snake = {}
   GR.Snake.Const = {}
-  GR.Snake.Const.Width = 720 
-  GR.Snake.Const.Height = 385
   GR.Snake.Const.NumOfCols = 60
   GR.Snake.Const.NumOfRows = 30
   GR.Snake.Const.MoveInterval = .11
@@ -14,14 +12,9 @@ function GR:CreateSnake()
   -- Snake Frame
   Main.Snake = CreateFrame("Frame", Snake, Main, "ThinBorderTemplate")
   local Snake = Main.Snake
-  Snake:SetPoint("BOTTOM", 0, 25 * Main.YRatio)
-  Snake:SetSize(GR.Snake.Const.Width * Main.XRatio, GR.Snake.Const.Height * Main.YRatio)
   Snake:Hide()
 
   -- Variables
-  Snake.XRatio = Snake:GetWidth() / GR.Snake.Const.Width
-  Snake.YRatio = Snake:GetHeight() / GR.Snake.Const.Height
-  Snake.ScreenRatio = ((Snake:GetWidth() / GR.Snake.Const.Width) + (Snake:GetHeight() / GR.Snake.Const.Height)) / 2
   Snake.Pos = {
     X = math.floor(GR.Snake.Const.NumOfCols / 2),
     Y = math.floor(GR.Snake.Const.NumOfRows / 2),
@@ -35,7 +28,6 @@ function GR:CreateSnake()
   Snake.TailLength = 0
   Snake.Points = 0
   Snake.OnState = "Stop"
-
 
   -- Create
   GR:CreateSnakeGameLoop()
@@ -90,40 +82,46 @@ end
 
 -- Size
 function GR:SnakeSize()
-  local Snake = GR_GUI.Main.Snake
+  local Main = GR_GUI.Main
+  local Snake = Main.Snake
 
   -- Snake Frame
-  Snake:SetPoint("BOTTOM", 0, 25 * GR_GUI.Main.YRatio)
-  Snake:SetSize(GR.Snake.Const.Width * GR_GUI.Main.XRatio, GR.Snake.Const.Height * GR_GUI.Main.YRatio)
-
-  -- Reset Snake Screen Variables
-  Snake.XRatio = Snake:GetWidth() / GR.Snake.Const.Width
-  Snake.YRatio = Snake:GetHeight() / GR.Snake.Const.Height
-  Snake.ScreenRatio = ((Snake:GetWidth() / GR.Snake.Const.Width) + (Snake:GetHeight() / GR.Snake.Const.Height)) / 2
-
+  Snake:SetPoint("BOTTOM", 0, 25 * Main.YRatio)
+  Snake:SetSize(GR.Win.Const.GameScreenWidth * Main.XRatio, GR.Win.Const.GameScreenHeight * Main.YRatio)
+  
   GR:SizeSnakeGrid()
   GR:SizeSnakeApple()
 end
 
 function GR:SizeSnakeGrid()
-  local Snake = GR_GUI.Main.Snake
+  local Main = GR_GUI.Main
+  local Snake = Main.Snake
   local Grid = Snake.Grid
-
-  for i = 1, GR.Snake.Const.NumOfRows, 1 do
-    for j = 1, GR.Snake.Const.NumOfCols, 1 do
-      local Tile = Snake.Grid[j + ((i - 1) * GR.Snake.Const.NumOfCols)]
-      Tile:SetPoint("BOTTOMLEFT", (GR.Snake.Const.Width * Snake.XRatio) * ((j -1) / GR.Snake.Const.NumOfCols), (GR.Snake.Const.Height * Snake.YRatio) * ((i -1) / GR.Snake.Const.NumOfRows))
-      Tile:SetSize((GR.Snake.Const.Width * Snake.XRatio) / GR.Snake.Const.NumOfCols, (GR.Snake.Const.Height * Snake.YRatio) / GR.Snake.Const.NumOfRows)
+  local cols = GR.Snake.Const.NumOfCols
+  local rows = GR.Snake.Const.NumOfRows
+  local height = GR.Win.Const.GameScreenHeight
+  local width = GR.Win.Const.GameScreenWidth
+  
+  for i = 1, rows, 1 do
+    for j = 1, cols, 1 do
+      local Tile = Snake.Grid[j + ((i - 1) * cols)]
+      Tile:SetPoint("BOTTOMLEFT", (width * Main.XRatio) * ((j -1) / cols), (height * Main.YRatio) * ((i -1) / rows))
+      Tile:SetSize((width * Main.XRatio) / cols, (height * Main.YRatio) / rows)
     end
   end
 end
 
 function GR:SizeSnakeApple()
-  local Snake = GR_GUI.Main.Snake
+  local Main = GR_GUI.Main
+  local Snake = Main.Snake
   local Apple = Snake.Apple
+  local cols = GR.Snake.Const.NumOfCols
+  local rows = GR.Snake.Const.NumOfRows
+  local height = GR.Win.Const.GameScreenHeight
+  local width = GR.Win.Const.GameScreenWidth
 
-  Apple:SetPoint("BOTTOMLEFT", (GR.Snake.Const.Width * Snake.XRatio) * (Apple.Pos.X / GR.Snake.Const.NumOfCols), (GR.Snake.Const.Height * Snake.YRatio) * (Apple.Pos.Y / GR.Snake.Const.NumOfRows))
-  Apple:SetSize((GR.Snake.Const.Width * Snake.XRatio) / GR.Snake.Const.NumOfCols, (GR.Snake.Const.Height * Snake.YRatio) / GR.Snake.Const.NumOfRows)
+  Apple:SetPoint("BOTTOMLEFT", (width * Main.XRatio) * (Apple.Pos.X / cols), (height * Main.YRatio) * (Apple.Pos.Y / rows))
+  Apple:SetSize((width * Main.XRatio) / cols, (height * Main.YRatio) / rows)
 end
 
 -- Show / Hide
@@ -350,15 +348,20 @@ function GR:SnakeMove()
 end
 
 function GR:SnakeMoveApple()
-  local Snake = GR_GUI.Main.Snake
+  local Main = GR_GUI.Main
+  local Snake = Main.Snake
   local Apple = Snake.Apple
+  local cols = GR.Snake.Const.NumOfCols
+  local rows = GR.Snake.Const.NumOfRows
+  local height = GR.Win.Const.GameScreenHeight
+  local width = GR.Win.Const.GameScreenWidth
 
   Apple.Pos = {
-    X = math.random(1, GR.Snake.Const.NumOfCols),
-    Y = math.random(1, GR.Snake.Const.NumOfRows),
+    X = math.random(1, cols),
+    Y = math.random(1, rows),
   }
 
-  Apple:SetPoint("BOTTOMLEFT", (GR.Snake.Const.Width * Snake.XRatio) * ((Apple.Pos.X -1) / GR.Snake.Const.NumOfCols), (GR.Snake.Const.Height * Snake.YRatio) * ((Apple.Pos.Y -1) / GR.Snake.Const.NumOfRows))
+  Apple:SetPoint("BOTTOMLEFT", (width * Main.XRatio) * ((Apple.Pos.X -1) / cols), (height * Main.YRatio) * ((Apple.Pos.Y -1) / rows))
 end
 
 function GR:SnakeGameOver()

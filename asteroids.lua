@@ -1,5 +1,7 @@
 -- create
 function GR:CreateAsteroids()
+  local Main = GR_GUI.Main
+
   -- Constants
   GR.Asteroids = {}
   GR.Asteroids.Const = {}
@@ -21,18 +23,13 @@ function GR:CreateAsteroids()
   GR.Asteroids.Const.BulletTimeout = 1
   
   -- Asteroids Frame
-  GR_GUI.Main.Asteroids = CreateFrame("Frame", Asteroids, GR_GUI.Main, "ThinBorderTemplate")
-  local Asteroids = GR_GUI.Main.Asteroids
-  Asteroids:SetPoint("BOTTOM", 0, 25 * (GR_GUI.Main:GetHeight() / 640))
-  Asteroids:SetSize(GR_GUI.Main:GetWidth() * (GR.Asteroids.Const.ScreenSizeX / 800), GR_GUI.Main:GetHeight() * (GR.Asteroids.Const.ScreenSizeY / 640))
+  Main.Asteroids = CreateFrame("Frame", Asteroids, Main, "ThinBorderTemplate")
+  local Asteroids = Main.Asteroids
   Asteroids:Hide()
   
   -- Variables
   GR.Asteroids.Phase = "Stopped"
   GR.Asteroids.GameTime = 0
-  GR.Asteroids.ScreenXRatio = Asteroids:GetWidth() / GR.Asteroids.Const.ScreenSizeX
-  GR.Asteroids.ScreenYRatio = Asteroids:GetHeight() / GR.Asteroids.Const.ScreenSizeY
-  GR.Asteroids.ScreenRatio = (Asteroids:GetWidth() / GR.Asteroids.Const.ScreenSizeX + Asteroids:GetHeight() / GR.Asteroids.Const.ScreenSizeY) / 2
   GR.Asteroids.ShipRotation = 0
   GR.Asteroids.ShipSize = GR.Asteroids.Const.ShipSize
   GR.Asteroids.ShipAcceleration = GR.Asteroids.Const.ShipAcceleration
@@ -162,7 +159,8 @@ function GR:CreateAsteroidsBullets()
 end
 
 function GR:CreateAsteroidsComets()
-  local Asteroids = GR_GUI.Main.Asteroids
+  local Main = GR_GUI.Main
+  local Asteroids = Main.Asteroids
   Asteroids.Comets = {}
   local Comets = Asteroids.Comets
 
@@ -170,10 +168,10 @@ function GR:CreateAsteroidsComets()
   for i=1, GR.Asteroids.Const.NumOfComets, 1 do
     local randX = (Asteroids:GetWidth() - GR.Asteroids.CometSize - 4) * (math.random(0, 10000) / 10000)
     local randY = (Asteroids:GetHeight() - GR.Asteroids.CometSize - 4) * (math.random(0, 10000) / 10000)
-    while (randX > Asteroids:GetWidth() / 2 - 35 * GR.Asteroids.ScreenRatio and randX < Asteroids:GetWidth() / 2 + 35 * GR.Asteroids.ScreenRatio) do
+    while (randX > Asteroids:GetWidth() / 2 - 35 * Main.ScreenRatio and randX < Asteroids:GetWidth() / 2 + 35 * Main.ScreenRatio) do
       randX = (Asteroids:GetWidth() - GR.Asteroids.CometSize - 4) * (math.random(0, 10000) / 10000)
     end
-    while (randY > Asteroids:GetHeight() / 2 - 35 * GR.Asteroids.ScreenRatio and randY < Asteroids:GetHeight() / 2 + 35 * GR.Asteroids.ScreenRatio) do
+    while (randY > Asteroids:GetHeight() / 2 - 35 * Main.ScreenRatio and randY < Asteroids:GetHeight() / 2 + 35 * Main.ScreenRatio) do
       randY = (Asteroids:GetHeight() - GR.Asteroids.CometSize - 4) * (math.random(0, 10000) / 10000)
     end
     local randVelX = GR.Asteroids.CometMaxSpeed * (math.random(-10000, 10000) / 10000)
@@ -193,7 +191,7 @@ function GR:CreateAsteroidsComets()
     for j=1, NumOfLines, 1 do 
       
       local angle = (3.14159 * (4 * (j / NumOfLines))) / 2
-      local y = math.random(5, 22 * GR.Asteroids.ScreenRatio)
+      local y = math.random(5, 22 * GR_GUI.Main.ScreenRatio)
       local x = 0
       Comets[i].Points[j] = CreateFrame("Frame", nil, Comets[i])
       local Point = Comets[i].Points[j] 
@@ -212,7 +210,7 @@ function GR:CreateAsteroidsComets()
         local x3, y3 = GR:RotateCoordPair(Point2.PosX, Point2.PosY, .5,.5, Point2.Angle, 1)
         Line:SetStartPoint("CENTER", Comets[i], x2, y2)
         Line:SetEndPoint("CENTER", Comets[i], x3, y3)
-        Line:SetThickness(3 * GR.Asteroids.ScreenRatio)
+        Line:SetThickness(3 * Main.ScreenRatio)
         Line:SetColorTexture(.8,.8,.8, 1)
 
         -- draw last line
@@ -223,7 +221,7 @@ function GR:CreateAsteroidsComets()
           local x4, y4 = GR:RotateCoordPair(Point3.PosX, Point3.PosY, .5,.5, Point3.Angle, 1)
           Line:SetStartPoint("CENTER", Comets[i], x2, y2)
           Line:SetEndPoint("CENTER", Comets[i], x4, y4)
-          Line:SetThickness(3 * GR.Asteroids.ScreenRatio)
+          Line:SetThickness(3 * Main.ScreenRatio)
           Line:SetColorTexture(.8,.8,.8, 1)
         end
       end
@@ -240,46 +238,43 @@ function GR:SizeAsteroids()
   local StopBtn = GR_GUI.Main.Asteroids.StopBtn
   
   -- Main Window
-  Asteroids:SetPoint("BOTTOM", 0, 25 * (Main:GetHeight() / 640))
-  Asteroids:SetSize(Main:GetWidth() * (GR.Asteroids.Const.ScreenSizeX / 800), Main:GetHeight() * (GR.Asteroids.Const.ScreenSizeY / 640))
-  GR.Asteroids.ScreenXRatio = Asteroids:GetWidth() / GR.Asteroids.Const.ScreenSizeX
-  GR.Asteroids.ScreenYRatio = Asteroids:GetHeight() / GR.Asteroids.Const.ScreenSizeY
-  GR.Asteroids.ScreenRatio = (Asteroids:GetWidth() / GR.Asteroids.Const.ScreenSizeX + Asteroids:GetHeight() / GR.Asteroids.Const.ScreenSizeY) / 2
-  local WidthRatio = GR.Asteroids.ScreenXRatio
-  local HeightRatio = GR.Asteroids.ScreenYRatio
+  Asteroids:SetPoint("BOTTOM", 0, 25 * Main.YRatio)
+  Asteroids:SetSize(GR.Win.Const.GameScreenWidth * Main.XRatio, GR.Win.Const.GameScreenHeight * Main.YRatio)
   
-  GR:SizeAsteroidsShip(WidthRatio, HeightRatio)
+  GR:SizeAsteroidsShip()
   GR:SizeAsteroidsBullets()
   GR:SizeAsteroidsComets()
 end
 
-function GR:SizeAsteroidsShip(WidthRatio, HeightRatio)
-  local Asteroids = GR_GUI.Main.Asteroids
-  local Ship = GR_GUI.Main.Asteroids.Ship
+function GR:SizeAsteroidsShip()
+  local Main = GR_GUI.Main
+  local Asteroids = Main.Asteroids
+  local Ship = Asteroids.Ship
 
-  GR.Asteroids.ShipAcceleration = GR.Asteroids.Const.ShipAcceleration * GR.Asteroids.ScreenRatio
-  GR.Asteroids.ShipMaxSpeed = GR.Asteroids.Const.ShipMaxSpeed * GR.Asteroids.ScreenRatio
+  GR.Asteroids.ShipAcceleration = GR.Asteroids.Const.ShipAcceleration * Main.ScreenRatio
+  GR.Asteroids.ShipMaxSpeed = GR.Asteroids.Const.ShipMaxSpeed * Main.ScreenRatio
 
   Ship:SetPoint("BOTTOMLEFT", Asteroids:GetWidth() / 2, Asteroids:GetHeight() / 2)
   GR.Asteroids.ShipPosX = Asteroids:GetWidth() / 2
   GR.Asteroids.ShipPosY = Asteroids:GetHeight() / 2
-  Ship.Line1:SetThickness(3 * GR.Asteroids.ScreenRatio)
-  Ship.Line2:SetThickness(3 * GR.Asteroids.ScreenRatio)
-  Ship.Line3:SetThickness(3 * GR.Asteroids.ScreenRatio)
-  Ship.Line4:SetThickness(3 * GR.Asteroids.ScreenRatio)
+  Ship.Line1:SetThickness(3 * Main.ScreenRatio)
+  Ship.Line2:SetThickness(3 * Main.ScreenRatio)
+  Ship.Line3:SetThickness(3 * Main.ScreenRatio)
+  Ship.Line4:SetThickness(3 * Main.ScreenRatio)
   Ship.Col:SetSize(GR.Asteroids.ShipSize, GR.Asteroids.ShipSize)
 
-  GR.Asteroids.ShipSize = GR.Asteroids.Const.ShipSize * GR.Asteroids.ScreenRatio
+  GR.Asteroids.ShipSize = GR.Asteroids.Const.ShipSize * Main.ScreenRatio
   GR:AsteroidsRotateShip(Ship)
 end
 
 function GR:SizeAsteroidsBullets()
-  local Bullets = GR_GUI.Main.Asteroids.Bullets
+  local Main = GR_GUI.Main
+  local Bullets = Main.Asteroids.Bullets
   
-  GR.Asteroids.BulletSize = GR.Asteroids.Const.BulletSize * GR.Asteroids.ScreenRatio
-  GR.Asteroids.BulletThickness = GR.Asteroids.Const.BulletThickness * GR.Asteroids.ScreenRatio
-  GR.Asteroids.BulletSpeed = GR.Asteroids.Const.BulletSpeed * GR.Asteroids.ScreenRatio
-
+  GR.Asteroids.BulletSize = GR.Asteroids.Const.BulletSize * Main.ScreenRatio
+  GR.Asteroids.BulletThickness = GR.Asteroids.Const.BulletThickness * Main.ScreenRatio
+  GR.Asteroids.BulletSpeed = GR.Asteroids.Const.BulletSpeed * Main.ScreenRatio
+  
   for i=1, #Bullets, 1 do
     Bullets[i].Line:SetThickness(GR.Asteroids.BulletThickness)
     GR:AsteroidsRotateBullet(Bullets[i])
@@ -287,12 +282,12 @@ function GR:SizeAsteroidsBullets()
 end
 
 function GR:SizeAsteroidsComets()
-  local Asteroids = GR_GUI.Main.Asteroids
-  local Comets = GR_GUI.Main.Asteroids.Comets
+  local Main = GR_GUI.Main
+  local Asteroids = Main.Asteroids
+  local Comets = Asteroids.Comets
 
-  
-  GR.Asteroids.CometSize = GR.Asteroids.Const.CometSize * GR.Asteroids.ScreenRatio
-  GR.Asteroids.CometMaxSpeed = GR.Asteroids.Const.CometMaxSpeed * GR.Asteroids.ScreenRatio
+  GR.Asteroids.CometSize = GR.Asteroids.Const.CometSize * Main.ScreenRatio
+  GR.Asteroids.CometMaxSpeed = GR.Asteroids.Const.CometMaxSpeed * Main.ScreenRatio
 
   for i=1, GR.Asteroids.Const.NumOfComets, 1 do
     local randX = (Asteroids:GetWidth() - GR.Asteroids.CometSize - 4) * (math.random(0, 10000) / 10000)
@@ -308,7 +303,7 @@ function GR:SizeAsteroidsComets()
 
     for j=1, #Comets[i].Points, 1 do 
       local angle = (3.14159 * (4 * (j / #Comets[i].Points))) / 2
-      local y = math.random(5, 22 * GR.Asteroids.ScreenRatio)
+      local y = math.random(5, 22 * Main.ScreenRatio)
       local x = 0
       local Point = Comets[i].Points[j] 
       Point.PosX = x
@@ -324,7 +319,7 @@ function GR:SizeAsteroidsComets()
         local x3, y3 = GR:RotateCoordPair(Point2.PosX, Point2.PosY, .5,.5, Point2.Angle, 1)
         Line:SetStartPoint("CENTER", Comets[i], x2, y2)
         Line:SetEndPoint("CENTER", Comets[i], x3, y3)
-        Line:SetThickness(3 * GR.Asteroids.ScreenRatio)
+        Line:SetThickness(3 * Main.ScreenRatio)
         Line:SetColorTexture(.8,.8,.8, 1)
 
         -- draw last line
@@ -334,7 +329,7 @@ function GR:SizeAsteroidsComets()
           local x4, y4 = GR:RotateCoordPair(Point3.PosX, Point3.PosY, .5,.5, Point3.Angle, 1)
           Line:SetStartPoint("CENTER", Comets[i], x2, y2)
           Line:SetEndPoint("CENTER", Comets[i], x4, y4)
-          Line:SetThickness(3 * GR.Asteroids.ScreenRatio)
+          Line:SetThickness(3 * Main.ScreenRatio)
           Line:SetColorTexture(.8,.8,.8, 1)
         end
       end
@@ -431,8 +426,9 @@ function GR:AsteroidsUnPauseGame()
 end
 
 function GR:AsteroidsStopGame()
-  local Asteroids = GR_GUI.Main.Asteroids
-  local Solo = GR_GUI.Main.HeaderInfo.Solo
+  local Main = GR_GUI.Main
+  local Asteroids = Main.Asteroids
+  local Solo = Main.HeaderInfo.Solo
   local Ship = Asteroids.Ship
   local Comets = Asteroids.Comets
 
@@ -467,10 +463,10 @@ function GR:AsteroidsStopGame()
   for i=1, #Comets, 1 do
     local randX = (Asteroids:GetWidth() - GR.Asteroids.CometSize - 4) * (math.random(0, 10000) / 10000)
     local randY = (Asteroids:GetHeight() - GR.Asteroids.CometSize - 4) * (math.random(0, 10000) / 10000)
-    while (randX > Asteroids:GetWidth() / 2 - 35 * GR.Asteroids.ScreenRatio and randX < Asteroids:GetWidth() / 2 + 35 * GR.Asteroids.ScreenRatio) do
+    while (randX > Asteroids:GetWidth() / 2 - 35 * Main.ScreenRatio and randX < Asteroids:GetWidth() / 2 + 35 * Main.ScreenRatio) do
       randX = (Asteroids:GetWidth() - GR.Asteroids.CometSize - 4) * (math.random(0, 10000) / 10000)
     end
-    while (randY > Asteroids:GetHeight() / 2 - 35 * GR.Asteroids.ScreenRatio and randY < Asteroids:GetHeight() / 2 + 35 * GR.Asteroids.ScreenRatio) do
+    while (randY > Asteroids:GetHeight() / 2 - 35 * Main.ScreenRatio and randY < Asteroids:GetHeight() / 2 + 35 * Main.ScreenRatio) do
       randY = (Asteroids:GetHeight() - GR.Asteroids.CometSize - 4) * (math.random(0, 10000) / 10000)
     end
     local randVelX = GR.Asteroids.CometMaxSpeed * (math.random(-10000, 10000) / 10000)
@@ -523,8 +519,9 @@ end
 
 -- Bullet
 function GR:AsteroidsShootBullet()
-  local Bullets = GR_GUI.Main.Asteroids.Bullets
-  local Ship = GR_GUI.Main.Asteroids.Ship
+  local Main = GR_GUI.Main
+  local Bullets = Main.Asteroids.Bullets
+  local Ship = Main.Asteroids.Ship
   local BulletShot = false
 
 
@@ -548,7 +545,7 @@ function GR:AsteroidsShootBullet()
       local point, relativeTo, relativePoint, xOfs, yOfs = Ship:GetPoint()
       BulletShot = true
       Bullets[i].PosX = (((shooter.LLx + shooter.LRx) / 2 * ShipSize) - ShipSize / 2) *1.5 + xOfs
-      Bullets[i].PosY = (((shooter.LLy + shooter.LRy) / 2 * ShipSize) - ShipSize) *1.5 + yOfs + (20 * GR.Asteroids.ScreenRatio)
+      Bullets[i].PosY = (((shooter.LLy + shooter.LRy) / 2 * ShipSize) - ShipSize) *1.5 + yOfs + (20 * Main.ScreenRatio)
       Bullets[i].Angle = (3.14159 * ((-GR.Asteroids.ShipRotation -.5) % 4)) / 2
       GR:AsteroidsRotateBullet(Bullets[i])
       Bullets[i]:Show()
@@ -829,13 +826,14 @@ function GR:AsteroidsColShipWall(Asteroids, Ship)
 end
 
 function GR:AsteroidsColBulletWall(Asteroids, Bullet)
+  local Main = GR_GUI.Main
   local relativePoint, relativeTo, SxOfs, SyOfs = Bullet.Line:GetStartPoint()
   local relativePoint, relativeTo, ExOfs, EyOfs = Bullet.Line:GetEndPoint()
   local Bulletx = {
     LLx = Bullet.PosX + SxOfs,
     LLy = Bullet.PosY + SyOfs,
-    URx = Bullet.PosX + SxOfs +5 * ((GR.Asteroids.ScreenXRatio * GR.Asteroids.ScreenYRatio) /2),
-    URy = Bullet.PosY + SyOfs +5 * ((GR.Asteroids.ScreenXRatio * GR.Asteroids.ScreenYRatio) /2)
+    URx = Bullet.PosX + SxOfs +5 * ((Main.XRatio * Main.YRatio) /2),
+    URy = Bullet.PosY + SyOfs +5 * ((Main.XRatio * Main.YRatio) /2)
   }
   local Border = {
     LLx = 0,
@@ -900,6 +898,8 @@ function GR:AsteroidsColCometWall(Asteroids, Comet)
 end
 
 function GR:AsteroidsColCometBullet(Asteroids, Comet, Bullet)
+  local Main = GR_GUI.Main
+
   if (Comet:IsVisible() and Bullet:IsVisible()) then
     local point, relativeTo, relativePoint, xOfs, yOfs = Comet:GetPoint()
     local Cometx = {
@@ -913,8 +913,8 @@ function GR:AsteroidsColCometBullet(Asteroids, Comet, Bullet)
     local Bulletx = {
       LLx = Bullet.PosX + SxOfs,
       LLy = Bullet.PosY + SyOfs,
-      URx = Bullet.PosX + SxOfs +0 * ((GR.Asteroids.ScreenXRatio * GR.Asteroids.ScreenYRatio) /2),
-      URy = Bullet.PosY + SyOfs +0 * ((GR.Asteroids.ScreenXRatio * GR.Asteroids.ScreenYRatio) /2)
+      URx = Bullet.PosX + SxOfs +0 * ((Main.XRatio * Main.YRatio) /2),
+      URy = Bullet.PosY + SyOfs +0 * ((Main.XRatio * Main.YRatio) /2)
     }
 
     -- check if bullet is inside of comet
@@ -926,6 +926,8 @@ function GR:AsteroidsColCometBullet(Asteroids, Comet, Bullet)
 end
 
 function GR:AsteroidsColShipComet(Ship, Comet)
+  local Main = GR_GUI.Main
+
   local Apoint, ArelativeTo, ArelativePoint, AxOfs, AyOfs = Comet:GetPoint()
   local Cometx = {
     LLx = AxOfs,
@@ -937,10 +939,10 @@ function GR:AsteroidsColShipComet(Ship, Comet)
   local point, relativeTo, relativePoint, xOfs, yOfs = Ship:GetPoint()
   local Cpoint, CrelativeTo, CrelativePoint, CxOfs, CyOfs = Ship.Col:GetPoint()
   local Shipx = {
-    LLx = (xOfs +CxOfs - GR.Asteroids.ShipSize / 2) + 13 * GR.Asteroids.ScreenRatio,
-    LLy = (yOfs +CyOfs - GR.Asteroids.ShipSize / 2) + 13 * GR.Asteroids.ScreenRatio,
-    URx = (xOfs +CxOfs + GR.Asteroids.ShipSize / 2) - 13 * GR.Asteroids.ScreenRatio,
-    URy = (yOfs +CyOfs + GR.Asteroids.ShipSize / 2) - 13 * GR.Asteroids.ScreenRatio
+    LLx = (xOfs +CxOfs - GR.Asteroids.ShipSize / 2) + 13 * Main.ScreenRatio,
+    LLy = (yOfs +CyOfs - GR.Asteroids.ShipSize / 2) + 13 * Main.ScreenRatio,
+    URx = (xOfs +CxOfs + GR.Asteroids.ShipSize / 2) - 13 * Main.ScreenRatio,
+    URy = (yOfs +CyOfs + GR.Asteroids.ShipSize / 2) - 13 * Main.ScreenRatio
   }
 
     -- check if ship is inside of comet
