@@ -4,8 +4,8 @@ function GR:CreateBouncyChicken()
   GR.BC.Const = {}
   GR.BC.Const.WallStartInt = 1.65
   GR.BC.Const.WallSpeed = 190
-  GR.BC.Const.WallWidth = 80
-  GR.BC.Const.WallHeight = 180
+  GR.BC.Const.WallWidth = 70
+  GR.BC.Const.WallHeight = 150
   GR.BC.Const.WallYPosOptions = { -120, -58, 4, 66, 128, 190, 252, 314, 376, 438 }
   GR.BC.Const.ChickenXPos = 100
   GR.BC.Const.ChickenYStart = 250
@@ -16,34 +16,32 @@ function GR:CreateBouncyChicken()
   GR.BC.Const.ChickenMaxVelY = 4.4
   
   -- Bouncy Chicken Frame
-  GR_GUI.Main.BC = CreateFrame("Frame", BouncyChicken, GR_GUI.Main, "ThinBorderTemplate")
+  local Main = GR_GUI.Main
+  Main.BC = CreateFrame("Frame", "BouncyChicken", Main, "ThinBorderTemplate")
   local BC = GR_GUI.Main.BC
   BC:SetClipsChildren(true)
   BC:Hide()
   
   -- Variables
-  GR.BC.XRatio = BC:GetWidth() / GR.Win.Const.GameScreenWidth
-  GR.BC.YRatio = BC:GetHeight() / GR.Win.Const.GameScreenHeight
-  GR.BC.ScreenRatio = (BC:GetWidth() / GR.Win.Const.GameScreenWidth + BC:GetHeight() / GR.Win.Const.GameScreenHeight) / 2
   GR.BC.ActiveState = "Stop"
   GR.BC.GameTime = 0
   GR.BC.Points = 0
   GR.BC.WallSpeed = GR.BC.Const.WallSpeed
-  GR.BC.WallWidth = GR.BC.Const.WallWidth * GR.BC.XRatio
-  GR.BC.WallHeight = GR.BC.Const.WallHeight * GR.BC.YRatio
+  GR.BC.WallWidth = GR.BC.Const.WallWidth * Main.XRatio
+  GR.BC.WallHeight = GR.BC.Const.WallHeight * Main.YRatio
   GR.BC.WallStartX = BC:GetWidth() * 1.1
   GR.BC.WallEndX = BC:GetWidth() * -.15
   GR.BC.WallYPosOptions = {}
   for i,v in pairs(GR.BC.Const.WallYPosOptions) do
-    GR.BC.WallYPosOptions[i] = v * GR.BC.YRatio
+    GR.BC.WallYPosOptions[i] = v * Main.YRatio
   end
-  GR.BC.ChickenXPos = GR.BC.Const.ChickenXPos * GR.BC.XRatio
-  GR.BC.ChickenYStart = GR.BC.Const.ChickenYStart * GR.BC.YRatio
-  GR.BC.ChickenWidth = GR.BC.Const.ChickenWidth * GR.BC.XRatio
-  GR.BC.ChickenHeight = GR.BC.Const.ChickenHeight * GR.BC.YRatio
-  GR.BC.ChickenGravity = GR.BC.Const.ChickenGravity * GR.BC.YRatio
-  GR.BC.ChickenMinVelY = GR.BC.Const.ChickenMinVelY * GR.BC.YRatio 
-  GR.BC.ChickenMaxVelY = GR.BC.Const.ChickenMaxVelY * GR.BC.YRatio 
+  GR.BC.ChickenXPos = GR.BC.Const.ChickenXPos * Main.XRatio
+  GR.BC.ChickenYStart = GR.BC.Const.ChickenYStart * Main.YRatio
+  GR.BC.ChickenWidth = GR.BC.Const.ChickenWidth * Main.XRatio
+  GR.BC.ChickenHeight = GR.BC.Const.ChickenHeight * Main.YRatio
+  GR.BC.ChickenGravity = GR.BC.Const.ChickenGravity * Main.YRatio
+  GR.BC.ChickenMinVelY = GR.BC.Const.ChickenMinVelY * Main.YRatio 
+  GR.BC.ChickenMaxVelY = GR.BC.Const.ChickenMaxVelY * Main.YRatio 
 
   -- Create
   GR:CreateBCGameLoop()
@@ -98,32 +96,30 @@ end
 function GR:SizeBC()
   local Main = GR_GUI.Main
   local BC = GR_GUI.Main.BC
-
+  
   -- Game Screen
   BC:SetPoint("BOTTOM", 0, 25 * Main.YRatio)
   BC:SetSize(GR.Win.Const.GameScreenWidth * Main.XRatio, GR.Win.Const.GameScreenHeight * Main.YRatio)
-  GR.BC.XRatio = BC:GetWidth() / GR.Win.Const.GameScreenWidth
-  GR.BC.YRatio = BC:GetHeight() / GR.Win.Const.GameScreenHeight
-  GR.BC.ScreenRatio = (BC:GetWidth() / GR.Win.Const.GameScreenWidth + BC:GetHeight() / GR.Win.Const.GameScreenHeight) / 2
-
+  
   GR:SizeBCWalls()
   GR:SizeBCChicken()
 end
 
 function GR:SizeBCWalls()
-  local BC = GR_GUI.Main.BC
-  local Walls = GR_GUI.Main.BC.Walls
-
+  local Main = GR_GUI.Main
+  local BC = Main.BC
+  local Walls = BC.Walls
+  
   -- Variables
-  GR.BC.WallSpeed = GR.BC.Const.WallSpeed * GR.BC.XRatio
-  GR.BC.WallWidth = GR.BC.Const.WallWidth * GR.BC.XRatio
-  GR.BC.WallHeight = GR.BC.Const.WallHeight * GR.BC.YRatio
+  GR.BC.WallSpeed = GR.BC.Const.WallSpeed * Main.XRatio
+  GR.BC.WallWidth = GR.BC.Const.WallWidth * Main.XRatio
+  GR.BC.WallHeight = GR.BC.Const.WallHeight * Main.YRatio
   GR.BC.WallStartX = BC:GetWidth() * 1.1
   GR.BC.WallEndX = BC:GetWidth() * -.15
   for i,v in pairs(GR.BC.Const.WallYPosOptions) do
-    GR.BC.WallYPosOptions[i] = v * GR.BC.YRatio
+    GR.BC.WallYPosOptions[i] = v * Main.YRatio
   end
-
+  
   for i = 1, #Walls, 1 do
     local Wall = Walls[i]
     Wall:SetSize(GR.BC.WallWidth, GR.BC.WallHeight)
@@ -131,16 +127,17 @@ function GR:SizeBCWalls()
 end
 
 function GR:SizeBCChicken()
-  local BC = GR_GUI.Main.BC
-  local Chicken = GR_GUI.Main.BC.Chicken
+  local Main = GR_GUI.Main
+  local BC = Main.BC
+  local Chicken = BC.Chicken
 
-  GR.BC.ChickenMinVelY = GR.BC.Const.ChickenMinVelY * GR.BC.YRatio 
-  GR.BC.ChickenMaxVelY = GR.BC.Const.ChickenMaxVelY * GR.BC.YRatio 
-  GR.BC.ChickenGravity = GR.BC.Const.ChickenGravity * GR.BC.YRatio
-  GR.BC.ChickenWidth = GR.BC.Const.ChickenWidth * GR.BC.XRatio
-  GR.BC.ChickenHeight = GR.BC.Const.ChickenHeight * GR.BC.YRatio
-  GR.BC.ChickenXPos = GR.BC.Const.ChickenXPos * GR.BC.XRatio
-  GR.BC.ChickenYStart = GR.BC.Const.ChickenYStart * GR.BC.YRatio
+  GR.BC.ChickenMinVelY = GR.BC.Const.ChickenMinVelY * Main.YRatio 
+  GR.BC.ChickenMaxVelY = GR.BC.Const.ChickenMaxVelY * Main.YRatio 
+  GR.BC.ChickenGravity = GR.BC.Const.ChickenGravity * Main.YRatio
+  GR.BC.ChickenWidth = GR.BC.Const.ChickenWidth * Main.XRatio
+  GR.BC.ChickenHeight = GR.BC.Const.ChickenHeight * Main.YRatio
+  GR.BC.ChickenXPos = GR.BC.Const.ChickenXPos * Main.XRatio
+  GR.BC.ChickenYStart = GR.BC.Const.ChickenYStart * Main.YRatio
   Chicken:SetPoint("BOTTOMLEFT", GR.BC.ChickenXPos, Chicken.YPos)
   Chicken:SetSize(GR.BC.ChickenWidth, GR.BC.ChickenHeight)
 end
@@ -204,14 +201,15 @@ function GR:ColBC()
 end
 
 function GR:ColBCChickenWall(Wall)
-  local Chicken = GR_GUI.Main.BC.Chicken
+  local Main = GR_GUI.Main
+  local Chicken = Main.BC.Chicken
 
   local point, relativeTo, relativePoint, xOfs, yOfs = Chicken:GetPoint()
   local ChickenPoints = {
-    LLx = xOfs + (12 * GR.BC.XRatio),
-    LLy = yOfs + (12 * GR.BC.YRatio),
-    URx = xOfs + Chicken:GetWidth() - (12 * GR.BC.XRatio),
-    URy = yOfs + Chicken:GetHeight() - (12 * GR.BC.YRatio)
+    LLx = xOfs + (12 * Main.XRatio),
+    LLy = yOfs + (12 * Main.YRatio),
+    URx = xOfs + Chicken:GetWidth() - (12 * Main.XRatio),
+    URy = yOfs + Chicken:GetHeight() - (12 * Main.YRatio)
   }
   point, relativeTo, relativePoint, xOfs, yOfs = Wall:GetPoint()
   local WallPoints = {
@@ -229,8 +227,9 @@ function GR:ColBCChickenWall(Wall)
 end
 
 function GR:ColBCChickenBorder()
-  local BC = GR_GUI.Main.BC
-  local Chicken = GR_GUI.Main.BC.Chicken
+  local Main = GR_GUI.Main
+  local BC = Main.BC
+  local Chicken = BC.Chicken
 
   local point, relativeTo, relativePoint, xOfs, yOfs = Chicken:GetPoint()
   local ChickenPoints = {
@@ -242,9 +241,9 @@ function GR:ColBCChickenBorder()
   point, relativeTo, relativePoint, xOfs, yOfs = BC:GetPoint()
   local BCPoints = {
     LLx = xOfs,
-    LLy = yOfs - (34 * GR.BC.YRatio),
+    LLy = yOfs - (34 * Main.YRatio),
     URx = xOfs + BC:GetWidth(),
-    URy = yOfs + BC:GetHeight() - (23 * GR.BC.YRatio)
+    URy = yOfs + BC:GetHeight() - (23 * Main.YRatio)
   }
   
   -- If Chicken Touches Border
@@ -276,11 +275,12 @@ function GR:BCBounce()
 end
 
 function GR:BCStartMovingWalls()
-  local Walls = GR_GUI.Main.BC.Walls
+  local Main = GR_GUI.Main
+  local Walls = Main.BC.Walls
 
   -- Scale WallYPosOptions for first render
   for i,v in pairs(GR.BC.Const.WallYPosOptions) do
-    GR.BC.WallYPosOptions[i] = v * GR.BC.YRatio
+    GR.BC.WallYPosOptions[i] = v * Main.YRatio
   end
 
   -- Position Walls
@@ -335,9 +335,10 @@ end
 
 -- Start Stop Pause Unpause
 function GR:BCStart()
-  local BC = GR_GUI.Main.BC
-  local Solo = GR_GUI.Main.HeaderInfo.Solo
-  local Walls = GR_GUI.Main.BC.Walls
+  local Main = GR_GUI.Main
+  local BC = Main.BC
+  local Solo = Main.HeaderInfo.Solo
+  local Walls = BC.Walls
 
   for i = 1, #Walls, 1 do
     Walls[i]:Hide()
@@ -347,7 +348,7 @@ function GR:BCStart()
   -- Reset Variables
   GR.BC.GameTime = 0
   GR.BC.Points = 0
-  GR.BC.WallSpeed = GR.BC.Const.WallSpeed * GR.BC.XRatio
+  GR.BC.WallSpeed = GR.BC.Const.WallSpeed * Main.XRatio
   BC.Chicken.VelY = 0
   BC.Chicken.YPos = GR.BC.ChickenYStart
 
