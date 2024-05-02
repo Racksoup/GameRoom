@@ -146,7 +146,8 @@ function GR:TictactoeShow()
     GR_GUI.Main.Tictactoe:Show()
     GR:SizeTictactoe()
     GR.GameType = "Tictactoe"
-    GR:ShowMultiGame()            
+    GR:ShowMultiGame()          
+    GR_GUI.Main.HeaderInfo.Multi.TurnString:Show()  
 end
 
 -- functions
