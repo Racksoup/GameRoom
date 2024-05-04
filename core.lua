@@ -522,6 +522,9 @@ function GR:ToggleTab()
 end
 
 -- Show/Hide Game
+-- ShowmMultiGame or ShowSoloGame is called first on game show
+-- then calls TabSelect()
+-- then calls [game]Show
 function GR:ShowMultiGame()
   local Main = GR_GUI.Main
   
@@ -537,11 +540,13 @@ function GR:ShowMultiGame()
   Main.HeaderInfo.Multi.ReMatch:Hide()
   Main.HeaderInfo.Multi.Rival:Hide()
   GR_GUI.Main.H2:SetText(GR.GameType)
-  
   if (GR.Opponent) then 
     Main.HeaderInfo.Multi.OpponentString:SetText("Opponent: " .. GR.Opponent)
   end
   GR:SetTurnString()
+
+  GR.db.realm.tab = "game"
+  GR:TabSelect()
 end
   
 function GR:ShowSoloGame()

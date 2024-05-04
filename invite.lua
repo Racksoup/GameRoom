@@ -197,7 +197,6 @@ function GR:AcceptGameClicked()
       GR:SendCommMessage("GameRoom_Inv", GR:Serialize(Message), ChatChannel)
       GR.UseGroupChat = true
     end
-    -- hide and reshowin GR:TabSelect()
     GR:TicTacToeHideContent()
   end
   if (GR.IncGameType == "Battleships") then
@@ -210,13 +209,11 @@ function GR:AcceptGameClicked()
       GR:SendCommMessage("GameRoom_Inv", GR:Serialize(Message), ChatChannel)
       GR.UseGroupChat = true
     end
-    -- hide and reshow in GR:TabSelect()
     GR:BattleshipsHideContent() 
   end
 
   -- show game
-  GR.db.realm.tab = "game"
-  GR:TabSelect()
+  GR:ShowMultiGame()
 end
 
 function GR:DeclineGameClicked()
@@ -277,7 +274,7 @@ function GR:AcceptGameInvite(text, distribution)
         GR.IsPlayerTurn = false
       end
 
-      -- hide game, set variable to show game in GR:TabSelect()
+      -- hide game, set variable to show game
       if (string.match(V.Tag, "TicTacToe_Accept")) then
         GR.GameType = "Tictactoe"
         GR:TicTacToeHideContent()  
@@ -288,8 +285,7 @@ function GR:AcceptGameInvite(text, distribution)
       end
       
       -- show game
-      GR.db.realm.tab = "game"
-      GR:TabSelect()
+      GR:ShowMultiGame()
     end
   end
 
@@ -314,8 +310,6 @@ function GR:GameDeclined(text, distribution)
     end
   end
 end
----
-
 
 -- Game ended
 function GR:ExitGameClicked()
@@ -376,8 +370,8 @@ function GR:ExitGameClicked()
   end
 
   GR.GameType = nil
-  GR.db.realm.tab = "solo"
   GR:ResetHeader()
+  GR.db.realm.tab = "solo"
   GR:TabSelect()
 end
 
@@ -387,17 +381,17 @@ function GR:OpponentEndedGame(text, distribution)
   if P then 
     if (string.match(V.Tag, "TicTacToe_GameEnd") and ((V.Target == "" or V.Target == UnitName("Player")) or (distribution ~= "RAID" and distribution ~= "PARTY"))) then
       GR.GameType = nil
-      GR.db.realm.tab = "solo"
-      GR:TicTacToeEndGame()
       GR:ResetHeader()
+      GR:TicTacToeEndGame()
+      GR.db.realm.tab = "solo"
       GR:TabSelect()
     end
     if (string.match(V.Tag, "Battleships_GameEnd") and ((V.Target == "" or V.Target == UnitName("Player")) or (distribution ~= "RAID" and distribution ~= "PARTY"))) then
       GR.GameType = nil
-      GR.db.realm.tab = "solo"
       GR:ResetHeader()
-      GR:TabSelect()
       GR:BattleshipsEndGame()
+      GR.db.realm.tab = "solo"
+      GR:TabSelect()
     end
   end 
 end
