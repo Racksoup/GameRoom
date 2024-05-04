@@ -529,6 +529,8 @@ function GR:ShowMultiGame()
   GR.InGame = true
   GR_GUI.Accept:Hide()
 
+  GR:ResetHeader()
+  
   Main.HeaderInfo:Show()
   Main.HeaderInfo.Solo:Hide()
   Main.HeaderInfo.Multi:Show()
@@ -547,6 +549,8 @@ function GR:ShowSoloGame()
   GR.InGame = true
   GR_GUI.Accept:Hide()
   
+  GR:ResetHeader()
+
   GR_GUI.Main.HeaderInfo:Show()
   GR_GUI.Main.HeaderInfo.Multi:Hide()
   GR_GUI.Main.HeaderInfo.Solo:Show()

@@ -143,6 +143,8 @@ function GR:CreateHeaderSoloGames()
   -- Info
   Solo.Info = Solo:CreateFontString(nil, "ARTWORK", "GameTooltipText")
   Solo.Info:SetTextColor(1,1,1, 1)
+
+  Solo:Hide()
 end
 
 function GR:CreateHeaderSoloStartStop()
@@ -393,6 +395,9 @@ function GR:HeaderSoloStop()
   end
   if (GR.GameType == "Suika") then
     GR:SuikaStop()
+  end
+  if (GR.GameType == "Minesweepers") then
+    GR:MinesweepersReset()
   end
 end
 function GR:HeaderSoloPause()

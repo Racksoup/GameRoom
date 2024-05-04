@@ -8,6 +8,7 @@ function GR:CreateMinesweepers()
   GR.Minesweepers.Const.NumOfBombs = 80
   
   GR.Minesweepers.isBoardSet = false
+  GR.Minesweepers.tilesRevealed = 0
 
   Main.Minesweepers = CreateFrame("Frame", "Minesweepers", Main, "ThinBorderTemplate")
   local Minesweepers = Main.Minesweepers
@@ -35,28 +36,50 @@ function GR:CreateMinesweepersGrid()
       Tile.hasBomb = false
       Tile.bombsTouching = 0
       Tile.revealed = false
+      Tile.flagged = false
       Tile.Tex = Tile:CreateTexture()
       Tile.Tex:SetColorTexture(255,255,255, .2)
       Tile.Tex:SetAllPoints(Tile)
       Tile.Tex:Show()
       Tile.FS = Tile:CreateFontString(nil, "OVERLAY", "GameTooltipText")
       Tile.FS:Hide()
-      Tile:SetScript("OnClick", function() 
-        Tile.FS:Show()
-        if (not GR.Minesweepers.isBoardSet) then
-          GR:MinesweepersSetBoard(j + ((i - 1) * cols))
-          GR.Minesweepers.isBoardSet = true
-        end
+      Tile:RegisterForClicks("LeftButtonDown", "RightButtonDown")
+      Tile:SetScript("OnClick", function(self, button, down) 
+        if (button == "LeftButton") then
+          Tile.flagged = false
+          Tile.FS:Show()
+          if (not GR.Minesweepers.isBoardSet) then
+            GR:MinesweepersSetBoard(j + ((i - 1) * cols))
+            GR.Minesweepers.isBoardSet = true
+          end
 
-        if (Tile.hasBomb) then 
-          Tile.Tex:SetColorTexture(255,0,0, 1)
-        else
-          Tile.Tex:Hide() 
-          if Tile.bombsTouching == 0 then
-            local row, col = GR:GetTilePosition(Tile)
-            GR:RevealEmptyNeighbors(row, col)
+          if (Tile.hasBomb) then 
+            Tile.Tex:SetColorTexture(255,0,0, 1)
+          else
+            Tile.revealed = true
+            Tile.Tex:Hide() 
+            if Tile.bombsTouching == 0 then
+              local row, col = GR:MinesweepersGetTilePosition(Tile)
+              GR:MinesweepersRevealEmptyNeighbors(row, col)
+            end
+          end
+
+          -- check game conditions after player move
+          GR:MinesweepersCheckForLose(Tile)
+          GR:MinesweepersCheckForWin()
+        end
+        
+        if (button == "RightButton" and Tile.revealed == false) then
+          if (not Tile.flagged) then
+            Tile.flagged = true
+            Tile.Tex:Show()
+            Tile.Tex:SetColorTexture(255,255,0, 1)
+          else
+            Tile.flagged = false
+            Tile.Tex:SetColorTexture(255,255,255, .2)
           end
         end
+        GR:MinesweeperBombsRemaining()
       end)
     end
   end
@@ -123,7 +146,7 @@ function GR:MinesweepersSetBoard(clickedTile)
     -- Check if the clicked tile contains a bomb
     if Grid[clickedTile].hasBomb or Grid[clickedTile].bombsTouching > 0 then
       -- Reroll the board if the clicked tile contains a bomb or is touching a bomb
-      GR:ResetGridVariables()
+      GR:MinesweepersResetGridVariables()
       rollBoard()
     end
   end
@@ -169,7 +192,7 @@ function GR:MinesweepersTilesTouching()
   end
 end
 
-function GR:RevealEmptyNeighbors(row, col)
+function GR:MinesweepersRevealEmptyNeighbors(row, col)
   local cols = GR.Minesweepers.Const.NumOfCols
   local rows = GR.Minesweepers.Const.NumOfRows
 
@@ -198,7 +221,7 @@ function GR:RevealEmptyNeighbors(row, col)
   revealNeighbors(row, col)
 end
 
-function GR:GetTilePosition(Tile)
+function GR:MinesweepersGetTilePosition(Tile)
   local Grid = GR_GUI.Main.Minesweepers.Grid
   local cols = GR.Minesweepers.Const.NumOfCols
 
@@ -211,12 +234,62 @@ function GR:GetTilePosition(Tile)
   end
 end
 
-function GR:ResetGridVariables()
+function GR:MinesweepersDisableClicks()
+  local Grid = GR_GUI.Main.Minesweepers.Grid
+
+  for i,v in ipairs(Grid) do 
+    v:Disable()
+  end
+end
+
+function GR:MinesweeperBombsRemaining()
+  local Solo = GR_GUI.Main.HeaderInfo.Solo
+  local total = 0
+
+  for i,v in ipairs (GR_GUI.Main.Minesweepers.Grid) do
+    if (v.flagged) then
+      total = total + 1
+    end
+  end
+
+  Solo.PointsFS:SetText("Bombs: " .. GR.Minesweepers.Const.NumOfBombs - total)
+end
+
+-- Win / Lose
+function GR:MinesweepersCheckForWin()
+  local whiteSpaces = GR.Minesweepers.Const.NumOfRows * GR.Minesweepers.Const.NumOfCols - GR.Minesweepers.Const.NumOfBombs
+  local totalRevealed = 0
+
+  for i,v in ipairs (GR_GUI.Main.Minesweepers.Grid) do
+    if (v.revealed) then
+      totalRevealed = totalRevealed + 1
+    end
+  end
+  if ( whiteSpaces == totalRevealed ) then
+    GR:MinesweepersDisableClicks()
+    GR_GUI.Main.HeaderInfo.Solo.GameOverFS:Show()
+    GR_GUI.Main.HeaderInfo.Solo.GameOverFS:SetText("Winner!")
+    GR_GUI.Main.HeaderInfo.Solo.GameOverFS:SetTextColor(0,1,0, 1)
+  end
+end
+
+function GR:MinesweepersCheckForLose(tile)
+  if (tile.hasBomb) then
+    GR:MinesweepersDisableClicks()
+    GR_GUI.Main.HeaderInfo.Solo.GameOverFS:Show()
+    GR_GUI.Main.HeaderInfo.Solo.GameOverFS:SetText("Game Over")
+    GR_GUI.Main.HeaderInfo.Solo.GameOverFS:SetTextColor(1,0,0, 1)
+  end
+end
+
+-- Reset
+function GR:MinesweepersResetGridVariables()
   local Grid = GR_GUI.Main.Minesweepers.Grid
   for _, tile in ipairs(Grid) do
     tile.hasBomb = false
     tile.bombsTouching = 0
     tile.revealed = false
+    tile.flagged = false
     tile.Tex:SetColorTexture(255,255,255, .2)
     tile.Tex:Show()
     tile.FS:Hide()
@@ -224,9 +297,31 @@ function GR:ResetGridVariables()
   end
 end
 
+function GR:MinesweepersReset()
+  local Solo = GR_GUI.Main.HeaderInfo.Solo
+  Solo.OnState = "Start"
+
+  for i,v in ipairs(GR_GUI.Main.Minesweepers.Grid) do 
+    v:Enable()
+  end
+  
+  Solo.GameOverFS:Hide()
+  GR.Minesweepers.isBoardSet = false
+  GR.Minesweepers.tilesRevealed = 0
+  GR:MinesweeperBombsRemaining()
+
+  GR:MinesweepersResetGridVariables()
+end
+
 -- Show / Hide
 function GR:MinesweepersShow()
   GR:SizeMinesweepers()
+  
+  local Solo = GR_GUI.Main.HeaderInfo.Solo
+  
+  Solo.Stopx:Show()
+  Solo.PointsFS:Show()
+  GR:MinesweeperBombsRemaining()
 
   GR_GUI.Main.Minesweepers:Show()
 end
