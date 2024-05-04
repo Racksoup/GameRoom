@@ -60,7 +60,7 @@ function GR:OnInitialize()
   GR.Win.Const.GameScreenWidth = 750
   GR.Win.Const.GameScreenHeight = 420
   GR.Win.Const.SuikaScreenWidth = 435
-  GR.Win.Const.SuikaScreenHeight = 660
+  GR.Win.Const.SuikaScreenHeight = 680
   GR.Win.Const.Tab2Width = 310
   GR.Win.Const.Tab2Height = 181
   GR.Win.Const.Tab3Width = 340
@@ -632,6 +632,7 @@ end
 -- guild needs to unregister offline players
 -- show challenge as msg doesn't allow players to accept challenges
 -- rivals spams 
+-- fix show / hide 
 
 -- GAMES
 -- chess
@@ -652,6 +653,4 @@ end
 -- rival message/response to register/unregister online/offline rivals
 -- maybe maybe... comms through bnet for cross-server games with bnet friends (while out of party/raid)
 
-
--- fix multi header
--- fix show / hide 
+  

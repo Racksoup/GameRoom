@@ -2,15 +2,15 @@ function GR:SuikaCreate()
   -- Contants
   GR.Suika = {}
   GR.Suika.Const = {}
-  GR.Suika.Const.BallSizes = {42, 67, 82.8, 105, 133, 213, 241.15, 280.7, 320.5, 380.1, 423.5, 467.8, 536.6, 590.3, 649.3, 714.2, 785.6}
-  GR.Suika.Const.Gravity = -6000
-  GR.Suika.Const.MinGravity = -10000
-  GR.Suika.Const.MaxSpeed = 2900
+  GR.Suika.Const.BallSizes = {29, 47, 58, 74, 93, 149, 168, 196, 224, 266, 296, 328, 375, 413, 454, 500, 550}
+  GR.Suika.Const.Gravity = -50
+  GR.Suika.Const.MaxFallSpeed = -120
+  GR.Suika.Const.MaxSpeed = 120
   GR.Suika.Const.StartSizes = 5
   GR.Suika.Const.TargetFrameTime = 1.0 / 60
-  GR.Suika.Const.DampingFactorX = .3
-  GR.Suika.Const.DampingFactorY = .3
-  GR.Suika.Const.MinVelThres = 5000
+  GR.Suika.Const.DampingFactorX = .99
+  GR.Suika.Const.DampingFactorY = .99
+  GR.Suika.Const.MinVelThres = 15
   GR.Suika.Const.Colors = {
     {1,0,0,1},
     {0,1,0,1},
@@ -42,26 +42,19 @@ function GR:SuikaCreate()
   }
   
   -- Suika Frame
-  GR_GUI.Main.Suika = CreateFrame("Frame", Suika, GR_GUI.Main, "ThinBorderTemplate")
-  local Suika = GR_GUI.Main.Suika
-  Suika:SetPoint("BOTTOM", 0, 25 * (GR_GUI.Main:GetHeight() / GR.Win.Const.Tab1HeightSuika))
-  Suika:SetSize(GR_GUI.Main:GetWidth() * (GR.Win.Const.SuikaScreenWidth / GR.Win.Const.Tab1WidthSuika), GR_GUI.Main:GetHeight() * (GR.Win.Const.SuikaScreenHeight / GR.Win.Const.Tab1HeightSuika))
+  local Main = GR_GUI.Main
+  Main.Suika = CreateFrame("Frame", Suika, Main, "ThinBorderTemplate")
+  local Suika = Main.Suika
   Suika:SetClipsChildren(true)
   Suika:Hide()
   
   -- Variables
-  GR.Suika.XRatio = 1
-  GR.Suika.YRatio = 1
-  GR.Suika.ScreenRatio = (Suika:GetWidth() / GR.Win.Const.SuikaScreenWidth + Suika:GetHeight() / GR.Win.Const.SuikaScreenHeight) / 2
   GR.Suika.BallSizes = {}
   for i,v in ipairs(GR.Suika.Const.BallSizes) do
-    GR.Suika.BallSizes[i] = v * GR.Suika.ScreenRatio
+    GR.Suika.BallSizes[i] = v * Main.ScreenRatio
   end
   GR.Suika.ActiveState = "Start"
   GR.Suika.Points = 0
-  GR.Suika.Gravity = GR.Suika.Const.Gravity * GR.Suika.YRatio
-  GR.Suika.MinGravity = GR.Suika.Const.MinGravity * GR.Suika.YRatio
-  GR.Suika.MaxSpeed = GR.Suika.Const.MaxSpeed * GR.Suika.ScreenRatio
   GR.Suika.SimTime = 0
 
   -- Create
@@ -99,7 +92,8 @@ function GR:CreateUseNextBall()
 end
 
 function GR:MakeBall(Ball)
-  local Suika = GR_GUI.Main.Suika
+  local Main = GR_GUI.Main
+  local Suika = Main.Suika
   
   Ball.Size = math.random(GR.Suika.Const.StartSizes)
   Ball.IsClickable = true
@@ -110,8 +104,8 @@ function GR:MakeBall(Ball)
   Ball.AccX = 0
   Ball.SkipGravity = false
   Ball.Mass = (4/3) * math.pi * (GR.Suika.BallSizes[Ball.Size] / 2)^3
-  Ball:SetSize(GR.Suika.BallSizes[Ball.Size] * GR.Suika.XRatio, GR.Suika.BallSizes[Ball.Size] * GR.Suika.YRatio)
-  Ball:SetPoint("CENTER", Suika, "BOTTOMLEFT", Suika:GetWidth() / 2, 475 * GR.Suika.YRatio)
+  Ball:SetSize(GR.Suika.BallSizes[Ball.Size] * Main.XRatio, GR.Suika.BallSizes[Ball.Size] * Main.YRatio)
+  Ball:SetPoint("CENTER", Suika, "BOTTOMLEFT", Suika:GetWidth() / 2, 570 * Main.YRatio)
   Ball:SetMovable(true)
   Ball:EnableMouse(true)
   Ball:SetPropagateKeyboardInput(true)
@@ -128,7 +122,7 @@ function GR:MakeBall(Ball)
     local left, bottom, width, height = self:GetRect()
     local left2, bottom2, width2, height2 = Suika:GetRect()
     self:ClearAllPoints()
-    self:SetPoint("CENTER", Suika, "BOTTOMLEFT", left - left2, 475 * GR.Suika.YRatio)
+    self:SetPoint("CENTER", Suika, "BOTTOMLEFT", left - left2, 570 * Main.YRatio)
     GR:CreateUseNextBall()
   end)
   if (Ball:GetRegions() == nil) then -- if new frame, create new texture
@@ -155,23 +149,15 @@ function GR:SuikaSize()
   local Suika = Main.Suika
 
   -- Game Screen
-  Suika:SetPoint("BOTTOM", 0, 25 * (Main:GetHeight() / GR.Win.Const.Tab1HeightSuika))
-  Suika:SetSize(Main:GetWidth() * (GR.Win.Const.SuikaScreenWidth / GR.Win.Const.Tab1WidthSuika), Main:GetHeight() * (GR.Win.Const.SuikaScreenHeight / GR.Win.Const.Tab1HeightSuika))
-  GR.Suika.XRatio = 1
-  GR.Suika.YRatio = 1
-  GR.Suika.ScreenRatio = (Suika:GetWidth() / GR.Win.Const.SuikaScreenWidth + Suika:GetHeight() / GR.Win.Const.SuikaScreenHeight) / 2
-
-  -- variables
-  GR.Suika.Gravity = GR.Suika.Const.Gravity * GR.Suika.YRatio
-  GR.Suika.MinGravity = GR.Suika.Const.MinGravity * GR.Suika.YRatio
-  GR.Suika.MaxSpeed = GR.Suika.Const.MaxSpeed * GR.Suika.ScreenRatio
+  Suika:SetPoint("BOTTOM", 0, 25 * Main.YRatio)
+  Suika:SetSize(GR.Win.Const.SuikaScreenWidth * Main.XRatio, GR.Win.Const.SuikaScreenHeight * Main.YRatio)
 
   GR:SuikaSizeBalls()
 end
 
 function GR:SuikaSizeBalls()
   for i,v in pairs(GR_GUI.Main.Suika.Balls) do
-    v:SetSize(GR.Suika.BallSizes[v.Size] * GR.Suika.XRatio, GR.Suika.BallSizes[v.Size] * GR.Suika.YRatio)
+    v:SetSize(GR.Suika.BallSizes[v.Size] * GR_GUI.Main.XRatio, GR.Suika.BallSizes[v.Size] * GR_GUI.Main.YRatio)
   end
 end
 
@@ -201,50 +187,61 @@ function GR:SuikaUpdate(self, elapsed)
 
   GR.Suika.SimTime = GR.Suika.SimTime + scaledElapsed
 
-  GR:SuikaCol()
   while (GR.Suika.SimTime >= GR.Suika.Const.TargetFrameTime) do
     GR:SuikaUpdateBalls(self, GR.Suika.Const.TargetFrameTime)
     GR.Suika.SimTime = GR.Suika.SimTime - GR.Suika.Const.TargetFrameTime 
   end
+  GR:SuikaCol()
 
 end
 
 function GR:SuikaUpdateBalls(self, elapsed)
   for i,v in pairs(GR_GUI.Main.Suika.Balls) do
     if (v.IsClickable == false and v.IsActive) then
-      if (v.VelX > GR.Suika.MaxSpeed) then -- limit speed
-        v.VelX = GR.Suika.MaxSpeed
-      end
-      if (v.VelX < -GR.Suika.MaxSpeed) then
-        v.VelX = -GR.Suika.MaxSpeed
-      end
-      if (v.VelY > GR.Suika.MaxSpeed) then
-        v.VelY = GR.Suika.MaxSpeed
-      end
-      if (v.VelY < -GR.Suika.MaxSpeed) then
-        v.VelY = -GR.Suika.MaxSpeed
-      end
-      v.AccX = -v.VelX * .1 -- drag
-      v.AccY = -v.VelY * .1
-      v.VelX = v.VelX + v.AccX -- Vel
-      v.VelY = v.VelY + v.AccY
-      v.SkipGravity = false
-      v.VelX = v.VelX * GR.Suika.Const.DampingFactorX -- dampening for jiggle
-      v.VelY = v.VelY * GR.Suika.Const.DampingFactorY
-      if math.abs(v.VelX) < GR.Suika.Const.MinVelThres * elapsed then
+
+      -- limit lowest speed so that objects rest
+      if math.abs(v.VelX) < GR.Suika.Const.MinVelThres then
         v.VelX = 0
       end
-      -- if math.abs(v.VelY) < GR.Suika.Const.MinVelThres * elapsed then
-      --   v.VelY = 0
-      -- end
-      if not v.SkipGravity then 
-        v.VelY = v.VelY + (GR.Suika.Gravity * elapsed) -- gravity
-      else 
-        v.VelY = v.VelY + (GR.Suika.Gravity * elapsed) * .1 -- smaller gravity
+      -- only limit if going up so that gravity continues to apply
+      if (v.VelY > 0 and v.VelY < GR.Suika.Const.MinVelThres) then
+        v.VelY = 0
       end
-      if (v.VelY < GR.Suika.MinGravity * elapsed) then v.VelY = GR.Suika.MinGravity * elapsed end -- limit fall speed
       
-      -- print(GR.Suika.MinGravity * elapsed, v.VelY, GR.Suika.Const.MinVelThres * elapsed)
+      -- apply gravity
+      v.VelY = v.VelY + GR.Suika.Const.Gravity * elapsed
+      
+      -- limit fall speed
+      if (v.VelY < GR.Suika.Const.MaxFallSpeed) then 
+        v.VelY = GR.Suika.Const.MaxFallSpeed
+      end 
+
+      -- limit speed
+      if (v.VelX > GR.Suika.Const.MaxSpeed) then 
+        v.VelX = GR.Suika.Const.MaxSpeed
+      end
+      if (v.VelX < -GR.Suika.Const.MaxSpeed) then
+        v.VelX = -GR.Suika.Const.MaxSpeed
+      end
+      if (v.VelY > GR.Suika.Const.MaxSpeed) then
+        v.VelY = GR.Suika.Const.MaxSpeed
+      end
+      if (v.VelY < -GR.Suika.Const.MaxSpeed) then
+        v.VelY = -GR.Suika.Const.MaxSpeed
+      end
+
+      v.AccX = -v.VelX * .01 -- drag
+      v.AccY = -v.VelY * .01
+      v.VelX = v.VelX + v.AccX -- Vel
+      v.VelY = v.VelY + v.AccY
+      v.VelX = v.VelX * GR.Suika.Const.DampingFactorX -- dampening for jiggle
+      v.VelY = v.VelY * GR.Suika.Const.DampingFactorY
+
+      print("Vel Y:", v.VelY)
+      print("Vel X:", v.VelX)
+      print("Max Fall Speed:", GR.Suika.Const.MaxFallSpeed)
+      print("Max Speed:", GR.Suika.Const.MaxSpeed)
+      print("Min Vel Threshold:", GR.Suika.Const.MinVelThres)
       
       local point, relativeTo, relativePoint, xOfs, yOfs = v:GetPoint()
       v:SetPoint(point, relativeTo, relativePoint, xOfs + v.VelX * elapsed, yOfs + v.VelY * elapsed) -- apply speed
@@ -254,7 +251,8 @@ end
 
 -- Collisions
 function GR:SuikaCol()
-  local Suika = GR_GUI.Main.Suika
+  local Main = GR_GUI.Main
+  local Suika = Main.Suika
   local Balls = Suika.Balls
   
   -- Ball to Wall
@@ -267,7 +265,7 @@ function GR:SuikaCol()
   for i,v in pairs(Balls) do
     if v.IsActive and not v.IsClickable then
       local point, _, _, xOfs, yOfs = v:GetPoint()
-      local r = GR.Suika.BallSizes[v.Size] / 2
+      local r = (GR.Suika.BallSizes[v.Size] / 2) * Main.ScreenRatio
       local Ball = {
         top = yOfs + r,
         right = xOfs + r,
@@ -305,12 +303,12 @@ function GR:SuikaCol()
   for i,v in pairs(Balls) do
     if (v.IsActive and not v.IsClickable) then
       local p1, rf1, rp1, x1, y1 = v:GetPoint()
-      local r1 = GR.Suika.BallSizes[v.Size] / 2
+      local r1 = (GR.Suika.BallSizes[v.Size] / 2) * Main.ScreenRatio
 
       for j,k in pairs(Balls) do
         if (k.IsActive and j ~= i) then
           local p2, rf2, rp2, x2, y2 = k:GetPoint()
-          local r2 = GR.Suika.BallSizes[k.Size] / 2
+          local r2 = (GR.Suika.BallSizes[k.Size] / 2) * Main.ScreenRatio
           
           if(GR:DoCirclesOverlap(x1, y1, r1, x2, y2, r2)) then
             v.SkipGravity = true
@@ -328,7 +326,7 @@ function GR:SuikaCol()
               v.Mass = (4/3) * math.pi * (GR.Suika.BallSizes[v.Size] / 2)^3
               local color = GR.Suika.Const.Colors[v.Size]
               v.Tex:SetColorTexture(color[1], color[2], color[3], color[4])
-              v:SetSize(GR.Suika.BallSizes[v.Size] * GR.Suika.XRatio, GR.Suika.BallSizes[v.Size] * GR.Suika.YRatio)
+              v:SetSize(GR.Suika.BallSizes[v.Size] * Main.XRatio, GR.Suika.BallSizes[v.Size] * Main.YRatio)
             else
               local distance = sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2))
               local overlap = (distance - r1 - r2) * .5
