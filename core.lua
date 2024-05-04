@@ -13,7 +13,6 @@ local GR_LDB = LibStub("LibDataBroker-1.1"):NewDataObject("GR", {
     if (GR_GUI.Main:IsVisible()) then 
       GR_GUI.Main:Hide()
     else 
-      GR:UpdateFriendsList() 
       GR:ShowMain()
     end
   end,
@@ -27,7 +26,7 @@ local defaults = {
   realm = {
     minimap = { hide = false },
     HideInCombat = false,
-    tab = 1,
+    tab = "solo",
     showBN = false,
     disableChallenges = false,
     showChallengeAsMsg = false,
@@ -96,7 +95,7 @@ function GR:OnInitialize()
   GR:CreateAsteroids()
   GR:CreateSnake()
   GR:CreateBouncyChicken()
-  GR:SuikaCreate()
+  GR:CreateSuika()
   GR:CreateMinesweepers()
 
   GR:SizeMain()
@@ -121,9 +120,9 @@ function GR:CreateMainWindow()
   -- GR_GUI.Main = CreateFrame("Frame", GameRoom, UIParent, "PortraitFrameFlatBaseTemplate")
   -- GR_GUI.Main = CreateFrame("Frame", GameRoom, UIParent, "PortraitFrameTemplate")
   local Main = GR_GUI.Main
-  Main:SetSize(GR.Win.Const.Tab2Width, GR.Win.Const.Tab2Height)
   Main:SetFrameStrata("HIGH")
   Main:SetPoint("TOP", UIParent, "TOP", 0, -130)
+  Main:SetClampedToScreen(true)
   Main:SetMovable(true)
   Main:EnableMouse(true)
   Main:SetResizable(true)
@@ -217,7 +216,7 @@ end
 
 function GR:CreateAcceptDecline()
   local PlayerName = UnitName("player")
-  GR_GUI.Accept = CreateFrame("Button", "Accept", UIParent, "UIPanelButtonTemplate")
+  GR_GUI.Accept = CreateFrame("Button", "GameRoomAcceptBtn", UIParent, "UIPanelButtonTemplate")
   local Accept = GR_GUI.Accept
   Accept:SetPoint(GR.db.realm.Point, GR.db.realm.Xpos, GR.db.realm.Ypos)
   Accept:SetSize(175, 62)
@@ -236,7 +235,7 @@ function GR:CreateAcceptDecline()
     GR:AcceptGameClicked()
   end)
 
-  Accept.DeclineBtn = CreateFrame("Button", "DeclineBtn", Accept, "UIPanelButtonTemplate")
+  Accept.DeclineBtn = CreateFrame("Button", "GameRoomDeclineBtn", Accept, "UIPanelButtonTemplate")
   local DeclineBtn = Accept.DeclineBtn
   DeclineBtn:SetPoint("TOP", Accept, "BOTTOM", 0, 0)
   DeclineBtn:SetSize(70, 23)
@@ -253,7 +252,7 @@ function GR:CreateAcceptDecline()
   end)
 
   -- Mover for Accept Button
-  GR_GUI.AcceptMover = CreateFrame("Frame", "AcceptMover", UIParent)
+  GR_GUI.AcceptMover = CreateFrame("Frame", "GameRoomAcceptMover", UIParent)
   local AcceptMover = GR_GUI.AcceptMover
   AcceptMover:SetPoint(GR.db.realm.Point, GR.db.realm.Xpos, GR.db.realm.Ypos)
   AcceptMover:SetSize(50, 50)
@@ -284,6 +283,7 @@ function GR:SizeMain()
   -- Size Main Ratios
   -- In Game
   if (GR.db.realm.tab == "game") then
+    -- Lock screen dimmensions for in game
     if (GR.GameType == 'Suika') then 
       Main.XRatio = Main:GetWidth() / GR.Win.Const.Tab1WidthSuika
       Main.YRatio = Main:GetHeight() / GR.Win.Const.Tab1HeightSuika
@@ -343,9 +343,9 @@ function GR:SizeAllGames()
   GR:SizeTictactoe()
   GR:SizeBattleships()
   GR:SizeAsteroids()
-  GR:SnakeSize()
+  GR:SizeSnake()
   GR:SizeBC()
-  GR:SuikaSize()
+  GR:SizeSuika()
   GR:SizeMinesweepers()
 end
 
@@ -364,25 +364,19 @@ function GR:TabSelect()
   
   -- In Game
   if (tab == "game") then
-    local Width, Height, BoundX, BoundY
+    local Width, Height
     
     if (GR.GameType == "Suika") then
       Width = GR.Win.Const.Tab1WidthSuika
       Height = GR.Win.Const.Tab1WidthSuika
-      BoundX = GR.Win.Const.Tab1WidthSuika /2
-      BoundY = GR.Win.Const.Tab1HeightSuika /2
     else
       Width = GR.Win.Const.Tab1Width
       Height = GR.Win.Const.Tab1Height
-      BoundX = GR.Win.Const.Tab1Width /2
-      BoundY = GR.Win.Const.Tab1Height /2
     end
 
     Main:SetSize(Width, Height)
-    Main:SetResizeBounds(BoundX, BoundY)
+    Main:SetResizeBounds(Width /2, Height /2)
 
-    GR:SizeMain()
-    
     if (GR.GameType == "Asteroids") then
       GR:AsteroidsShow()
     end
@@ -410,8 +404,6 @@ function GR:TabSelect()
     Main:SetSize(GR.Win.Const.Tab2Width, GR.Win.Const.Tab2Height)
     Main:SetResizeBounds(GR.Win.Const.Tab2Width, GR.Win.Const.Tab2Height)
 
-    GR:SizeMain()
-
     Main.Tab2:Show()
     Main.H2:SetText("Single Player Games")
     Main.H2:Show()
@@ -421,13 +413,12 @@ function GR:TabSelect()
     Main:SetSize(GR.Win.Const.Tab3Width, GR.Win.Const.Tab3Height)
     Main:SetResizeBounds(GR.Win.Const.Tab3Width, GR.Win.Const.Tab3Height)
     
-    GR:SizeMain()
-
-    Main.Tab3:Show()
     Main.Tab3.Invite.ServerScrollFrame:Show()
     Main.Tab3.Invite.ActiveTab = "server"
     GR:ToggleInviteTab()
     GR:DisableMultiGameButtons()
+
+    Main.Tab3:Show()
     Main.H2:SetText("Multi Player Games")
     Main.H2:Show()
   end
@@ -435,20 +426,20 @@ function GR:TabSelect()
   if (tab == "settings") then
     Main:SetSize(GR.Win.Const.Tab4Width, GR.Win.Const.Tab4Height)
     Main:SetResizeBounds(GR.Win.Const.Tab4Width, GR.Win.Const.Tab4Height)
-  
-    GR:SizeMain()
+
+    GR.CurrList = "Blacklist"
+    GR:ToggleSettingsListTab()
 
     Main.Tab4:Show()
     Main.H2:SetText("Settings")
     Main.H2:Show()
-    GR.CurrList = "Blacklist"
-    GR:ToggleSettingsListTab()
   end
 
-  GR:ToggleTab()
+  GR:SizeMain()
+  GR:UIToggleTab()
 end
 
-function GR:ToggleTab()
+function GR:UIToggleTab()
   local tabIndex = GR.db.realm.tab
   local tab1 = GR_GUI.Main.TabButton1
   local tab2 = GR_GUI.Main.TabButton2
@@ -576,7 +567,7 @@ end
 function GR:ShowMain()
   local Main = GR_GUI.Main
 
-  local function SizeMain()
+  local function resetMainSize()
     if (GR.db.realm.tab == "game") then 
       Main:SetSize(GR.Win.Const.Tab1Width, GR.Win.Const.Tab1Height)
     end
@@ -590,27 +581,15 @@ function GR:ShowMain()
       Main:SetSize(GR.Win.Const.Tab4Width, GR.Win.Const.Tab4Height)
     end
   end
-  
-  Main:Show() 
-
-  if (GR:CheckOutOfBoundsRects(Main, UIParent)) then
-    Main:SetPoint("TOPLEFT", UIParent, "TOPLEFT", UIParent:GetWidth() / 2 - GR.Win.Const.Tab2Width / 2, -130)
-  end
-
-  -- if main is bigger than screen, reset main size
-  if (Main:GetHeight() > UIParent:GetHeight() or Main:GetWidth() > UIParent:GetWidth()) then
-      SizeMain()
-  end
-  
-  GR:UpdateFriendsList()
 
   Main.ScreenRatio = 1
   Main.XRatio = 1
   Main.YRatio = 1
 
-  SizeMain()
-
+  resetMainSize()
   GR:SizeMain()
+  Main:Show()
+  GR:UpdateFriendsList()
 end
 
 -- Extra

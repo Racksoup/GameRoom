@@ -35,7 +35,7 @@ function GR:CreateSnake()
   GR:CreateSnakeApple()
 
   -- Size
-  GR:SnakeSize()
+  GR:SizeSnake()
 end
 
 function GR:CreateSnakeGameLoop()
@@ -81,7 +81,7 @@ function GR:CreateSnakeApple()
 end
 
 -- Size
-function GR:SnakeSize()
+function GR:SizeSnake()
   local Main = GR_GUI.Main
   local Snake = Main.Snake
 
@@ -129,7 +129,7 @@ function GR:SnakeShow()
   local Snake = GR_GUI.Main.Snake
   local Solo = GR_GUI.Main.HeaderInfo.Solo
 
-  GR:SnakeSize()
+  GR:SizeSnake()
 
   Solo:Show()
   Solo.Timer:Show()

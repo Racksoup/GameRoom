@@ -1,4 +1,4 @@
-function GR:SuikaCreate()
+function GR:CreateSuika()
   -- Contants
   GR.Suika = {}
   GR.Suika.Const = {}
@@ -74,7 +74,7 @@ function GR:SuikaGameLoop()
   Game:Hide()
 end
 
-function GR:CreateUseNextBall()
+function GR:SuikaCreateUseNextBall()
   local Suika = GR_GUI.Main.Suika
 
   local Ball = nil
@@ -88,10 +88,10 @@ function GR:CreateUseNextBall()
     Ball = CreateFrame("Frame", Ball, Suika)
     Ball.New = true
   end
-  GR:MakeBall(Ball)
+  GR:SuikaMakeBall(Ball)
 end
 
-function GR:MakeBall(Ball)
+function GR:SuikaMakeBall(Ball)
   local Main = GR_GUI.Main
   local Suika = Main.Suika
   
@@ -123,7 +123,7 @@ function GR:MakeBall(Ball)
     local left2, bottom2, width2, height2 = Suika:GetRect()
     self:ClearAllPoints()
     self:SetPoint("CENTER", Suika, "BOTTOMLEFT", left - left2, 570 * Main.YRatio)
-    GR:CreateUseNextBall()
+    GR:SuikaCreateUseNextBall()
   end)
   if (Ball:GetRegions() == nil) then -- if new frame, create new texture
     Ball.Tex = Ball:CreateTexture()
@@ -144,7 +144,7 @@ function GR:MakeBall(Ball)
 end
 
 -- Size
-function GR:SuikaSize()
+function GR:SizeSuika()
   local Main = GR_GUI.Main
   local Suika = Main.Suika
 
@@ -152,10 +152,10 @@ function GR:SuikaSize()
   Suika:SetPoint("BOTTOM", 0, 25 * Main.YRatio)
   Suika:SetSize(GR.Win.Const.SuikaScreenWidth * Main.XRatio, GR.Win.Const.SuikaScreenHeight * Main.YRatio)
 
-  GR:SuikaSizeBalls()
+  GR:SizeSuikaBalls()
 end
 
-function GR:SuikaSizeBalls()
+function GR:SizeSuikaBalls()
   for i,v in pairs(GR_GUI.Main.Suika.Balls) do
     v:SetSize(GR.Suika.BallSizes[v.Size] * GR_GUI.Main.XRatio, GR.Suika.BallSizes[v.Size] * GR_GUI.Main.YRatio)
   end
@@ -371,7 +371,7 @@ function GR:SuikaShow()
   local Suika = GR_GUI.Main.Suika
   local Solo = GR_GUI.Main.HeaderInfo.Solo
   
-  GR:SuikaSize()
+  GR:SizeSuika()
   
   Suika:Show()
   Solo:Show()
@@ -407,7 +407,7 @@ function GR:SuikaStart()
   Suika.Game:Show()
   local Ball = CreateFrame("Frame", Ball, Suika)
   Ball.New = true
-  GR:MakeBall(Ball)
+  GR:SuikaMakeBall(Ball)
   
   -- Show Game Info and Buttons
   GR.Suika.ActiveState = 'Start'
