@@ -368,7 +368,7 @@ function GR:TabSelect()
     
     if (GR.GameType == "Suika") then
       Width = GR.Win.Const.Tab1WidthSuika
-      Height = GR.Win.Const.Tab1WidthSuika
+      Height = GR.Win.Const.Tab1HeightSuika
     else
       Width = GR.Win.Const.Tab1Width
       Height = GR.Win.Const.Tab1Height

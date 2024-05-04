@@ -237,11 +237,11 @@ function GR:SuikaUpdateBalls(self, elapsed)
       v.VelX = v.VelX * GR.Suika.Const.DampingFactorX -- dampening for jiggle
       v.VelY = v.VelY * GR.Suika.Const.DampingFactorY
 
-      print("Vel Y:", v.VelY)
-      print("Vel X:", v.VelX)
-      print("Max Fall Speed:", GR.Suika.Const.MaxFallSpeed)
-      print("Max Speed:", GR.Suika.Const.MaxSpeed)
-      print("Min Vel Threshold:", GR.Suika.Const.MinVelThres)
+      -- print("Vel Y:", v.VelY)
+      -- print("Vel X:", v.VelX)
+      -- print("Max Fall Speed:", GR.Suika.Const.MaxFallSpeed)
+      -- print("Max Speed:", GR.Suika.Const.MaxSpeed)
+      -- print("Min Vel Threshold:", GR.Suika.Const.MinVelThres)
       
       local point, relativeTo, relativePoint, xOfs, yOfs = v:GetPoint()
       v:SetPoint(point, relativeTo, relativePoint, xOfs + v.VelX * elapsed, yOfs + v.VelY * elapsed) -- apply speed
