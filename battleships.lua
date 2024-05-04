@@ -1351,9 +1351,6 @@ function GR:BattleshipsEndGame()
   GR.CanSendInvite = true
   GR.IsChallenged = false
   GR.Opponent = nil
-
-  GR.db.realm.tab = "solo"
-  GR:TabSelect()
 end
 
 function GR:BattleshipsShow()

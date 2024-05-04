@@ -133,14 +133,14 @@ function GR:IncomingInvite(text, distribution)
           GR.GameType = "Battleships"
           GR.IncGameType = "Battleships"
           GameDisplayName = "Battleships"
-          Accept.FS2:SetText(V.Sender .. " - " .. GameDisplayName)
+          Accept.FS:SetText(V.Sender .. " - " .. GameDisplayName)
           GR.Opponent = V.Sender
         end
         if (string.match(V.Tag, "TicTacToe_Challenge")) then
           GR.GameType = "Tictactoe"
           GR.IncGameType = "Tictactoe"
           GameDisplayName = "Tic-Tac-Toe"
-          Accept.FS2:SetText(V.Sender .. " - " .. GameDisplayName)
+          Accept.FS:SetText(V.Sender .. " - " .. GameDisplayName)
           GR.Opponent = V.Sender
         end
 
