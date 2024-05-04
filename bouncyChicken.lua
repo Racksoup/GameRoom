@@ -4,16 +4,16 @@ function GR:CreateBouncyChicken()
   GR.BC.Const = {}
   GR.BC.Const.WallStartInt = 1.65
   GR.BC.Const.WallSpeed = 190
-  GR.BC.Const.WallWidth = 70
-  GR.BC.Const.WallHeight = 150
-  GR.BC.Const.WallYPosOptions = { -120, -58, 4, 66, 128, 190, 252, 314, 376, 438 }
+  GR.BC.Const.WallWidth = 60
+  GR.BC.Const.WallHeight = 130
+  GR.BC.Const.WallYPosOptions = { lower = -50, upper = 365  }
   GR.BC.Const.ChickenXPos = 100
-  GR.BC.Const.ChickenYStart = 250
+  GR.BC.Const.ChickenYStart = 240
   GR.BC.Const.ChickenWidth = 46
-  GR.BC.Const.ChickenHeight = 52
+  GR.BC.Const.ChickenHeight = 46
   GR.BC.Const.ChickenGravity = -9.5
   GR.BC.Const.ChickenMinVelY = -3.8
-  GR.BC.Const.ChickenMaxVelY = 4.4
+  GR.BC.Const.ChickenMaxVelY = 4.05
   
   -- Bouncy Chicken Frame
   local Main = GR_GUI.Main
@@ -31,10 +31,10 @@ function GR:CreateBouncyChicken()
   GR.BC.WallHeight = GR.BC.Const.WallHeight * Main.YRatio
   GR.BC.WallStartX = BC:GetWidth() * 1.1
   GR.BC.WallEndX = BC:GetWidth() * -.15
-  GR.BC.WallYPosOptions = {}
-  for i,v in pairs(GR.BC.Const.WallYPosOptions) do
-    GR.BC.WallYPosOptions[i] = v * Main.YRatio
-  end
+  GR.BC.WallYPosOptions = {
+    lower = GR.BC.Const.WallYPosOptions.lower * Main.YRatio, 
+    upper = GR.BC.Const.WallYPosOptions.upper * Main.YRatio
+  }
   GR.BC.ChickenXPos = GR.BC.Const.ChickenXPos * Main.XRatio
   GR.BC.ChickenYStart = GR.BC.Const.ChickenYStart * Main.YRatio
   GR.BC.ChickenWidth = GR.BC.Const.ChickenWidth * Main.XRatio
@@ -116,9 +116,10 @@ function GR:SizeBCWalls()
   GR.BC.WallHeight = GR.BC.Const.WallHeight * Main.YRatio
   GR.BC.WallStartX = BC:GetWidth() * 1.1
   GR.BC.WallEndX = BC:GetWidth() * -.15
-  for i,v in pairs(GR.BC.Const.WallYPosOptions) do
-    GR.BC.WallYPosOptions[i] = v * Main.YRatio
-  end
+  GR.BC.WallYPosOptions = {
+    lower = GR.BC.Const.WallYPosOptions.lower * Main.YRatio, 
+    upper = GR.BC.Const.WallYPosOptions.upper * Main.YRatio
+  }
   
   for i = 1, #Walls, 1 do
     local Wall = Walls[i]
@@ -165,7 +166,7 @@ function GR:UpdateBCWalls(self, elapsed)
       local Wall = Walls[i]
 
       if (Wall.XPos < GR.BC.WallEndX) then
-        Wall.YPos = GR.BC.WallYPosOptions[math.random(1,#GR.BC.Const.WallYPosOptions)]
+        Wall.YPos = math.random(GR.BC.WallYPosOptions.lower, GR.BC.WallYPosOptions.upper)
         Wall.XPos = GR.BC.WallStartX
         Wall:SetPoint("BOTTOMLEFT", Wall.XPos, Wall.YPos)
       else
@@ -264,29 +265,26 @@ function GR:ControlsBC()
 
   Game:SetScript("OnKeyDown", function(self, key)
     if (key == "SPACE" or key == "W" or key == "w" or key == "UP") then 
-      GR:BCBounce()
+      GR_GUI.Main.BC.Chicken.VelY = GR.BC.ChickenMaxVelY
     end
   end)
 end
 
 -- Functions
-function GR:BCBounce()
-  GR_GUI.Main.BC.Chicken.VelY = GR.BC.ChickenMaxVelY
-end
-
 function GR:BCStartMovingWalls()
   local Main = GR_GUI.Main
   local Walls = Main.BC.Walls
 
   -- Scale WallYPosOptions for first render
-  for i,v in pairs(GR.BC.Const.WallYPosOptions) do
-    GR.BC.WallYPosOptions[i] = v * Main.YRatio
-  end
+  GR.BC.WallYPosOptions = {
+    lower = GR.BC.Const.WallYPosOptions.lower * Main.YRatio, 
+    upper = GR.BC.Const.WallYPosOptions.upper * Main.YRatio
+  }
 
   -- Position Walls
   for i = 1, #Walls, 1 do
     Walls[i].XPos = GR.BC.WallStartX
-    Walls[i].YPos = GR.BC.WallYPosOptions[math.random(1,#GR.BC.Const.WallYPosOptions)]
+    Walls[i].YPos = math.random(GR.BC.WallYPosOptions.lower, GR.BC.WallYPosOptions.upper)
   end
 
   -- Cancel Old Wall Timers

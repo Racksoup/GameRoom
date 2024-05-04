@@ -358,7 +358,6 @@ function GR:AsteroidsShow()
   local Asteroids = GR_GUI.Main.Asteroids
   local Solo = GR_GUI.Main.HeaderInfo.Solo
 
-  GR.GameType = "Asteroids"
   Asteroids:Show()
   Asteroids.Game:Hide()
 
@@ -368,7 +367,7 @@ function GR:AsteroidsShow()
   Solo.Info:Show()
   Solo.Start:Show()
 
-  GR:ShowSoloGame()
+  GR:SizeAsteroids()
 end
 
 -- Start Stop Pause Unpause

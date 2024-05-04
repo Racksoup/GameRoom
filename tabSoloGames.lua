@@ -15,7 +15,8 @@ function GR:CreateTabSoloGames()
   AsteroidsFS:SetText("Asteroids")
   AsteroidsBtn:SetScript("OnClick", function(self, button, down) 
     if (button == "LeftButton" and down == false) then
-      GR:AsteroidsShow()
+      GR.GameType = "Asteroids"
+      GR:ShowSoloGame()
     end
   end)
 

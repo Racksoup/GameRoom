@@ -220,17 +220,17 @@ function GR:CreateAcceptDecline()
   GR_GUI.Accept = CreateFrame("Button", "Accept", UIParent, "UIPanelButtonTemplate")
   local Accept = GR_GUI.Accept
   Accept:SetPoint(GR.db.realm.Point, GR.db.realm.Xpos, GR.db.realm.Ypos)
-  Accept:SetSize(214, 58)
+  Accept:SetSize(155, 35)
   local AcceptString = Accept:CreateFontString(nil, "OVERLAY", "GameTooltipText")
   AcceptString:SetPoint("TOP", 0, -11)
-  AcceptString:SetTextScale(1.5)
+  AcceptString:SetTextScale(1)
   AcceptString:SetTextColor(1,.82,0, 1)
   AcceptString:SetText("Incoming Challenge!")
-  Accept.FS2 = Accept:CreateFontString(nil, "OVERLAY", "GameTooltipText")
-  local AcceptString2 = Accept.FS2
-  AcceptString2:SetPoint("BOTTOM", 0, 10)
-  AcceptString2:SetTextScale(1.3)
-  AcceptString2:SetTextColor(1,.82,0, 1)
+  Accept.FS = Accept:CreateFontString(nil, "OVERLAY", "GameTooltipText")
+  local AcceptString = Accept.FS
+  AcceptString:SetPoint("BOTTOM", 0, 10)
+  AcceptString:SetTextScale(1)
+  AcceptString:SetTextColor(1,.82,0, 1)
   Accept:SetScript("OnClick", function(self, button, down)
     GR_GUI.Main:Show() 
     GR:AcceptGameClicked()
@@ -238,11 +238,11 @@ function GR:CreateAcceptDecline()
 
   Accept.DeclineBtn = CreateFrame("Button", "DeclineBtn", Accept, "UIPanelButtonTemplate")
   local DeclineBtn = Accept.DeclineBtn
-  DeclineBtn:SetPoint("RIGHT", 100, 0)
+  DeclineBtn:SetPoint("TOP", Accept, "BOTTOM", 0, 0)
   DeclineBtn:SetSize(70, 20)
   local DeclineFS = DeclineBtn:CreateFontString(nil, "OVERLAY", "GameTooltipText")
   DeclineFS:SetPoint("CENTER", 0, 0)
-  DeclineFS:SetTextScale(1.1)
+  DeclineFS:SetTextScale(1)
   DeclineFS:SetTextColor(1,1,1, 1)
   DeclineFS:SetText("Decline")
   DeclineBtn:SetScript("OnClick", function(self, button, down)
@@ -384,8 +384,7 @@ function GR:TabSelect()
     GR:SizeMain()
     
     if (GR.GameType == "Asteroids") then
-      Main.Asteroids:Show()
-      GR:SizeAsteroids()
+      GR:AsteroidsShow()
     end
     if (GR.GameType == "Snake") then
       GR:SnakeShow()
@@ -636,7 +635,6 @@ end
 -- guild needs to unregister offline players
 -- show challenge as msg doesn't allow players to accept challenges
 -- rivals spams 
--- fix show / hide 
 
 -- GAMES
 -- chess
@@ -646,7 +644,6 @@ end
 -- bejeweled
 -- galaga
 -- frogger
--- minesweeper
 -- pin-ball macheine
 -- tower defense
 -- boat launch game (like angry birds  but you shoot the boat then they shoot you)
