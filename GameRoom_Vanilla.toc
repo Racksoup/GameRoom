@@ -1,0 +1,25 @@
+## Interface: 11502
+## Title: Game Room
+## Author: ZUI
+## DefaultState: enabled
+## SavedVariables: GameRoomDB
+## OptionalDeps: Ace3
+## X-Embeds: Ace3
+
+embeds.xml
+
+enUS.lua
+core.lua
+headerInfo.lua
+tabSoloGames.lua
+tabMultiGames.lua
+tabSettings.lua
+register.lua
+invite.lua
+tictactoe.lua
+battleships.lua
+asteroids.lua
+snake.lua
+bouncyChicken.lua
+suika.lua
+minesweepers.lua
