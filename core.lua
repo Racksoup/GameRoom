@@ -525,14 +525,13 @@ function GR:UIToggleTab()
     normal(tab2)
     active(tab3)
   end
-
 end
 
 function GR:UIInitTabTop(tab)
   if (GR.Retail) then
-    tab.Friends.LeftActive:Hide()
-    tab.Friends.MiddleActive:Hide()
-    tab.Friends.RightActive:Hide()
+    tab.LeftActive:Hide()
+    tab.MiddleActive:Hide()
+    tab.RightActive:Hide()
   else
     tab.HighlightTexture:Hide()
     tab.Left:Hide()
