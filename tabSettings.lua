@@ -314,9 +314,7 @@ function GR:CreateSettingsTabs()
   -- BlacklistBtn
   Settings.Listtabs.BlacklistBtn = CreateFrame("Button", "BlacklistBtn", Listtabs, "PanelTopTabButtonTemplate")
   local BlacklistBtn = Settings.Listtabs.BlacklistBtn
-  BlacklistBtn.LeftActive:Hide()
-  BlacklistBtn.MiddleActive:Hide()
-  BlacklistBtn.RightActive:Hide()
+  GR:UIInitTabTop(BlacklistBtn)
   BlacklistBtn:SetText("Blacklist")
   BlacklistBtn:SetPoint("BOTTOMLEFT")
   BlacklistBtn:SetScript("OnClick", function(self, button, down) 
@@ -335,9 +333,7 @@ function GR:CreateSettingsTabs()
   -- WhitelistBtn
   Settings.Listtabs.WhitelistBtn = CreateFrame("Button", "WhitelistBtn", Listtabs, "PanelTopTabButtonTemplate")
   local WhitelistBtn = Settings.Listtabs.WhitelistBtn
-  WhitelistBtn.LeftActive:Hide()
-  WhitelistBtn.MiddleActive:Hide()
-  WhitelistBtn.RightActive:Hide()
+  GR:UIInitTabTop(WhitelistBtn)
   WhitelistBtn:SetText("Whitelist")
   WhitelistBtn:SetPoint("BOTTOM")
   WhitelistBtn:SetScript("OnClick", function(self, button, down) 
@@ -356,9 +352,7 @@ function GR:CreateSettingsTabs()
   -- RivalBtn
   Settings.Listtabs.RivalsBtn = CreateFrame("Button", "RivalsBtn", Listtabs, "PanelTopTabButtonTemplate")
   local RivalsBtn = Settings.Listtabs.RivalsBtn
-  RivalsBtn.LeftActive:Hide()
-  RivalsBtn.MiddleActive:Hide()
-  RivalsBtn.RightActive:Hide()
+  GR:UIInitTabTop(RivalsBtn)
   RivalsBtn:SetText("Rivals")
   RivalsBtn:SetPoint("BOTTOMRIGHT")
   RivalsBtn:SetScript("OnClick", function(self, button, down) 
@@ -373,6 +367,12 @@ function GR:CreateSettingsTabs()
       Settings.Rivals:Show()
     end
   end)
+
+  if (not GR.Retail) then
+    BlacklistBtn:SetSize(80, 20)
+    WhitelistBtn:SetSize(80, 20)
+    RivalsBtn:SetSize(80, 20)
+  end
 end
 
 function GR:CreateListControls()
@@ -659,45 +659,51 @@ end
 function GR:ToggleSettingsListTab()
   local tabIndex = GR.CurrList
   local tabs = GR_GUI.Main.Tab4.Settings.Listtabs
-  
+
   local function normal(tab)
-    tab.Left:Show()
-    tab.LeftActive:Hide()
-    tab.LeftHighlight:Hide()
-    tab.Middle:Show()
-    tab.MiddleActive:Hide()
-    tab.MiddleHighlight:Hide()
-    tab.Right:Show()
-    tab.RightActive:Hide()
-    tab.RightHighlight:Hide() 
+    if (GR.Retail) then
+      tab.Left:Show()
+      tab.LeftActive:Hide()
+      tab.LeftHighlight:Hide()
+      tab.Middle:Show()
+      tab.MiddleActive:Hide()
+      tab.MiddleHighlight:Hide()
+      tab.Right:Show()
+      tab.RightActive:Hide()
+      tab.RightHighlight:Hide()     
+    end
     tab.Text:SetPoint("CENTER", 0, 0)
     tab.Text:SetTextColor(1,.82,0,1)
   end
-
+  
   local function active(tab)
-    tab.Left:Hide()
-    tab.LeftActive:Show()
-    tab.LeftHighlight:Hide()
-    tab.Middle:Hide()
-    tab.MiddleActive:Show()
-    tab.MiddleHighlight:Hide()
-    tab.Right:Hide()
-    tab.RightActive:Show()
-    tab.RightHighlight:Hide() 
+    if (GR.Retail) then
+      tab.Left:Hide()
+      tab.LeftActive:Show()
+      tab.LeftHighlight:Hide()
+      tab.Middle:Hide()
+      tab.MiddleActive:Show()
+      tab.MiddleHighlight:Hide()
+      tab.Right:Hide()
+      tab.RightActive:Show()
+      tab.RightHighlight:Hide()        
+    end
     tab.Text:SetPoint("CENTER", 0, 0)
     tab.Text:SetTextColor(1,1,1,1)
   end
-
+  
   local function highlight(tab)
-    tab.Left:Hide()
-    tab.LeftActive:Hide()
-    tab.LeftHighlight:Show()
-    tab.Middle:Hide()
-    tab.MiddleActive:Hide()
-    tab.MiddleHighlight:Show()
-    tab.Right:Hide()
-    tab.RightActive:Hide()
-    tab.RightHighlight:Show() 
+    if (GR.Retail) then
+      tab.Left:Hide()
+      tab.LeftActive:Hide()
+      tab.LeftHighlight:Show()
+      tab.Middle:Hide()
+      tab.MiddleActive:Hide()
+      tab.MiddleHighlight:Show()
+      tab.Right:Hide()
+      tab.RightActive:Hide()
+      tab.RightHighlight:Show()  
+    end
   end
 
   if (tabIndex == "Blacklist") then

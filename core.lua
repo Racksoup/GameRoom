@@ -150,6 +150,10 @@ function GR:CreateMainWindow()
   Main.XButton = CreateFrame("Button", "XButton", Main, "UIPanelCloseButtonDefaultAnchors")
   Main.XButton:SetPoint("TOPRIGHT", 0, -1)
   Main.XButton:SetSize(21, 21)
+  if (not GR.Retail) then
+    Main.XButton:SetPoint("TOPRIGHT", 1.7, 1.5)
+    Main.XButton:SetSize(28, 28)
+  end
 
   -- Resize Button
   Main.ResizeBtn = CreateFrame("Button", nil, Main)
@@ -198,7 +202,7 @@ function GR:CreateMainWindow()
     GR.db.realm.tab = "multi" 
     GR:TabSelect()
   end)
-
+  
   Main.TabButton3 = CreateFrame("Button", "TabButton3", Main, "PanelTabButtonTemplate")
   local TabButton3 = Main.TabButton3
   TabButton3:SetPoint("BOTTOMLEFT", 170, -30)
@@ -207,7 +211,19 @@ function GR:CreateMainWindow()
     GR.db.realm.tab = "settings"
     GR:TabSelect()
   end)
-
+  
+  if (not GR.Retail) then
+    TabButton1:SetScale(.65)
+    TabButton1.Text:SetTextScale(1.4)
+    TabButton1:SetPoint("BOTTOMLEFT", 10, -26)
+    TabButton2:SetScale(.65)
+    TabButton2.Text:SetTextScale(1.4)
+    TabButton2:SetPoint("BOTTOMLEFT", 140, -26)
+    TabButton3:SetScale(.65)
+    TabButton3.Text:SetTextScale(1.4)
+    TabButton3:SetPoint("BOTTOMLEFT", 280, -26)
+  end
+  
   -- Header 2
   Main.H2 = Main:CreateFontString(nil, "OVERLAY", "GameTooltipText")
   local H2 = Main.H2
@@ -510,6 +526,22 @@ function GR:UIToggleTab()
     active(tab3)
   end
 
+end
+
+function GR:UIInitTabTop(tab)
+  if (GR.Retail) then
+    tab.Friends.LeftActive:Hide()
+    tab.Friends.MiddleActive:Hide()
+    tab.Friends.RightActive:Hide()
+  else
+    tab.HighlightTexture:Hide()
+    tab.Left:Hide()
+    tab.LeftDisabled:Hide()
+    tab.Middle:Hide()
+    tab.MiddleDisabled:Hide()
+    tab.Right:Hide()
+    tab.RightDisabled:Hide()
+  end
 end
 
 -- Show/Hide Game

@@ -238,30 +238,22 @@ function GR:CreateInviteTab()
 
   -- Server
   Tab.Server = CreateFrame("Button", "ServerTab", Tab, "PanelTopTabButtonTemplate")
-  Tab.Server.LeftActive:Hide()
-  Tab.Server.MiddleActive:Hide()
-  Tab.Server.RightActive:Hide()
+  GR:UIInitTabTop(Tab.Server)
   Tab.Server:SetText("Server")
   
   -- Friends
   Tab.Friends = CreateFrame("Button", "FriendsTab", Tab, "PanelTopTabButtonTemplate")
-  Tab.Friends.LeftActive:Hide()
-  Tab.Friends.MiddleActive:Hide()
-  Tab.Friends.RightActive:Hide()
+  GR:UIInitTabTop(Tab.Friends)
   Tab.Friends:SetText("Friends")
   
   -- Party
   Tab.Party = CreateFrame("Button", "PartyTab", Tab, "PanelTopTabButtonTemplate")
-  Tab.Party.LeftActive:Hide()
-  Tab.Party.MiddleActive:Hide()
-  Tab.Party.RightActive:Hide()
+  GR:UIInitTabTop(Tab.Party)
   Tab.Party:SetText("Party")
   
   -- Zone
   Tab.Zone = CreateFrame("Button", "ZoneTab", Tab, "PanelTopTabButtonTemplate")
-  Tab.Zone.LeftActive:Hide()
-  Tab.Zone.MiddleActive:Hide()
-  Tab.Zone.RightActive:Hide()
+  GR:UIInitTabTop(Tab.Zone)
   Tab.Zone:SetText("Zone")
 
   
@@ -465,43 +457,49 @@ function GR:ToggleInviteTab()
   local tabIndex = Invite.ActiveTab
 
   local function normal(tab)
-    tab.Left:Show()
-    tab.LeftActive:Hide()
-    tab.LeftHighlight:Hide()
-    tab.Middle:Show()
-    tab.MiddleActive:Hide()
-    tab.MiddleHighlight:Hide()
-    tab.Right:Show()
-    tab.RightActive:Hide()
-    tab.RightHighlight:Hide() 
+    if (GR.Retail) then
+      tab.Left:Show()
+      tab.LeftActive:Hide()
+      tab.LeftHighlight:Hide()
+      tab.Middle:Show()
+      tab.MiddleActive:Hide()
+      tab.MiddleHighlight:Hide()
+      tab.Right:Show()
+      tab.RightActive:Hide()
+      tab.RightHighlight:Hide()   
+    end
     tab.Text:SetPoint("CENTER", 0, 0)
     tab.Text:SetTextColor(1,.82,0,1)
   end
-
+  
   local function active(tab)
-    tab.Left:Hide()
-    tab.LeftActive:Show()
-    tab.LeftHighlight:Hide()
-    tab.Middle:Hide()
-    tab.MiddleActive:Show()
-    tab.MiddleHighlight:Hide()
-    tab.Right:Hide()
-    tab.RightActive:Show()
-    tab.RightHighlight:Hide() 
+    if (GR.Retail) then
+      tab.Left:Hide()
+      tab.LeftActive:Show()
+      tab.LeftHighlight:Hide()
+      tab.Middle:Hide()
+      tab.MiddleActive:Show()
+      tab.MiddleHighlight:Hide()
+      tab.Right:Hide()
+      tab.RightActive:Show()
+      tab.RightHighlight:Hide()        
+    end
     tab.Text:SetPoint("CENTER", 0, 0)
     tab.Text:SetTextColor(1,1,1,1)
   end
-
+  
   local function highlight(tab)
-    tab.Left:Hide()
-    tab.LeftActive:Hide()
-    tab.LeftHighlight:Show()
-    tab.Middle:Hide()
-    tab.MiddleActive:Hide()
-    tab.MiddleHighlight:Show()
-    tab.Right:Hide()
-    tab.RightActive:Hide()
-    tab.RightHighlight:Show() 
+    if (GR.Retail) then
+      tab.Left:Hide()
+      tab.LeftActive:Hide()
+      tab.LeftHighlight:Show()
+      tab.Middle:Hide()
+      tab.MiddleActive:Hide()
+      tab.MiddleHighlight:Show()
+      tab.Right:Hide()
+      tab.RightActive:Hide()
+      tab.RightHighlight:Show()       
+    end
   end
 
   if (tabIndex == "server") then
