@@ -275,6 +275,14 @@ end
 
 function GR:MinesweepersCheckForLose(tile)
   if (tile.hasBomb) then
+    --show bombs
+    for i,v in pairs(GR_GUI.Main.Minesweepers.Grid) do 
+      if v.hasBomb then 
+        v.Tex:SetColorTexture(255,0,0, 1)
+        v.Tex:Show()
+      end
+    end
+    
     GR:MinesweepersDisableClicks()
     GR_GUI.Main.HeaderInfo.Solo.GameOverFS:Show()
     GR_GUI.Main.HeaderInfo.Solo.GameOverFS:SetText("Game Over")
