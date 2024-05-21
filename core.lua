@@ -97,6 +97,7 @@ function GR:OnInitialize()
   GR:CreateBouncyChicken()
   GR:CreateSuika()
   GR:CreateMinesweepers()
+  GR:CreateSuduko()
 
   GR:SizeMain()
   GR:SizeAllGames()
@@ -363,6 +364,7 @@ function GR:SizeAllGames()
   GR:SizeBC()
   GR:SizeSuika()
   GR:SizeMinesweepers()
+  GR:SizeSuduko()
 end
 
 -- Functionality
@@ -413,6 +415,9 @@ function GR:TabSelect()
     end
     if (GR.GameType == "Minesweepers") then
       GR:MinesweepersShow()
+    end
+    if (GR.GameType == "Suduko") then
+      GR:SudukoShow()
     end
   end
   -- Solo Games

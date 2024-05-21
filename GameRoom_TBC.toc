@@ -23,3 +23,4 @@ snake.lua
 bouncyChicken.lua
 suika.lua
 minesweepers.lua
+suduko.lua

@@ -369,6 +369,11 @@ function GR:ExitGameClicked()
     GR:MinesweepersHide()    
   end
 
+  -- Suduko
+  if (GR.GameType == "Suduko") then
+    GR:SudukoHide()    
+  end
+
   GR.GameType = nil
   GR:ResetHeader()
   GR.db.realm.tab = "solo"

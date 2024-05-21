@@ -72,6 +72,19 @@ function GR:CreateTabSoloGames()
     end
   end)
 
+  SoloGames.SudukoBtn = CreateFrame("Button", "SudukoBtn", SoloGames, "UIPanelButtonTemplate")
+  local SudukoBtn = SoloGames.SudukoBtn
+  SudukoBtn.FS = SudukoBtn:CreateFontString(nil, "OVERLAY", "GameTooltipText")
+  local SudukoFS = SudukoBtn.FS
+  SudukoFS:SetTextColor(1,1,1, 1)
+  SudukoFS:SetText("Suduko")
+  SudukoBtn:SetScript("OnClick", function(self, button, down) 
+    if (button == "LeftButton" and down == false) then
+      GR.GameType = "Suduko"
+      GR:ShowSoloGame()
+    end
+  end)
+
   Tab2:Hide()
 end
 
@@ -115,4 +128,10 @@ function GR:SizeTabSoloGames()
   local MinesweepersFS = MinesweepersBtn.FS
   MinesweepersFS:SetPoint("CENTER", 0, 0)
   MinesweepersFS:SetTextScale(1 * Main.ScreenRatio)
+  local SudukoBtn = SoloGames.SudukoBtn
+  SudukoBtn:SetPoint("TOPRIGHT", -5 * Main.XRatio, -75 * Main.YRatio)
+  SudukoBtn:SetSize(120 * Main.XRatio, 30 * Main.YRatio)
+  local SudukoFS = SudukoBtn.FS
+  SudukoFS:SetPoint("CENTER", 0, 0)
+  SudukoFS:SetTextScale(1 * Main.ScreenRatio)
 end
