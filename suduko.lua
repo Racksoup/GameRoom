@@ -44,7 +44,22 @@ function GR:CreateSudukoGrid()
 end
 
 function GR:CreateSudukoBlackLines()
+  local Main = GR_GUI.Main
+  local Suduko = Main.Suduko
 
+  Suduko.BlackLines = CreateFrame("FRAME", "BlackLines", Suduko)
+  local BlackLines = Suduko.BlackLines
+  BlackLines:SetAllPoints(Suduko);
+  BlackLines:Raise()
+
+  BlackLines.VL = BlackLines:CreateLine()
+  BlackLines.VL:SetColorTexture(0,0,0, 1)
+  BlackLines.VR = BlackLines:CreateLine()
+  BlackLines.VR:SetColorTexture(0,0,0, 1)
+  BlackLines.HB = BlackLines:CreateLine()
+  BlackLines.HB:SetColorTexture(0,0,0, 1)
+  BlackLines.HT = BlackLines:CreateLine()
+  BlackLines.HT:SetColorTexture(0,0,0, 1)
 end
 
 -- Size
@@ -80,7 +95,22 @@ function GR:SizeSudukoGrid()
 end
 
 function GR:SizeSudukoBlackLines()
+  local Main = GR_GUI.Main
+  local Suduko = Main.Suduko
+  local BlackLines = Suduko.BlackLines
 
+  BlackLines.VL:SetThickness(5 * Main.ScreenRatio)
+  BlackLines.VR:SetThickness(5 * Main.ScreenRatio)
+  BlackLines.HB:SetThickness(5 * Main.ScreenRatio)
+  BlackLines.HT:SetThickness(5 * Main.ScreenRatio)
+  BlackLines.VL:SetStartPoint("TOPLEFT", GR.Win.Const.SudukoScreenWidth * Main.XRatio /3, -3 * Main.YRatio)
+  BlackLines.VL:SetEndPoint("BOTTOMLEFT", GR.Win.Const.SudukoScreenWidth * Main.XRatio /3, 3 * Main.YRatio)
+  BlackLines.VR:SetStartPoint("TOPLEFT", (GR.Win.Const.SudukoScreenWidth * Main.XRatio /3) *2, -3 * Main.YRatio)
+  BlackLines.VR:SetEndPoint("BOTTOMLEFT", (GR.Win.Const.SudukoScreenWidth * Main.XRatio /3) *2, 3 * Main.YRatio)
+  BlackLines.HB:SetStartPoint("BOTTOMLEFT", 3 * Main.XRatio, GR.Win.Const.SudukoScreenHeight * Main.YRatio /3)
+  BlackLines.HB:SetEndPoint("BOTTOMRIGHT", -3 * Main.XRatio, GR.Win.Const.SudukoScreenHeight * Main.YRatio /3)
+  BlackLines.HT:SetStartPoint("BOTTOMLEFT", 3 * Main.XRatio, (GR.Win.Const.SudukoScreenHeight * Main.YRatio /3) *2)
+  BlackLines.HT:SetEndPoint("BOTTOMRIGHT", -3 * Main.XRatio, (GR.Win.Const.SudukoScreenHeight * Main.YRatio /3) *2)
 end
 
 -- Show / Hide
