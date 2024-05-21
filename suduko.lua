@@ -27,15 +27,21 @@ function GR:CreateSudukoGrid()
     for j = 1, cols, 1 do
       Suduko.Grid[j + ((i -1) * cols)] = CreateFrame("BUTTON", nil, Suduko, "ThinBorderTemplate")
       local Tile = Suduko.Grid[j + ((i -1) * cols)] 
+      Tile.Tex = Tile:CreateTexture()
+      Tile.Tex:SetAllPoints(Tile)
+      Tile.Tex:Hide()
       Tile.FS = Tile:CreateFontString(nil, "OVERLAY", "GameTooltipText")
       Tile.FS:Hide()
       Tile:RegisterForClicks("LeftButtonDown", "RightButtonDown")
       Tile:SetScript("OnClick", function(self, button, down)
         if (button == "LeftButton") then
-          
+          Tile.Tex:Show()
+          Tile.Tex:SetColorTexture(255,0,0, .2)
         end
-
+        
         if (button == "RightButton") then
+          Tile.Tex:Show()
+          Tile.Tex:SetColorTexture(255,255,255, .2)
 
         end
       end)
