@@ -56,10 +56,14 @@ function GR:OnInitialize()
   GR.Win.Const.Tab1Height = 520
   GR.Win.Const.Tab1WidthSuika = 475
   GR.Win.Const.Tab1HeightSuika = 800
+  GR.Win.Const.Tab1WidthSuduko = 475
+  GR.Win.Const.Tab1HeightSuduko = 525
   GR.Win.Const.GameScreenWidth = 750
   GR.Win.Const.GameScreenHeight = 420
   GR.Win.Const.SuikaScreenWidth = 435
   GR.Win.Const.SuikaScreenHeight = 680
+  GR.Win.Const.SudukoScreenWidth = 425
+  GR.Win.Const.SudukoScreenHeight = 425
   GR.Win.Const.Tab2Width = 310
   GR.Win.Const.Tab2Height = 181
   GR.Win.Const.Tab3Width = 340
@@ -310,6 +314,15 @@ function GR:SizeMain()
         Main.YRatio = Main.XRatio
       end
       Main:SetSize(Main.XRatio * GR.Win.Const.Tab1WidthSuika, Main.YRatio * GR.Win.Const.Tab1HeightSuika)
+    elseif (GR.GameType == 'Suduko') then 
+      Main.XRatio = Main:GetWidth() / GR.Win.Const.Tab1WidthSuduko
+      Main.YRatio = Main:GetHeight() / GR.Win.Const.Tab1HeightSuduko
+      if (Main.XRatio > Main.YRatio) then
+        Main.XRatio = Main.YRatio
+      else
+        Main.YRatio = Main.XRatio
+      end
+      Main:SetSize(Main.XRatio * GR.Win.Const.Tab1WidthSuduko, Main.YRatio * GR.Win.Const.Tab1HeightSuduko)
     else
       Main.XRatio = Main:GetWidth() / GR.Win.Const.Tab1Width
       Main.YRatio = Main:GetHeight() / GR.Win.Const.Tab1Height
@@ -387,6 +400,9 @@ function GR:TabSelect()
     if (GR.GameType == "Suika") then
       Width = GR.Win.Const.Tab1WidthSuika
       Height = GR.Win.Const.Tab1HeightSuika
+    elseif (GR.GameType == "Suduko") then
+      Width = GR.Win.Const.Tab1WidthSuduko
+      Height = GR.Win.Const.Tab1HeightSuduko
     else
       Width = GR.Win.Const.Tab1Width
       Height = GR.Win.Const.Tab1Height

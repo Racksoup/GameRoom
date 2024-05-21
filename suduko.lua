@@ -17,7 +17,7 @@ function GR:SizeSuduko()
   local Suduko = Main.Suduko
 
   Suduko:SetPoint("BOTTOM", 0, 25 * Main.YRatio)
-  Suduko:SetSize(GR.Win.Const.GameScreenWidth * Main.XRatio, GR.Win.Const.GameScreenHeight * Main.YRatio)
+  Suduko:SetSize(GR.Win.Const.SudukoScreenWidth * Main.XRatio, GR.Win.Const.SudukoScreenHeight * Main.YRatio)
 end
 
 -- Show / Hide
