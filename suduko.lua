@@ -3,6 +3,7 @@ function GR:CreateSuduko()
   local Main = GR_GUI.Main
   GR.Suduko = {}
   GR.Suduko.CurrTile = nil
+  GR.Suduko.Board = {}
   GR.Suduko.Const = {}
   GR.Suduko.Const.NumOfCols = 9
   GR.Suduko.Const.NumOfRows = 9
@@ -31,6 +32,7 @@ function GR:CreateSudukoGrid()
       local Tile = Suduko.Grid[j + ((i -1) * cols)] 
       Tile.insertMode = nil
       Tile.Marks = {}
+      Tile.Pick = nil
       Tile.Tex = Tile:CreateTexture()
       Tile.Tex:SetAllPoints(Tile)
       Tile.Tex:Hide()
@@ -105,7 +107,7 @@ function GR:SizeSudukoGrid()
       Tile:SetPoint("BOTTOMLEFT", (width * Main.XRatio) * ((j -1) / cols), (height * Main.YRatio) * ((i -1) / rows))
       Tile:SetSize((width * Main.XRatio) / cols, (height * Main.YRatio) / rows)
       Tile.FS:SetPoint("CENTER")
-      Tile.FS:SetTextScale(1.2 * Main.ScreenRatio)
+      Tile.FS:SetTextScale(1.6 * Main.ScreenRatio)
       Tile.MarksFS:SetPoint("TOP", 0, -3 * Main.YRatio)
       Tile.MarksFS:SetTextScale(.8 * Main.ScreenRatio)
     end
@@ -155,11 +157,13 @@ function GR:SudukoControls()
     if GR.Suduko.CurrTile ~= nil then
       if key:match("[123456789]") then
         if (GR.Suduko.CurrTile.insertMode == "pick") then
+          GR.Suduko.CurrTile.Pick = key
           GR.Suduko.CurrTile.MarksFS:Hide()
           GR.Suduko.CurrTile.FS:Show()
           GR.Suduko.CurrTile.FS:SetText(key)
         end
         if (GR.Suduko.CurrTile.insertMode == "marks") then
+          GR.Suduko.CurrTile.Pick = nil 
           GR.Suduko.CurrTile.FS:Hide()
           GR.Suduko.CurrTile.MarksFS:Show()
           table.insert(GR.Suduko.CurrTile.Marks, key)
@@ -172,16 +176,66 @@ function GR:SudukoControls()
         GR.Suduko.CurrTile = nil
         Controls:Hide()
       end
+
+      if key == "BACKSPACE" then
+        GR.Suduko.CurrTile.Marks = {}
+        GR.Suduko.CurrTile.Pick = nil 
+        GR.Suduko.CurrTile.MarksFS:SetText("")
+        GR.Suduko.CurrTile.MarksFS:Hide()
+        GR.Suduko.CurrTile.insertMode = nil
+        GR.Suduko.CurrTile.Tex:Hide()
+        GR.Suduko.CurrTile = nil
+        Controls:Hide()
+      end
     end 
   end)
 end
 
+function GR:SudukoSetBoard()
+  local Board = GR.Suduko.Board
+  local Grid = GR_GUI.Main.Suduko.Grid
+
+  Board = {
+    r1 = {0, 0, 0, 0, 0, 0, 0, 0, 0},
+    r2 = {0, 0, 0, 0, 0, 0, 0, 0, 0},
+    r3 = {0, 0, 0, 0, 0, 0, 0, 0, 0},
+    r4 = {0, 0, 0, 0, 0, 0, 0, 0, 0},
+    r5 = {0, 0, 0, 0, 0, 0, 0, 0, 0},
+    r6 = {0, 0, 0, 0, 0, 0, 0, 0, 0},
+    r7 = {0, 0, 0, 0, 0, 0, 0, 0, 0},
+    r8 = {0, 0, 0, 0, 0, 0, 0, 0, 0},
+    r9 = {0, 0, 0, 0, 0, 0, 0, 0, 0},
+  }
+
+
+
+  for i,v in ipairs(Board.r1) do
+    local function findNum()
+      Board.r1[i] = math.random(1, 9)
+      print(1)
+      for j,k in ipairs(Board.r1) do
+        print(2)
+        if Board.r1[j] == Board.r1[i] and i ~= j then
+          print(Board.r1[j], Board.r1[i])
+          findNum()
+        end
+      end
+    end
+    findNum()
+  end
+  
+  for i,v in ipairs(Board.r1) do 
+    Grid[i].FS:Show()
+    Grid[i].FS:SetText(v)
+  end
+end
+
 -- Show / Hide
 function GR:SudukoShow()
-  local Solo = GR_GUI.Main.HeaderInfo.Solo
-
   GR:SizeSuduko()  
   
+  GR:SudukoSetBoard()
+
   GR_GUI.Main.Suduko:Show()
 end
 
