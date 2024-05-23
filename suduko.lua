@@ -2,6 +2,7 @@
 function GR:CreateSuduko()
   local Main = GR_GUI.Main
   GR.Suduko = {}
+  GR.Suduko.CurrTile = nil
   GR.Suduko.Const = {}
   GR.Suduko.Const.NumOfCols = 9
   GR.Suduko.Const.NumOfRows = 9
@@ -11,6 +12,7 @@ function GR:CreateSuduko()
 
   GR:CreateSudukoGrid()
   GR:CreateSudukoBlackLines()
+  GR:SudukoControls()
 
   GR:SizeSuduko()
 end
@@ -35,6 +37,8 @@ function GR:CreateSudukoGrid()
       Tile:RegisterForClicks("LeftButtonDown", "RightButtonDown")
       Tile:SetScript("OnClick", function(self, button, down)
         GR:HideTiles()
+        GR.Suduko.CurrTile = self
+        Suduko.Controls:Show()
         if (button == "LeftButton") then
           Tile.Tex:Show()
           Tile.Tex:SetColorTexture(255,0,0, .2)
@@ -63,8 +67,7 @@ function GR:CreateSudukoBlackLines()
   BlackLines.VL:SetColorTexture(0,0,0, 1)
   BlackLines.VR = BlackLines:CreateLine()
   BlackLines.VR:SetColorTexture(0,0,0, 1)
-  BlackLines.HB = BlackLines:CreateLine()
-  BlackLines.HB:SetColorTexture(0,0,0, 1)
+  BlackLines.HB = BlackLines:CreateLine() BlackLines.HB:SetColorTexture(0,0,0, 1)
   BlackLines.HT = BlackLines:CreateLine()
   BlackLines.HT:SetColorTexture(0,0,0, 1)
 end
@@ -125,9 +128,32 @@ function GR:HideTiles()
   local Main = GR_GUI.Main
   local Grid = Main.Suduko.Grid
 
+  GR.Suduko.CurrTile = nil
+
   for i,v in ipairs(Grid) do
     v.Tex:Hide()
   end
+end
+
+function GR:SudukoControls()
+  local Suduko = GR_GUI.Main.Suduko
+  local Tile = GR.Suduko.CurrTile
+
+  Suduko.Controls = CreateFrame("FRAME")
+  local Controls = Suduko.Controls
+  Controls:Hide()
+
+  Controls:SetScript("OnKeyDown", function(self, key)
+    if GR.Suduko.CurrTile ~= nil then
+      if key:match("[123456789]") then
+        GR.Suduko.CurrTile.FS:Show()
+        GR.Suduko.CurrTile.FS:SetText(key)
+        GR.Suduko.CurrTile.Tex:Hide()
+        GR.Suduko.CurrTile = nil
+        Controls:Hide()
+      end
+    end 
+  end)
 end
 
 -- Show / Hide
