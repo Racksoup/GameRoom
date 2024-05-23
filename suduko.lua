@@ -34,6 +34,7 @@ function GR:CreateSudukoGrid()
       Tile.FS:Hide()
       Tile:RegisterForClicks("LeftButtonDown", "RightButtonDown")
       Tile:SetScript("OnClick", function(self, button, down)
+        GR:HideTiles()
         if (button == "LeftButton") then
           Tile.Tex:Show()
           Tile.Tex:SetColorTexture(255,0,0, .2)
@@ -119,6 +120,16 @@ function GR:SizeSudukoBlackLines()
   BlackLines.HT:SetEndPoint("BOTTOMRIGHT", -3 * Main.XRatio, (GR.Win.Const.SudukoScreenHeight * Main.YRatio /3) *2)
 end
 
+-- Func
+function GR:HideTiles()					
+  local Main = GR_GUI.Main
+  local Grid = Main.Suduko.Grid
+
+  for i,v in ipairs(Grid) do
+    v.Tex:Hide()
+  end
+end
+
 -- Show / Hide
 function GR:SudukoShow()
   local Solo = GR_GUI.Main.HeaderInfo.Solo
@@ -130,4 +141,4 @@ end
 
 function GR:SudukoHide()
   GR_GUI.Main.Suduko:Hide()
-end
+end 
