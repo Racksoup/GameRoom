@@ -29,25 +29,30 @@ function GR:CreateSudukoGrid()
     for j = 1, cols, 1 do
       Suduko.Grid[j + ((i -1) * cols)] = CreateFrame("BUTTON", nil, Suduko, "ThinBorderTemplate")
       local Tile = Suduko.Grid[j + ((i -1) * cols)] 
+      Tile.insertMode = nil
+      Tile.Marks = {}
       Tile.Tex = Tile:CreateTexture()
       Tile.Tex:SetAllPoints(Tile)
       Tile.Tex:Hide()
       Tile.FS = Tile:CreateFontString(nil, "OVERLAY", "GameTooltipText")
       Tile.FS:Hide()
+      Tile.MarksFS = Tile:CreateFontString(nil, "OVERLAY", "GameTooltipText")
+      Tile.MarksFS:Hide()
       Tile:RegisterForClicks("LeftButtonDown", "RightButtonDown")
       Tile:SetScript("OnClick", function(self, button, down)
         GR:HideTiles()
         GR.Suduko.CurrTile = self
         Suduko.Controls:Show()
         if (button == "LeftButton") then
+          Tile.insertMode = "pick"
           Tile.Tex:Show()
           Tile.Tex:SetColorTexture(255,0,0, .2)
         end
         
         if (button == "RightButton") then
+          Tile.insertMode = "marks"
           Tile.Tex:Show()
           Tile.Tex:SetColorTexture(255,255,255, .2)
-
         end
       end)
     end
@@ -64,12 +69,13 @@ function GR:CreateSudukoBlackLines()
   BlackLines:Raise()
 
   BlackLines.VL = BlackLines:CreateLine()
-  BlackLines.VL:SetColorTexture(0,0,0, 1)
+  BlackLines.VL:SetColorTexture(0,255,255, 1)
   BlackLines.VR = BlackLines:CreateLine()
-  BlackLines.VR:SetColorTexture(0,0,0, 1)
-  BlackLines.HB = BlackLines:CreateLine() BlackLines.HB:SetColorTexture(0,0,0, 1)
+  BlackLines.VR:SetColorTexture(0,255,255, 1)
+  BlackLines.HB = BlackLines:CreateLine()
+  BlackLines.HB:SetColorTexture(0,255,255, 1)
   BlackLines.HT = BlackLines:CreateLine()
-  BlackLines.HT:SetColorTexture(0,0,0, 1)
+  BlackLines.HT:SetColorTexture(0,255,255, 1)
 end
 
 -- Size
@@ -99,7 +105,9 @@ function GR:SizeSudukoGrid()
       Tile:SetPoint("BOTTOMLEFT", (width * Main.XRatio) * ((j -1) / cols), (height * Main.YRatio) * ((i -1) / rows))
       Tile:SetSize((width * Main.XRatio) / cols, (height * Main.YRatio) / rows)
       Tile.FS:SetPoint("CENTER")
-      Tile.FS:SetTextScale(1 * Main.ScreenRatio)
+      Tile.FS:SetTextScale(1.2 * Main.ScreenRatio)
+      Tile.MarksFS:SetPoint("TOP", 0, -3 * Main.YRatio)
+      Tile.MarksFS:SetTextScale(.8 * Main.ScreenRatio)
     end
   end
 end
@@ -146,8 +154,20 @@ function GR:SudukoControls()
   Controls:SetScript("OnKeyDown", function(self, key)
     if GR.Suduko.CurrTile ~= nil then
       if key:match("[123456789]") then
-        GR.Suduko.CurrTile.FS:Show()
-        GR.Suduko.CurrTile.FS:SetText(key)
+        if (GR.Suduko.CurrTile.insertMode == "pick") then
+          GR.Suduko.CurrTile.MarksFS:Hide()
+          GR.Suduko.CurrTile.FS:Show()
+          GR.Suduko.CurrTile.FS:SetText(key)
+        end
+        if (GR.Suduko.CurrTile.insertMode == "marks") then
+          GR.Suduko.CurrTile.FS:Hide()
+          GR.Suduko.CurrTile.MarksFS:Show()
+          table.insert(GR.Suduko.CurrTile.Marks, key)
+          GR.Suduko.CurrTile.MarksFS:SetText(
+            table.concat(GR.Suduko.CurrTile.Marks, " ")
+          )
+        end
+        GR.Suduko.CurrTile.insertMode = nil
         GR.Suduko.CurrTile.Tex:Hide()
         GR.Suduko.CurrTile = nil
         Controls:Hide()
