@@ -7,6 +7,7 @@ function GR:CreateSuduko()
   GR.Suduko.Const = {}
   GR.Suduko.Const.NumOfCols = 9
   GR.Suduko.Const.NumOfRows = 9
+  GR.Suduko.Const.maxOverflow = 20
 
   Main.Suduko = CreateFrame("Frame", "Suduko", Main, "ThinBorderTemplate")
   Main.Suduko:Hide()
@@ -195,6 +196,7 @@ function GR:SudukoSetBoard()
   local Board = GR.Suduko.Board
   local Grid = GR_GUI.Main.Suduko.Grid
 
+  -- Initialize the board with zeros
   Board = {
     r1 = {0, 0, 0, 0, 0, 0, 0, 0, 0},
     r2 = {0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -207,172 +209,46 @@ function GR:SudukoSetBoard()
     r9 = {0, 0, 0, 0, 0, 0, 0, 0, 0},
   }
 
-  -- Set Lines
-  -- First
-  for i,v in ipairs(Board.r1) do
-    local function findNum1()
-      Board.r1[i] = math.random(1, 9)
-      for j,k in ipairs(Board.r1) do
-        if Board.r1[j] == Board.r1[i] and i ~= j then
-          findNum1()
+  local function isValid(board, row, col, num)
+    for i = 1, 9 do
+      if board["r"..row][i] == num or board["r"..i][col] == num then
+        return false
+      end
+    end
+    
+    local startRow = math.floor((row - 1) / 3) * 3 + 1
+    local startCol = math.floor((col - 1) / 3) * 3 + 1
+    for i = 0, 2 do
+      for j = 0, 2 do
+        if board["r"..(startRow + i)][startCol + j] == num then
+          return false
         end
       end
     end
-    findNum1()
+    return true
   end
 
-  -- Second
-  for i,v in ipairs(Board.r2) do 
-    local function findNum2()
-      Board.r2[i] = math.random(1,9)
-      
-      -- Row
-      for j,k in ipairs(Board.r2) do
-        if i ~= j then 
-          if Board.r2[i] == Board.r2[j] then
-            findNum2()
+  local function solve(board)
+    for row = 1, 9 do
+      for col = 1, 9 do
+        if board["r"..row][col] == 0 then
+          for num = 1, 9 do
+            if isValid(board, row, col, num) then
+              board["r"..row][col] = num
+              if solve(board) then
+                return true
+              end
+              board["r"..row][col] = 0
+            end
           end
+          return false
         end
       end
-
-      -- Col
-      if Board.r2[i] == Board.r1[i] then
-        findNum2()
-      end
-
-      -- Square
-      if tostring(i):match("[123]") then
-        if Board.r2[i] == Board.r1[1] or Board.r2[i] == Board.r1[2] or Board.r2[i] == Board.r1[3] then
-          findNum2()
-        end
-      end
-      if tostring(i):match("[456]") then
-        if Board.r2[i] == Board.r1[4] or Board.r2[i] == Board.r1[5] or Board.r2[i] == Board.r1[6] then
-          findNum2()
-        end
-      end 
-      if tostring(i):match("[789]") then
-        if Board.r2[i] == Board.r1[7] or Board.r2[i] == Board.r1[8] or Board.r2[i] == Board.r1[9] then
-          findNum2()
-        end
-      end 
-
     end
-    findNum2()
+    return true
   end
 
-  -- Third
-  for i,v in ipairs(Board.r3) do 
-    local function findNum3()
-      Board.r3[i] = math.random(1,9)
-      
-      -- Check Row
-      for j,k in ipairs(Board.r3) do
-        if i ~= j then 
-          if Board.r3[i] == Board.r3[j] then
-            findNum3()
-          end
-        end
-      end
-
-      -- Check Col
-      if Board.r3[i] == Board.r1[i] or 
-        Board.r3[i] == Board.r2[i] then
-        findNum3()
-      end
-
-
-      -- Check Square
-      if tostring(i):match("[123]") then
-        if Board.r3[i] == Board.r1[1] or Board.r3[i] == Board.r1[2] or Board.r3[i] == Board.r1[3] or 
-          Board.r3[i] == Board.r2[1] or Board.r3[i] == Board.r2[2] or Board.r3[i] == Board.r2[3] then
-          findNum3()
-        end
-      end
-      if tostring(i):match("[456]") then
-        if Board.r3[i] == Board.r1[4] or Board.r3[i] == Board.r1[5] or Board.r3[i] == Board.r1[6] or 
-          Board.r3[i] == Board.r2[4] or Board.r3[i] == Board.r2[5] or Board.r3[i] == Board.r2[6] then
-          findNum3()
-        end
-      end 
-      if tostring(i):match("[789]") then
-        if Board.r3[i] == Board.r1[7] or Board.r3[i] == Board.r1[8] or Board.r3[i] == Board.r1[9] or 
-          Board.r3[i] == Board.r2[7] or Board.r3[i] == Board.r2[8] or Board.r3[i] == Board.r2[9] then
-          findNum3()
-        end
-      end 
-
-    end
-    findNum3()
-  end
-
-  -- Fourth
-  for i,v in ipairs(Board.r4) do 
-    local function findNum4()
-      Board.r4[i] = math.random(1,9)
-      
-      -- Check Row
-      for j,k in ipairs(Board.r4) do
-        if i ~= j then 
-          if Board.r4[i] == Board.r4[j] then
-            findNum4()
-          end
-        end
-      end
-
-      -- Check Col
-      if Board.r4[i] == Board.r1[i] or 
-        Board.r4[i] == Board.r2[i] or
-        Board.r4[i] == Board.r3[i] then
-        findNum4()
-      end
-
-    end
-    findNum4()
-  end
-  
-  -- Fifth
-  for i,v in ipairs(Board.r5) do 
-    local function findNum5()
-      Board.r5[i] = math.random(1,9)
-      
-      -- Row
-      for j,k in ipairs(Board.r5) do
-        if i ~= j then 
-          if Board.r5[i] == Board.r5[j] then
-            findNum5()
-          end
-        end
-      end
-
-      -- Check Col
-      if Board.r5[i] == Board.r1[i] or 
-        Board.r5[i] == Board.r2[i] or
-        Board.r5[i] == Board.r3[i] or
-        Board.r5[i] == Board.r4[i] then
-        findNum5()
-      end
- 
-      -- Square
-      if tostring(i):match("[123]") then
-        if Board.r5[i] == Board.r4[1] or Board.r5[i] == Board.r4[2] or Board.r5[i] == Board.r4[3] then
-          findNum5()
-        end
-      end
-      if tostring(i):match("[456]") then
-        if Board.r5[i] == Board.r4[4] or Board.r5[i] == Board.r4[5] or Board.r5[i] == Board.r4[6] then
-          findNum5()
-        end
-      end 
-      if tostring(i):match("[789]") then
-        if Board.r5[i] == Board.r4[7] or Board.r5[i] == Board.r4[8] or Board.r5[i] == Board.r4[9] then
-          findNum5()
-        end
-      end 
-
-    end
-    findNum5()
-  end
+  solve(Board)
 
   -- Set Text
   for i,v in ipairs(Board.r1) do 
@@ -398,6 +274,26 @@ function GR:SudukoSetBoard()
   for i,v in ipairs(Board.r5) do
     Grid[i+36].FS:Show()
     Grid[i+36].FS:SetText(v)
+  end
+
+  for i,v in ipairs(Board.r6) do
+    Grid[i+45].FS:Show()
+    Grid[i+45].FS:SetText(v)
+  end
+
+  for i,v in ipairs(Board.r7) do
+    Grid[i+54].FS:Show()
+    Grid[i+54].FS:SetText(v)
+  end
+
+  for i,v in ipairs(Board.r8) do
+    Grid[i+63].FS:Show()
+    Grid[i+63].FS:SetText(v)
+  end
+
+  for i,v in ipairs(Board.r9) do
+    Grid[i+72].FS:Show()
+    Grid[i+72].FS:SetText(v)
   end
 end
 
