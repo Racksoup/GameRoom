@@ -210,74 +210,75 @@ function GR:SudukoSetBoard()
   -- Set Lines
   -- First
   for i,v in ipairs(Board.r1) do
-    local function findNum()
+    local function findNum1()
       Board.r1[i] = math.random(1, 9)
       for j,k in ipairs(Board.r1) do
         if Board.r1[j] == Board.r1[i] and i ~= j then
-          findNum()
+          findNum1()
         end
       end
     end
-    findNum()
+    findNum1()
   end
 
   -- Second
   for i,v in ipairs(Board.r2) do 
-    local function findNum()
+    local function findNum2()
       Board.r2[i] = math.random(1,9)
       
       -- Row
       for j,k in ipairs(Board.r2) do
         if i ~= j then 
           if Board.r2[i] == Board.r2[j] then
-            findNum()
+            findNum2()
           end
         end
       end
 
       -- Col
       if Board.r2[i] == Board.r1[i] then
-        findNum()
+        findNum2()
       end
 
       -- Square
       if tostring(i):match("[123]") then
         if Board.r2[i] == Board.r1[1] or Board.r2[i] == Board.r1[2] or Board.r2[i] == Board.r1[3] then
-          findNum()
+          findNum2()
         end
       end
       if tostring(i):match("[456]") then
         if Board.r2[i] == Board.r1[4] or Board.r2[i] == Board.r1[5] or Board.r2[i] == Board.r1[6] then
-          findNum()
+          findNum2()
         end
       end 
       if tostring(i):match("[789]") then
         if Board.r2[i] == Board.r1[7] or Board.r2[i] == Board.r1[8] or Board.r2[i] == Board.r1[9] then
-          findNum()
+          findNum2()
         end
       end 
 
     end
-    findNum()
+    findNum2()
   end
 
   -- Third
   for i,v in ipairs(Board.r3) do 
-    local function findNum()
+    local function findNum3()
       Board.r3[i] = math.random(1,9)
       
       -- Check Row
       for j,k in ipairs(Board.r3) do
         if i ~= j then 
           if Board.r3[i] == Board.r3[j] then
-            findNum()
+            findNum3()
           end
         end
       end
 
       -- Check Col
-      if Board.r3[i] == Board.r1[i] or Board.r3[i] == Board.r2[i] then
-        findNum()
+      if Board.r3[i] == Board.r1[i] or 
+        Board.r3[i] == Board.r2[i] then
+        findNum3()
       end
 
 
@@ -285,24 +286,92 @@ function GR:SudukoSetBoard()
       if tostring(i):match("[123]") then
         if Board.r3[i] == Board.r1[1] or Board.r3[i] == Board.r1[2] or Board.r3[i] == Board.r1[3] or 
           Board.r3[i] == Board.r2[1] or Board.r3[i] == Board.r2[2] or Board.r3[i] == Board.r2[3] then
-          findNum()
+          findNum3()
         end
       end
       if tostring(i):match("[456]") then
         if Board.r3[i] == Board.r1[4] or Board.r3[i] == Board.r1[5] or Board.r3[i] == Board.r1[6] or 
           Board.r3[i] == Board.r2[4] or Board.r3[i] == Board.r2[5] or Board.r3[i] == Board.r2[6] then
-          findNum()
+          findNum3()
         end
       end 
       if tostring(i):match("[789]") then
         if Board.r3[i] == Board.r1[7] or Board.r3[i] == Board.r1[8] or Board.r3[i] == Board.r1[9] or 
           Board.r3[i] == Board.r2[7] or Board.r3[i] == Board.r2[8] or Board.r3[i] == Board.r2[9] then
-          findNum()
+          findNum3()
         end
       end 
 
     end
-    findNum()
+    findNum3()
+  end
+
+  -- Fourth
+  for i,v in ipairs(Board.r4) do 
+    local function findNum4()
+      Board.r4[i] = math.random(1,9)
+      
+      -- Check Row
+      for j,k in ipairs(Board.r4) do
+        if i ~= j then 
+          if Board.r4[i] == Board.r4[j] then
+            findNum4()
+          end
+        end
+      end
+
+      -- Check Col
+      if Board.r4[i] == Board.r1[i] or 
+        Board.r4[i] == Board.r2[i] or
+        Board.r4[i] == Board.r3[i] then
+        findNum4()
+      end
+
+    end
+    findNum4()
+  end
+  
+  -- Fifth
+  for i,v in ipairs(Board.r5) do 
+    local function findNum5()
+      Board.r5[i] = math.random(1,9)
+      
+      -- Row
+      for j,k in ipairs(Board.r5) do
+        if i ~= j then 
+          if Board.r5[i] == Board.r5[j] then
+            findNum5()
+          end
+        end
+      end
+
+      -- Check Col
+      if Board.r5[i] == Board.r1[i] or 
+        Board.r5[i] == Board.r2[i] or
+        Board.r5[i] == Board.r3[i] or
+        Board.r5[i] == Board.r4[i] then
+        findNum5()
+      end
+ 
+      -- Square
+      if tostring(i):match("[123]") then
+        if Board.r5[i] == Board.r4[1] or Board.r5[i] == Board.r4[2] or Board.r5[i] == Board.r4[3] then
+          findNum5()
+        end
+      end
+      if tostring(i):match("[456]") then
+        if Board.r5[i] == Board.r4[4] or Board.r5[i] == Board.r4[5] or Board.r5[i] == Board.r4[6] then
+          findNum5()
+        end
+      end 
+      if tostring(i):match("[789]") then
+        if Board.r5[i] == Board.r4[7] or Board.r5[i] == Board.r4[8] or Board.r5[i] == Board.r4[9] then
+          findNum5()
+        end
+      end 
+
+    end
+    findNum5()
   end
 
   -- Set Text
@@ -319,6 +388,16 @@ function GR:SudukoSetBoard()
   for i,v in ipairs(Board.r3) do
     Grid[i+18].FS:Show()
     Grid[i+18].FS:SetText(v)
+  end
+
+  for i,v in ipairs(Board.r4) do
+    Grid[i+27].FS:Show()
+    Grid[i+27].FS:SetText(v)
+  end
+
+  for i,v in ipairs(Board.r5) do
+    Grid[i+36].FS:Show()
+    Grid[i+36].FS:SetText(v)
   end
 end
 
