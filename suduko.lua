@@ -232,7 +232,11 @@ function GR:SudukoSetBoard()
     for row = 1, 9 do
       for col = 1, 9 do
         if board["r"..row][col] == 0 then
-          for num = 1, 9 do
+          local numList = {1,2,3,4,5,6,7,8,9}
+          for i = 1, 9 do
+            local randIndex = math.random(1, #numList)
+            local num = numList[randIndex]
+            table.remove(numList, randIndex)
             if isValid(board, row, col, num) then
               board["r"..row][col] = num
               if solve(board) then
