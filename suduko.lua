@@ -4,6 +4,7 @@ function GR:CreateSuduko()
   GR.Suduko = {}
   GR.Suduko.CurrTile = nil
   GR.Suduko.Board = {}
+  GR.Suduko.SolvedBoard = {}
   GR.Suduko.Const = {}
   GR.Suduko.Const.NumOfCols = 9
   GR.Suduko.Const.NumOfRows = 9
@@ -13,7 +14,7 @@ function GR:CreateSuduko()
   Main.Suduko:Hide()
 
   GR:CreateSudukoGrid()
-  GR:CreateSudukoBlackLines()
+  GR:CreateSudukoBoardLines()
   GR:SudukoControls()
 
   GR:SizeSuduko()
@@ -62,23 +63,38 @@ function GR:CreateSudukoGrid()
   end
 end
 
-function GR:CreateSudukoBlackLines()
+function GR:CreateSudukoBoardLines()
   local Main = GR_GUI.Main
   local Suduko = Main.Suduko
 
   Suduko.BlackLines = CreateFrame("FRAME", "BlackLines", Suduko)
   local BlackLines = Suduko.BlackLines
   BlackLines:SetAllPoints(Suduko);
-  BlackLines:Raise()
+  BlackLines:SetFrameLevel(4)
 
   BlackLines.VL = BlackLines:CreateLine()
-  BlackLines.VL:SetColorTexture(0,255,255, 1)
+  BlackLines.VL:SetColorTexture(0,0,0, 1)
   BlackLines.VR = BlackLines:CreateLine()
-  BlackLines.VR:SetColorTexture(0,255,255, 1)
+  BlackLines.VR:SetColorTexture(0,0,0, 1)
   BlackLines.HB = BlackLines:CreateLine()
-  BlackLines.HB:SetColorTexture(0,255,255, 1)
+  BlackLines.HB:SetColorTexture(0,0,0, 1)
   BlackLines.HT = BlackLines:CreateLine()
-  BlackLines.HT:SetColorTexture(0,255,255, 1)
+  BlackLines.HT:SetColorTexture(0,0,0, 1)
+
+
+  Suduko.WhiteLines = CreateFrame("FRAME", "WhiteLines", Suduko)
+  local WhiteLines = Suduko.WhiteLines
+  WhiteLines:SetAllPoints(Suduko);
+  WhiteLines:SetFrameLevel(3)
+
+  WhiteLines.VL = WhiteLines:CreateLine()
+  WhiteLines.VL:SetColorTexture(255,255,255, 1)
+  WhiteLines.VR = WhiteLines:CreateLine()
+  WhiteLines.VR:SetColorTexture(255,255,255, 1)
+  WhiteLines.HB = WhiteLines:CreateLine()
+  WhiteLines.HB:SetColorTexture(255,255,255, 1)
+  WhiteLines.HT = WhiteLines:CreateLine()
+  WhiteLines.HT:SetColorTexture(255,255,255, 1)
 end
 
 -- Size
@@ -119,6 +135,7 @@ function GR:SizeSudukoBlackLines()
   local Main = GR_GUI.Main
   local Suduko = Main.Suduko
   local BlackLines = Suduko.BlackLines
+  local WhiteLines = Suduko.WhiteLines
 
   BlackLines.VL:SetThickness(5 * Main.ScreenRatio)
   BlackLines.VR:SetThickness(5 * Main.ScreenRatio)
@@ -132,6 +149,20 @@ function GR:SizeSudukoBlackLines()
   BlackLines.HB:SetEndPoint("BOTTOMRIGHT", -3 * Main.XRatio, GR.Win.Const.SudukoScreenHeight * Main.YRatio /3)
   BlackLines.HT:SetStartPoint("BOTTOMLEFT", 3 * Main.XRatio, (GR.Win.Const.SudukoScreenHeight * Main.YRatio /3) *2)
   BlackLines.HT:SetEndPoint("BOTTOMRIGHT", -3 * Main.XRatio, (GR.Win.Const.SudukoScreenHeight * Main.YRatio /3) *2)
+
+
+  WhiteLines.VL:SetThickness(10 * Main.ScreenRatio)
+  WhiteLines.VR:SetThickness(10 * Main.ScreenRatio)
+  WhiteLines.HB:SetThickness(10 * Main.ScreenRatio)
+  WhiteLines.HT:SetThickness(10 * Main.ScreenRatio)
+  WhiteLines.VL:SetStartPoint("TOPLEFT", GR.Win.Const.SudukoScreenWidth * Main.XRatio /3, -3 * Main.YRatio)
+  WhiteLines.VL:SetEndPoint("BOTTOMLEFT", GR.Win.Const.SudukoScreenWidth * Main.XRatio /3, 3 * Main.YRatio)
+  WhiteLines.VR:SetStartPoint("TOPLEFT", (GR.Win.Const.SudukoScreenWidth * Main.XRatio /3) *2, -3 * Main.YRatio)
+  WhiteLines.VR:SetEndPoint("BOTTOMLEFT", (GR.Win.Const.SudukoScreenWidth * Main.XRatio /3) *2, 3 * Main.YRatio)
+  WhiteLines.HB:SetStartPoint("BOTTOMLEFT", 3 * Main.XRatio, GR.Win.Const.SudukoScreenHeight * Main.YRatio /3)
+  WhiteLines.HB:SetEndPoint("BOTTOMRIGHT", -3 * Main.XRatio, GR.Win.Const.SudukoScreenHeight * Main.YRatio /3)
+  WhiteLines.HT:SetStartPoint("BOTTOMLEFT", 3 * Main.XRatio, (GR.Win.Const.SudukoScreenHeight * Main.YRatio /3) *2)
+  WhiteLines.HT:SetEndPoint("BOTTOMRIGHT", -3 * Main.XRatio, (GR.Win.Const.SudukoScreenHeight * Main.YRatio /3) *2)
 end
 
 -- Func
@@ -253,52 +284,41 @@ function GR:SudukoSetBoard()
   end
 
   solve(Board)
+  GR.Suduko.SolvedBoard = Board
 
-  -- Set Text
-  for i,v in ipairs(Board.r1) do 
-    Grid[i].FS:Show()
-    Grid[i].FS:SetText(v)
+  local function hideTiles(board, grid)
+    print('here')
+    local i = 1
+    while i <= 20 do
+      local randIndex = math.random(0, #grid -1)
+      local col = (randIndex % 9) +1 
+      local row = math.floor(randIndex / 9) +1
+      if board["r"..row][col] ~= 0 then
+        board["r"..row][col] = 0
+        Grid[(row -1) *9 + col].FS:Hide()
+        i = i +1
+      end
+    end
   end
 
-  for i,v in ipairs(Board.r2) do
-    Grid[i+9].FS:Show()
-    Grid[i+9].FS:SetText(v)
+  hideTiles(Board, Grid)
+
+  local function checkHiddenTiles()
+
   end
 
-  for i,v in ipairs(Board.r3) do
-    Grid[i+18].FS:Show()
-    Grid[i+18].FS:SetText(v)
+  -- print tiles
+  for rowIndex = 1, 9 do
+    local row = Board["r" .. rowIndex]
+    for i, v in ipairs(row) do
+      local gridIndex = i + (rowIndex - 1) * 9
+      if v ~= 0 then
+        Grid[gridIndex].FS:Show()
+        Grid[gridIndex].FS:SetText(v)
+      end
+    end
   end
 
-  for i,v in ipairs(Board.r4) do
-    Grid[i+27].FS:Show()
-    Grid[i+27].FS:SetText(v)
-  end
-
-  for i,v in ipairs(Board.r5) do
-    Grid[i+36].FS:Show()
-    Grid[i+36].FS:SetText(v)
-  end
-
-  for i,v in ipairs(Board.r6) do
-    Grid[i+45].FS:Show()
-    Grid[i+45].FS:SetText(v)
-  end
-
-  for i,v in ipairs(Board.r7) do
-    Grid[i+54].FS:Show()
-    Grid[i+54].FS:SetText(v)
-  end
-
-  for i,v in ipairs(Board.r8) do
-    Grid[i+63].FS:Show()
-    Grid[i+63].FS:SetText(v)
-  end
-
-  for i,v in ipairs(Board.r9) do
-    Grid[i+72].FS:Show()
-    Grid[i+72].FS:SetText(v)
-  end
 end
 
 -- Show / Hide
