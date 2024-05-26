@@ -295,7 +295,7 @@ function GR:SudukoSetBoard()
       local row = math.floor(randIndex / 9) +1
       if board["r"..row][col] ~= 0 then
         board["r"..row][col] = 0
-        Grid[(row -1) *9 + col].FS:Hide()
+        grid[(row -1) *9 + col].FS:Hide()
         i = i +1
       end
     end
@@ -303,9 +303,20 @@ function GR:SudukoSetBoard()
 
   hideTiles(Board, Grid)
 
-  local function checkHiddenTiles()
-
+  local function checkHiddenTiles(board)
+    local checkBoard = board
+    for row = 1 , 9 do
+      for col = 1, 9 do
+        if board["r"..row][col] == 0 then
+          for num = 1, 9 do
+            -- isOnlyValid()
+          end
+        end
+      end
+    end
   end
+
+  checkHiddenTiles(Board)
 
   -- print tiles
   for rowIndex = 1, 9 do
