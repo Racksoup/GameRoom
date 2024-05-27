@@ -667,6 +667,21 @@ function ScrollFrame_OnMouseWheel(self, delta)
   self:SetVerticalScroll(newValue);
 end
 
+function GR:deepCopy(orig)
+    local orig_type = type(orig)
+    local copy
+    if orig_type == 'table' then
+        copy = {}
+        for orig_key, orig_value in next, orig, nil do
+            copy[GR:deepCopy(orig_key)] = GR:deepCopy(orig_value)
+        end
+        setmetatable(copy, GR:deepCopy(getmetatable(orig)))
+    else -- number, string, boolean, etc
+        copy = orig
+    end
+    return copy
+end
+
 -- BUGS
 -- guild needs to unregister offline players
 -- show challenge as msg doesn't allow players to accept challenges

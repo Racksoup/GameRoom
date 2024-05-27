@@ -4,7 +4,8 @@ function GR:CreateSuduko()
   GR.Suduko = {}
   GR.Suduko.CurrTile = nil
   GR.Suduko.Board = {}
-  GR.Suduko.SolvedBoard = {}
+  GR.Suduko.SolvedBoard = {}	
+  GR.Suduko.CheckBoard = {}	
   GR.Suduko.Const = {}
   GR.Suduko.Const.NumOfCols = 9
   GR.Suduko.Const.NumOfRows = 9
@@ -225,6 +226,8 @@ end
 
 function GR:SudukoSetBoard()
   local Board = GR.Suduko.Board
+  local SolvedBoard = GR.Suduko.SolvedBoard
+  local CheckBoard = GR.Suduko.CheckBoard
   local Grid = GR_GUI.Main.Suduko.Grid
 
   -- Initialize the board with zeros
@@ -284,12 +287,11 @@ function GR:SudukoSetBoard()
   end
 
   solve(Board)
-  GR.Suduko.SolvedBoard = Board
+  SolvedBoard = GR:deepCopy(Board)
 
   local function hideTiles(board, grid)
-    print('here')
     local i = 1
-    while i <= 20 do
+    while i <= 40 do
       local randIndex = math.random(0, #grid -1)
       local col = (randIndex % 9) +1 
       local row = math.floor(randIndex / 9) +1
@@ -302,23 +304,58 @@ function GR:SudukoSetBoard()
   end
 
   hideTiles(Board, Grid)
+	CheckBoard = GR:deepCopy(Board)
 
   local function checkHiddenTiles(board)
-    local checkBoard = board
     for row = 1 , 9 do
       for col = 1, 9 do
         if board["r"..row][col] == 0 then
+					local numValidNums = 0
+					local validNum = 0
           for num = 1, 9 do
-            -- isOnlyValid()
+						if isValid(board, row, col, num) then
+							numValidNums = numValidNums +1	
+							validNum = num
+						end
           end
+					if numValidNums == 1 then
+						board["r"..row][col] = validNum
+						if checkHiddenTiles(board) then
+							return true
+						end
+					end
         end
       end
     end
+
+		for row = 1, 9 do
+			for col = 1, 9 do
+				if board["r"..row][col] == 0 then
+					return false
+				end
+			end
+		end
+
+		return true
   end
 
-  checkHiddenTiles(Board)
+	local function setHiddenTiles()
+		if not checkHiddenTiles(CheckBoard) then
+			Board = GR:deepCopy(SolvedBoard)
+			hideTiles(Board, Grid)
+			CheckBoard = GR:deepCopy(Board)
+			print('un-solvable :(')
+			setHiddenTiles()
+		end
+	end
 
-  -- print tiles
+	checkHiddenTiles(CheckBoard)
+  
+	setHiddenTiles()
+
+	print('solvable')
+
+	-- print tiles
   for rowIndex = 1, 9 do
     local row = Board["r" .. rowIndex]
     for i, v in ipairs(row) do
@@ -338,9 +375,16 @@ function GR:SudukoShow()
   
   GR:SudukoSetBoard()
 
-  GR_GUI.Main.Suduko:Show()
-end
+  GR_GUI.Main.Suduko:Show() end
 
 function GR:SudukoHide()
   GR_GUI.Main.Suduko:Hide()
-end 
+end
+
+
+-- lock the tiles that have been placed by pc
+-- color tiles player places
+-- check if board == solved board for win
+-- game difficulty
+-- hide controller whenever game hides
+-- highlight tiles that player needs to check against current selected tile
