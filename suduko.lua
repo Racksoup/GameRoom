@@ -348,8 +348,6 @@ function GR:SudukoSetBoard()
 			setHiddenTiles()
 		end
 	end
-
-	checkHiddenTiles(CheckBoard)
   
 	setHiddenTiles()
 
