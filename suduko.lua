@@ -198,6 +198,7 @@ function GR:SudukoControls()
           GR.Suduko.CurrTile.FS:Show()
           GR.Suduko.CurrTile.FS:SetText(key)
 					GR.Suduko.CurrTile.FS:SetTextColor(255,255,0, 1)
+					GR:SudukoCheckWin()
         end
         if (GR.Suduko.CurrTile.insertMode == "marks") then
           GR.Suduko.CurrTile.Pick = nil 
@@ -229,13 +230,10 @@ function GR:SudukoControls()
 end
 
 function GR:SudukoSetBoard()
-  local Board = GR.Suduko.Board
-  local SolvedBoard = GR.Suduko.SolvedBoard
-  local CheckBoard = GR.Suduko.CheckBoard
   local Grid = GR_GUI.Main.Suduko.Grid
 
   -- Initialize the board with zeros
-  Board = {
+  GR.Suduko.Board = {
     r1 = {0, 0, 0, 0, 0, 0, 0, 0, 0},
     r2 = {0, 0, 0, 0, 0, 0, 0, 0, 0},
     r3 = {0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -290,8 +288,8 @@ function GR:SudukoSetBoard()
     return true
   end
 
-  solve(Board)
-  SolvedBoard = GR:deepCopy(Board)
+  solve(GR.Suduko.Board)
+  GR.Suduko.SolvedBoard = GR:deepCopy(GR.Suduko.Board)
 
   local function hideTiles(board, grid)
     local i = 1
@@ -315,8 +313,8 @@ function GR:SudukoSetBoard()
     end
   end
 
-  hideTiles(Board, Grid)
-	CheckBoard = GR:deepCopy(Board)
+  hideTiles(GR.Suduko.Board, Grid)
+	GR.Suduko.CheckBoard = GR:deepCopy(GR.Suduko.Board)
 
   local function checkHiddenTiles(board)
     for row = 1 , 9 do
@@ -352,10 +350,10 @@ function GR:SudukoSetBoard()
   end
 
 	local function setHiddenTiles()
-		if not checkHiddenTiles(CheckBoard) then
-			Board = GR:deepCopy(SolvedBoard)
-			hideTiles(Board, Grid)
-			CheckBoard = GR:deepCopy(Board)
+		if not checkHiddenTiles(GR.Suduko.CheckBoard) then
+			GR.Suduko.Board = GR:deepCopy(GR.Suduko.SolvedBoard)
+			hideTiles(GR.Suduko.Board, Grid)
+			GR.Suduko.CheckBoard = GR:deepCopy(GR.Suduko.Board)
 			print('un-solvable :(')
 			setHiddenTiles()
 		end
@@ -367,7 +365,7 @@ function GR:SudukoSetBoard()
 
 	-- print tiles
   for rowIndex = 1, 9 do
-    local row = Board["r" .. rowIndex]
+    local row = GR.Suduko.Board["r" .. rowIndex]
     for i, v in ipairs(row) do
       local gridIndex = i + (rowIndex - 1) * 9
 			Grid[gridIndex].Changeable = true
@@ -379,7 +377,24 @@ function GR:SudukoSetBoard()
       end
     end
   end
+end
 
+function GR:SudukoCheckWin()
+	local count = 0
+	for row = 1, 9 do
+		for col = 1, 9 do
+			if GR.Suduko.Board["r"..row][col] == GR.Suduko.SolvedBoard["r"..row][col] then
+				count = count +1	
+			end
+		end
+	end
+
+	print(count)
+	if count == 81 then
+		GR_GUI.Main.HeaderInfo.Solo.GameOverFS:SetText("SOLVED!")
+		GR_GUI.Main.HeaderInfo.Solo.GameOverFS:SetTextColor(0,255,0, 1)
+		GR_GUI.Main.HeaderInfo.Solo.GameOverFS:Show()
+	end
 end
 
 -- Show / Hide
@@ -409,3 +424,4 @@ end
 
 -- check if board == solved board for win
 -- highlight tiles that player needs to check against current selected tile
+-- unselect tile after placement
