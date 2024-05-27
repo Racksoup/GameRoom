@@ -36,6 +36,7 @@ function GR:CreateSudukoGrid()
       Tile.insertMode = nil
       Tile.Marks = {}
       Tile.Pick = nil
+			Tile.Changeable = true
       Tile.Tex = Tile:CreateTexture()
       Tile.Tex:SetAllPoints(Tile)
       Tile.Tex:Hide()
@@ -48,17 +49,19 @@ function GR:CreateSudukoGrid()
         GR:HideTiles()
         GR.Suduko.CurrTile = self
         Suduko.Controls:Show()
-        if (button == "LeftButton") then
-          Tile.insertMode = "pick"
-          Tile.Tex:Show()
-          Tile.Tex:SetColorTexture(255,0,0, .2)
-        end
-        
-        if (button == "RightButton") then
-          Tile.insertMode = "marks"
-          Tile.Tex:Show()
-          Tile.Tex:SetColorTexture(255,255,255, .2)
-        end
+				if self.Changeable then
+					if (button == "LeftButton") then
+						Tile.insertMode = "pick"
+						Tile.Tex:Show()
+						Tile.Tex:SetColorTexture(255,0,0, .2)
+					end
+					
+					if (button == "RightButton") then
+						Tile.insertMode = "marks"
+						Tile.Tex:Show()
+						Tile.Tex:SetColorTexture(255,255,255, .2)
+					end
+				end
       end)
     end
   end
@@ -292,7 +295,15 @@ function GR:SudukoSetBoard()
 
   local function hideTiles(board, grid)
     local i = 1
-    while i <= 40 do
+		local numToHide = 20
+		if GR.GameDifficulty == "easy" then
+			numToHide = 20
+		elseif GR.GameDifficulty == "med" then
+			numToHide = 30
+		elseif GR.GameDifficulty == "hard" then
+			numToHide = 40
+		end
+    while i <= numToHide do
       local randIndex = math.random(0, #grid -1)
       local col = (randIndex % 9) +1 
       local row = math.floor(randIndex / 9) +1
@@ -359,7 +370,9 @@ function GR:SudukoSetBoard()
     local row = Board["r" .. rowIndex]
     for i, v in ipairs(row) do
       local gridIndex = i + (rowIndex - 1) * 9
+			Grid[gridIndex].Changeable = true
       if v ~= 0 then
+				Grid[gridIndex].Changeable = false
         Grid[gridIndex].FS:Show()
         Grid[gridIndex].FS:SetText(v)
         Grid[gridIndex].FS:SetTextColor(255,255,255, 1)
@@ -371,19 +384,28 @@ end
 
 -- Show / Hide
 function GR:SudukoShow()
+	local Solo = GR_GUI.Main.HeaderInfo.Solo
+
   GR:SizeSuduko()  
-  
+	
+	GR_GUI.Main.HeaderInfo:Show()
+	Solo:Show()
+	Solo.Difficulty:Show()
+	Solo.Difficulty.Easy:Show()
+	Solo.Difficulty.Med:Show()
+  Solo.Difficulty.Hard:Show()
+
+	GR.GameDifficulty = "easy"
   GR:SudukoSetBoard()
 
-  GR_GUI.Main.Suduko:Show() end
+  GR_GUI.Main.Suduko:Show()
+end
 
 function GR:SudukoHide()
+	GR.GameDifficulty = "easy"
   GR_GUI.Main.Suduko:Hide()
 end
 
 
--- lock the tiles that have been placed by pc
 -- check if board == solved board for win
--- game difficulty
--- hide controller whenever game hides
 -- highlight tiles that player needs to check against current selected tile

@@ -78,6 +78,7 @@ function GR:OnInitialize()
   GR.IsChallenged = false
   GR.PlayerName = UnitName("player")
   GR.ChannelNumber = nil
+	GR.GameDifficulty = "easy"
 
   -- Retail or Classic
   version, build, datex, tocversion = GetBuildInfo()

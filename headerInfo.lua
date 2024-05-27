@@ -123,6 +123,7 @@ function GR:CreateHeaderSoloGames()
   Solo.OnState = "Stop"
 
   GR:CreateHeaderSoloStartStop()
+	GR:CreateHeaderSoloDifficultyButtons()
 
   -- Timer
   Solo.Timer = Solo:CreateFontString(nil, "ARTWORK", "GameTooltipText")
@@ -145,6 +146,37 @@ function GR:CreateHeaderSoloGames()
   Solo.Info:SetTextColor(1,1,1, 1)
 
   Solo:Hide()
+end
+
+function GR:CreateHeaderSoloDifficultyButtons()
+  local Solo = GR_GUI.Main.HeaderInfo.Solo
+
+	Solo.Difficulty = CreateFrame("Frame", "Difficulty", Solo)
+	local D = Solo.Difficulty
+	D.Easy = CreateFrame("Button", "Easy", D, "UIPanelButtonTemplate")
+	D.Easy:SetText('Easy')
+	D.Easy:SetScript("OnClick", function(self, button, down)
+		if (button == "LeftButton" and down == false) then
+			GR.GameDifficulty = "easy"
+			GR:SudukoSetBoard()
+		end
+	end)
+	D.Med = CreateFrame("Button", "Med", D, "UIPanelButtonTemplate")
+	D.Med:SetText('Med')
+	D.Med:SetScript("OnClick", function(self, button, down)
+		if (button == "LeftButton" and down == false) then
+			GR.GameDifficulty = "med"
+			GR:SudukoSetBoard()
+		end
+	end)
+	D.Hard = CreateFrame("Button", "Hard", D, "UIPanelButtonTemplate")
+	D.Hard:SetText('Hard')
+	D.Hard:SetScript("OnClick", function(self, button, down)
+		if (button == "LeftButton" and down == false) then
+			GR.GameDifficulty = "hard"
+			GR:SudukoSetBoard()
+		end
+	end)
 end
 
 function GR:CreateHeaderSoloStartStop()
@@ -270,6 +302,7 @@ function GR:SizeHeaderSoloGames()
   local Solo = Main.HeaderInfo.Solo
 
   GR:SizeHeaderSoloStartStop()
+	GR:SizeHeaderSoloDifficultyButtons()
 
   if (GR.GameType == "Suika") then
     Solo.Timer:SetPoint("BOTTOM", -70 * Main.XRatio, 0 * Main.YRatio)
@@ -284,6 +317,20 @@ function GR:SizeHeaderSoloGames()
   Solo.PointsFS:SetTextScale(2 * Main.ScreenRatio)
   Solo.GameOverFS:SetTextScale(3.7 * Main.ScreenRatio)
   Solo.Info:SetTextScale(1 * Main.ScreenRatio)
+end
+
+function GR:SizeHeaderSoloDifficultyButtons()
+	local Main = GR_GUI.Main
+	local D = Main.HeaderInfo.Solo.Difficulty
+	
+	D:SetSize(150, 45)
+	D:SetPoint("BOTTOMLEFT", 20, 3)
+	D.Easy:SetSize(45, 20)
+	D.Easy:SetPoint("BOTTOMLEFT")
+	D.Med:SetSize(45, 20)
+	D.Med:SetPoint("BOTTOM")
+	D.Hard:SetSize(45, 20)
+	D.Hard:SetPoint("BOTTOMRIGHT")
 end
 
 function GR:SizeHeaderSoloStartStop()
@@ -358,6 +405,10 @@ function GR:ResetHeader()
   Header.Solo.Start:Hide()
   Header.Solo.Stopx:Hide()
   Header.Solo.Pausex:Hide()
+	Header.Solo.Difficulty.Easy:Hide()
+	Header.Solo.Difficulty.Med:Hide()
+	Header.Solo.Difficulty.Hard:Hide()
+	Header.Solo.Difficulty:Hide()
   Header.Solo:Hide()
   Header.Multi.TurnString:Hide()
   Header.Multi.OpponentString:Hide()
