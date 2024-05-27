@@ -194,6 +194,7 @@ function GR:SudukoControls()
           GR.Suduko.CurrTile.MarksFS:Hide()
           GR.Suduko.CurrTile.FS:Show()
           GR.Suduko.CurrTile.FS:SetText(key)
+					GR.Suduko.CurrTile.FS:SetTextColor(255,255,0, 1)
         end
         if (GR.Suduko.CurrTile.insertMode == "marks") then
           GR.Suduko.CurrTile.Pick = nil 
@@ -361,6 +362,7 @@ function GR:SudukoSetBoard()
       if v ~= 0 then
         Grid[gridIndex].FS:Show()
         Grid[gridIndex].FS:SetText(v)
+        Grid[gridIndex].FS:SetTextColor(255,255,255, 1)
       end
     end
   end
@@ -381,7 +383,6 @@ end
 
 
 -- lock the tiles that have been placed by pc
--- color tiles player places
 -- check if board == solved board for win
 -- game difficulty
 -- hide controller whenever game hides
