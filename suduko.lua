@@ -37,6 +37,7 @@ function GR:CreateSudukoGrid()
       Tile.Marks = {}
       Tile.Pick = nil
 			Tile.Changeable = true
+			Tile.Pos = { Row = i, Col = j }
       Tile.Tex = Tile:CreateTexture()
       Tile.Tex:SetAllPoints(Tile)
       Tile.Tex:Hide()
@@ -193,6 +194,7 @@ function GR:SudukoControls()
     if GR.Suduko.CurrTile ~= nil then
       if key:match("[123456789]") then
         if (GR.Suduko.CurrTile.insertMode == "pick") then
+					GR.Suduko.Board["r"..GR.Suduko.CurrTile.Pos.Row][GR.Suduko.CurrTile.Pos.Col] = tonumber(key)
           GR.Suduko.CurrTile.Pick = key
           GR.Suduko.CurrTile.MarksFS:Hide()
           GR.Suduko.CurrTile.FS:Show()
@@ -386,6 +388,7 @@ function GR:SudukoCheckWin()
 			if GR.Suduko.Board["r"..row][col] == GR.Suduko.SolvedBoard["r"..row][col] then
 				count = count +1	
 			end
+			print(GR.Suduko.Board["r"..row][col], GR.Suduko.SolvedBoard["r"..row][col])
 		end
 	end
 
@@ -405,6 +408,8 @@ function GR:SudukoShow()
 	
 	GR_GUI.Main.HeaderInfo:Show()
 	Solo:Show()
+	Solo.Info:Show()
+	Solo.Info:SetText("Place Tile: Click Tile then 1-9 Key. Backspace Clear Selection")
 	Solo.Difficulty:Show()
 	Solo.Difficulty.Easy:Show()
 	Solo.Difficulty.Med:Show()
@@ -422,6 +427,4 @@ function GR:SudukoHide()
 end
 
 
--- check if board == solved board for win
 -- highlight tiles that player needs to check against current selected tile
--- unselect tile after placement

@@ -115,6 +115,7 @@ end
 
 function GR:CreateHeaderSoloGames()
   local HeaderInfo = GR_GUI.Main.HeaderInfo
+	HeaderInfo:Raise()
 
   -- Solo Frame
   HeaderInfo.Solo = CreateFrame("Frame", "Solo", HeaderInfo)
@@ -246,7 +247,7 @@ function GR:SizeHeaderInfo()
       height = 47 * (Main.YRatio * 1.13)
     end
   end
-  HeaderInfo:SetSize(Main:GetWidth(), height)
+  HeaderInfo:SetSize(Main:GetWidth() - 25 * Main.XRatio, height)
   
   -- Exit Button
   local ExitBtn = HeaderInfo.ExitBtn
@@ -312,7 +313,7 @@ function GR:SizeHeaderSoloGames()
     Solo.PointsFS:SetPoint("BOTTOM", 180 * Main.XRatio, 0 * Main.YRatio)
   end
   Solo.GameOverFS:SetPoint("TOP", 0, -160 * Main.YRatio)
-  Solo.Info:SetPoint("TOPLEFT", 100 * Main.XRatio, 0 * Main.YRatio)
+  Solo.Info:SetPoint("TOPLEFT", 0 * Main.XRatio, 0 * Main.YRatio)
   Solo.Timer:SetTextScale(2 * Main.ScreenRatio)
   Solo.PointsFS:SetTextScale(2 * Main.ScreenRatio)
   Solo.GameOverFS:SetTextScale(3.7 * Main.ScreenRatio)
@@ -323,13 +324,13 @@ function GR:SizeHeaderSoloDifficultyButtons()
 	local Main = GR_GUI.Main
 	local D = Main.HeaderInfo.Solo.Difficulty
 	
-	D:SetSize(150, 45)
-	D:SetPoint("BOTTOMLEFT", 20, 3)
-	D.Easy:SetSize(45, 20)
+	D:SetSize(150 * Main.XRatio, 45 * Main.YRatio)
+	D:SetPoint("BOTTOMLEFT", 10 * Main.XRatio, 3 * Main.YRatio)
+	D.Easy:SetSize(45 * Main.XRatio, 20 * Main.YRatio)
 	D.Easy:SetPoint("BOTTOMLEFT")
-	D.Med:SetSize(45, 20)
+	D.Med:SetSize(45 * Main.XRatio, 20 * Main.YRatio)
 	D.Med:SetPoint("BOTTOM")
-	D.Hard:SetSize(45, 20)
+	D.Hard:SetSize(45 * Main.XRatio, 20 * Main.YRatio)
 	D.Hard:SetPoint("BOTTOMRIGHT")
 end
 
