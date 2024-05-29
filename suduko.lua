@@ -356,14 +356,11 @@ function GR:SudukoSetBoard()
 			GR.Suduko.Board = GR:deepCopy(GR.Suduko.SolvedBoard)
 			hideTiles(GR.Suduko.Board, Grid)
 			GR.Suduko.CheckBoard = GR:deepCopy(GR.Suduko.Board)
-			print('un-solvable :(')
 			setHiddenTiles()
 		end
 	end
   
 	setHiddenTiles()
-
-	print('solvable')
 
 	-- print tiles
   for rowIndex = 1, 9 do
@@ -388,11 +385,9 @@ function GR:SudukoCheckWin()
 			if GR.Suduko.Board["r"..row][col] == GR.Suduko.SolvedBoard["r"..row][col] then
 				count = count +1	
 			end
-			print(GR.Suduko.Board["r"..row][col], GR.Suduko.SolvedBoard["r"..row][col])
 		end
 	end
 
-	print(count)
 	if count == 81 then
 		GR_GUI.Main.HeaderInfo.Solo.GameOverFS:SetText("SOLVED!")
 		GR_GUI.Main.HeaderInfo.Solo.GameOverFS:SetTextColor(0,255,0, 1)

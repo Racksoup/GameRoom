@@ -57,7 +57,12 @@ function GR:CreateRegister()
     
     -- removes offline friends
     if (event == "FRIENDLIST_UPDATE" or event == "BN_FRIEND_INFO_CHANGED") then
-      GR:RemoveDisconnectedFromFriendsList()
+      -- Ensure 'self' is valid and method exists
+		if GR and GR.RemoveDisconnectedFromFriendsList then
+				GR:RemoveDisconnectedFromFriendsList()
+		else
+				print("Error: self or RemoveDisconnectedFromFriendsList is nil")
+			end
       GR:RefreshFriendsListUI()
     end
       
