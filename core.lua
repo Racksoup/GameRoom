@@ -705,5 +705,5 @@ end
 -- rematch button
 -- rival message/response to register/unregister online/offline rivals
 -- maybe maybe... comms through bnet for cross-server games with bnet friends (while out of party/raid)
-
-  
+ 
+-- update curseforge pictures

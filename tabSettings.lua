@@ -722,3 +722,5 @@ function GR:ToggleSettingsListTab()
     active(tabs.RivalsBtn)
   end
 end
+
+-- background non-transparent black option

@@ -422,9 +422,6 @@ function GR:SudukoHide()
 end
 
 
--- darker color
--- easy med hard button text scale
--- header size a bit better
--- background non-transparent black option
+-- orange for player placed tiles
 -- game end text higher
 -- highlight tiles that player needs to check against current selected tile

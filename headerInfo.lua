@@ -474,3 +474,6 @@ function GR:HeaderSoloUnpause()
     GR:AsteroidsUnPauseGame()
   end
 end
+
+-- easy med hard button text scale
+-- header size a bit better
