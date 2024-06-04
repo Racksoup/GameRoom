@@ -337,3 +337,5 @@ end
 function GR:MinesweepersHide()
   GR_GUI.Main.Minesweepers:Hide()
 end
+
+-- easy med hard mode
