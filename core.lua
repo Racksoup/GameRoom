@@ -689,17 +689,18 @@ end
 -- rivals spams 
 
 -- GAMES
--- chess
--- pac-man
--- suduko
--- tetris
--- bejeweled
--- galaga
--- frogger
--- pin-ball macheine
+-- nonograms
+-- maze puzzles
+-- 2048
+-- tents puzzle
 -- tower defense
 -- boat launch game (like angry birds  but you shoot the boat then they shoot you)
--- heli attack 3 (or something similar thats generated where you shoot targets, dodge attacks, get power ups)
+-- chess
+-- bejeweled
+-- frogger
+-- tetris
+-- pac-man
+-- galaga
 
 -- FUNCTIONS
 -- rematch button
