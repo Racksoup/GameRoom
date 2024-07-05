@@ -47,9 +47,10 @@ function GR:CreateSudukoGrid()
       Tile.MarksFS:Hide()
       Tile:RegisterForClicks("LeftButtonDown", "RightButtonDown")
       Tile:SetScript("OnClick", function(self, button, down)
-        GR:HideTiles()
-        GR.Suduko.CurrTile = self
-        Suduko.Controls:Show()
+			local function clickActivate() 
+				GR:HideTiles()
+				GR.Suduko.CurrTile = self
+				Suduko.Controls:Show()
 				if self.Changeable then
 					if (button == "LeftButton") then
 						Tile.insertMode = "pick"
@@ -63,7 +64,22 @@ function GR:CreateSudukoGrid()
 						Tile.Tex:SetColorTexture(255,255,255, .2)
 					end
 				end
-      end)
+			end
+
+				
+				if (GR.Suduko.CurrTile ~= nil and GR.Suduko.CurrTile.Pos.Row == self.Pos.Row and GR.Suduko.CurrTile.Pos.Col == self.Pos.Col) then 
+					if (GR.Suduko.CurrTile.insertMode == "pick" and button == "LeftButton" or GR.Suduko.CurrTile.insertMode == "marks" and button == "RightButton") then
+						GR.Suduko.CurrTile = nil
+						Tile.Tex:Hide()
+						Suduko.Controls:Hide()
+					else 
+						clickActivate()
+					end
+				else
+				 clickActivate()
+				end
+
+			end)
     end
   end
 end
@@ -418,6 +434,7 @@ end
 
 function GR:SudukoHide()
 	GR.GameDifficulty = "easy"
+	GR_GUI.Main.Suduko.Controls:Hide()
   GR_GUI.Main.Suduko:Hide()
 end
 
